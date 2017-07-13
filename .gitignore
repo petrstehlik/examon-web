@@ -90,6 +90,7 @@ ENV/
 .ropeproject
 
 *.swp
+*.swo
 .DS_Store
 
 # Angular JS and webdev
