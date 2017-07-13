@@ -1,0 +1,3 @@
+[submodule "libs/pyKairosDB"]
+	path = libs/pyKairosDB
+	url = https://github.com/fbeneventi/pyKairosDB.git
