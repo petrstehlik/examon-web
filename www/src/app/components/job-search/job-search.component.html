@@ -1,11 +1,13 @@
-<form (ngSubmit)="searchJob()" class="container-fluid">
+<ex-navbar></ex-navbar>
+
+<!--form (ngSubmit)="searchJob()" class="container-fluid">
     <div class="form-group row">
         <label class="col-2 col-form-label">Search for a job:</label>
 
         <input type="text" [(ngModel)]="job.id" name="jobid" class="form-control col-md-6 mr-2">
         <button type="submit" class="btn btn-primary col">Search</button>
     </div>
-</form>
+</form-->
 
 <div class="alert alert-danger" *ngIf="error.status">
     {{ error.message }}
