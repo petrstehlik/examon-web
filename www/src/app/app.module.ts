@@ -12,13 +12,15 @@ import { AppComponent } from './app.component';
 import { NullComponent } from './components/null/null.component';
 import { JobSearchComponent } from './components/job-search/job-search.component';
 import { JobsLookupComponent } from './components/jobs-lookup/jobs-lookup.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NullComponent,
     JobSearchComponent,
-    JobsLookupComponent
+    JobsLookupComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
