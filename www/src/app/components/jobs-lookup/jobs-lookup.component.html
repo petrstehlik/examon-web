@@ -1,0 +1,9 @@
+<div class="container-fluid">
+    <form class="form-group row">
+        <label class="col-2 col-form-label">Search for a job:</label>
+
+        <input type="text" [(ngModel)]="jobid" name="jobid" class="form-control col-md-6 mr-2">
+        <a [routerLink]="['jobs', jobid]" class="btn btn-primary col">Search</a>
+    </form>
+</div>
+

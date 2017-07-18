@@ -1,7 +1,119 @@
-<h2>
-    Search for a job
-</h2>
+<form (ngSubmit)="searchJob()" class="container-fluid">
+    <div class="form-group row">
+        <label class="col-2 col-form-label">Search for a job:</label>
 
-<input type="text" [(ngModel)]="job.id" name="jobid" class="form-control">
+        <input type="text" [(ngModel)]="job.id" name="jobid" class="form-control col-md-6 mr-2">
+        <button type="submit" class="btn btn-primary col">Search</button>
+    </div>
+</form>
 
-{{ job | json }}
+<div class="alert alert-danger" *ngIf="error.status">
+    {{ error.message }}
+</div>
+<section class="job-info" *ngIf="job.loaded">
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-block">
+                Job ID: {{ job.data.job_id }} |
+                User ID: {{ job.data.user_id }} |
+                Account name: {{ job.data.account_name }} |
+                Project: {{ job.data.project }} |
+                Job Name: {{ job.data.job_name }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card time">
+            <div class="card-block">
+            <h4 class="card-title">Times</h4>
+            <p><small>Duration:</small> <span *ngIf="duration.days">{{ duration.days }} days</span>
+                    <span *ngIf="duration.hours">{{ duration.hours }} hours</span>
+                    <span *ngIf="duration.minutes">{{ duration.minutes }} mins</span>
+                    <span *ngIf="duration.seconds">{{ duration.seconds }} secs</span></p>
+
+            <p><small>Queue time:</small> {{ job.data.backup_qtime | date:'hh:mm:ss dd/MM/yy' }}</p>
+            <p><small>Start time:</small> {{ job.data.start_time | date:'hh:mm:ss dd/MM/yy' }}</p>
+            <p><small>End time:</small> {{ job.data.end_time | date:'hh:mm:ss dd/MM/yy' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card varlist">
+            <div class="card-block">
+                <h4 class="card-title">Variables list</h4>
+                <textarea class="form-control" disabled>{{ job.data.var_list }}</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Memory</small>
+                <h5>{{ job.data.mem_req | number }} MB</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Time</small>
+                <h5>{{ job.data.req_time | number }} s</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">GPUs</small>
+                <h5>{{ job.data.ngpus_req | number }}</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">MICs</small>
+                <h5>{{ job.data.nmics_req | number }}</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Nodes</small>
+                <h5>{{ job.data.nnodes_req | number }}</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">CPUs</small>
+                <h5>{{ job.data.ncpus_req | number }}</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">MPI Processes</small>
+                <h5>{{ job.data.mpiprocs | number }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
