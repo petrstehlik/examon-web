@@ -9,6 +9,19 @@ conn = connect(server = config["kairosdb"].get("server"),
         user = config["kairosdb"].get("user"),
         passw = config["kairosdb"].get("password"))
 
+base_query = {
+            "start_absolute" : 0,
+            "end_absolute" : 0,
+            "metrics" : [
+                    {
+                        "tags" : {
+                            "org" : ["cineca"],
+                            "cluster" : ["galileo"]
+                        }
+                    }
+                ]
+        }
+
 def generate_health_url():
     return("{0}://{1}:{2}/api/v1/health".format(conn.schema, conn.server, conn.port))
 
