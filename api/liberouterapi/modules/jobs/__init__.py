@@ -9,6 +9,11 @@ from cassandra.query import dict_factory
 import json
 import calendar, datetime
 
+from cassandra_connector import connect, prepare_statements
+
+session = connect()
+prepared = prepare_statements(session)
+
 def default(obj):
     """Default JSON serializer."""
 
@@ -22,13 +27,6 @@ def default(obj):
         return millis
     raise TypeError('Not sure how to serialize %s' % (obj,))
 
-auth = PlainTextAuthProvider(username="petr", password="e55Z958!")
-cluster = Cluster(contact_points=(["137.204.213.225"]), auth_provider = auth)
-session = cluster.connect("cineca")
-session.row_factory = dict_factory
-
-prepared = dict()
-prepared["sel_by_job_id"] = session.prepare("SELECT * FROM galileo_jobs_simplekey WHERE job_id = ? LIMIT 1")
 
 jobs = Blueprint('jobs', __name__, url_prefix = '/jobs')
 
