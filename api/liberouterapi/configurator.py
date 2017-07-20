@@ -43,8 +43,7 @@ class Config(object):
         self.config.read(args['config'])
 
         # Check if config was loaded successfully, api section must be there
-        print(self.config)
-            #    log.error("Missing config file")
+        # log.error("Missing config file")
 
         self.DEBUG = self.config["api"].getboolean("debug")
         self.HOST = self.config.get("api", "host")
