@@ -5,11 +5,14 @@ from getpass import getpass
 from flask import request, Blueprint
 from bson import json_util
 
-from liberouterapi import app, config
+from liberouterapi import app
+from .configurator import Config
 from .modules.module import Module
 from .error import ApiException
 from .dbConnector import dbConnector
 from .Auth import Auth
+
+config = Config()
 
 def routes():
     """
