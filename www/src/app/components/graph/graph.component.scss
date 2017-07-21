@@ -1,0 +1,24 @@
+.chart {
+    position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        min-height: 250px;
+    }
+
+.chart-wrapper {
+    position: relative;
+    display: block;
+    min-height: 250px;
+}
+
+.labels {
+    border: 1px solid darken(#FFF, 10%);
+    border-radius: 2px;
+    position: fixed;
+    background: #FFF;
+    padding: 0.5em;
+    font-size: 0.75em;
+    display: none;
+}
