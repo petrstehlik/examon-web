@@ -85,3 +85,7 @@ def jobs_hello(jobid):
     res[0]['ctime'] = calendar.timegm(res[0]['ctime'].timetuple()) * 1000
     return(json.dumps(res[0], default=default))
 
+@jobs.route('/latest')
+def jobs_latest():
+    res = session.execute(prepared["latest_job"])
+    return(json.dumps(res[0], default=default))
