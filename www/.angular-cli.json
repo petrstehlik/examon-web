@@ -20,9 +20,12 @@
       "prefix": "ex",
       "styles": [
         "styles.css",
-        "../node_modules/bootstrap/dist/css/bootstrap.min.css"
+        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "../node_modules/dygraphs/dist/dygraph.css"
       ],
-      "scripts": [],
+      "scripts": [
+        "../node_modules/dygraphs/dist/dygraph.js"
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
