@@ -13,6 +13,8 @@ import { NullComponent } from './components/null/null.component';
 import { JobSearchComponent } from './components/job-search/job-search.component';
 import { JobsLookupComponent } from './components/jobs-lookup/jobs-lookup.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { GraphComponent } from './components/graph/graph.component';
+import { GeneralPublicViewComponent } from './components/general-public-view/general-public-view.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +22,9 @@ import { NavbarComponent } from './components/navbar/navbar.component';
     NullComponent,
     JobSearchComponent,
     JobsLookupComponent,
-    NavbarComponent
+    NavbarComponent,
+    GraphComponent,
+    GeneralPublicViewComponent
   ],
   imports: [
     BrowserModule,

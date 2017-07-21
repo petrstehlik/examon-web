@@ -1,4 +1,4 @@
-import { JobSearchComponent, JobsLookupComponent } from './components';
+import { JobSearchComponent, JobsLookupComponent, GeneralPublicViewComponent } from './components';
 import { NullComponent } from './components';
 
 export const appRoutes = [
@@ -11,7 +11,12 @@ export const appRoutes = [
         component : JobSearchComponent
     },
     {
+        path : 'public',
+        component : GeneralPublicViewComponent
+    },
+
+    {
         path : '**',
         component : NullComponent
-    }
+    },
 ]
