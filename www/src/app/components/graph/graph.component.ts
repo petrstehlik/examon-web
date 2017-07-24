@@ -32,6 +32,7 @@ export class GraphComponent implements OnInit {
         this.http.get('/api/kairos/basic').subscribe(
             data => {
                 this.data = data;
+                console.log(this.data)
 
                 let values = this.extractData(this.data);
                 let plot_data = [];
@@ -53,7 +54,8 @@ export class GraphComponent implements OnInit {
                 let labels = ["Time"]
 
                 for (var i = 0; i < point.length; i++) {
-                    labels.push(point[i]["group_by"][0]["group"]["core"])
+                labels.push(point[i]["group_by"][0]["group"]["node"] + "/" +
+                    point[i]["group_by"][0]["group"]["core"])
                 }
 
                 this.graphRef = new Dygraph(this.chart.nativeElement, plot_data, {
@@ -67,6 +69,9 @@ export class GraphComponent implements OnInit {
                     highlightCallback : this.moveLabel,
                     gridLineColor : "rgb(242, 242, 242)"
                 });
+
+                console.log(plot_data);
+                console.log(labels);
             });
     }
 
