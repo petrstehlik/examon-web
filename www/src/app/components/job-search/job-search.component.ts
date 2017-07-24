@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 import { Job } from 'app/interfaces';
 
@@ -24,7 +25,8 @@ export class JobSearchComponent implements OnInit {
     };
 
     constructor(private http: HttpClient,
-                private router : ActivatedRoute) { }
+        private router : ActivatedRoute,
+        private modal: NgbModal) { }
 
     ngOnInit() {
         this.router.params.subscribe(params => {
