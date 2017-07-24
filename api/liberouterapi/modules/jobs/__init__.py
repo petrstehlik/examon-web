@@ -30,6 +30,12 @@ def default(obj):
 
 jobs = Blueprint('jobs', __name__, url_prefix = '/jobs')
 
+def split_list(values, delim = ","):
+    """
+    Remove all whitespaces and split by delimiter
+    """
+    return values.replace(" ", "").split(delim)
+
 def asoc_node_core(cores, nodes):
     """
     Associate nodes with theirs cores
@@ -42,12 +48,6 @@ def asoc_node_core(cores, nodes):
         commna separated list with the number of items as in cores list for nodes
     """
     asoc_nodes = list()
-
-    def split_list(values, delim = ","):
-        """
-        Remove all whitespaces and split by delimiter
-        """
-        return values.replace(" ", "").split(delim)
 
     nodes_list = split_list(nodes)
     cores_list = split_list(cores, delim="#")
@@ -74,6 +74,7 @@ def jobs_hello(jobid):
 
     try:
         res[0]["asoc_nodes"] = asoc_node_core(res[0]["used_cores"], res[0]["vnode_list"])
+        res[0]["vars"] = split_list(res[0]["var_list"])
     except Exception as e:
         return(json.dumps({
                 "message" : str(e),
