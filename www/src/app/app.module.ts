@@ -10,7 +10,7 @@ import { appRoutes } from './app.routes';
 
 import { AppComponent } from './app.component';
 import { NullComponent } from './components/null/null.component';
-import { JobSearchComponent } from './components/job-search/job-search.component';
+import { JobInfoComponent } from './components';
 import { JobsLookupComponent } from './components/jobs-lookup/jobs-lookup.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { GraphComponent } from './components/graph/graph.component';
@@ -20,7 +20,7 @@ import { GeneralPublicViewComponent } from './components/general-public-view/gen
   declarations: [
     AppComponent,
     NullComponent,
-    JobSearchComponent,
+    JobInfoComponent,
     JobsLookupComponent,
     NavbarComponent,
     GraphComponent,

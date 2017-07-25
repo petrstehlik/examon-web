@@ -1,18 +1,13 @@
-<ex-navbar></ex-navbar>
-
-<div class="alert alert-danger" *ngIf="error.status">
-    {{ error.message }}
-</div>
-<section class="job-info" *ngIf="job.loaded">
+<section class="job-info" *ngIf="job?.loaded">
 <div class="row mb-3">
     <div class="col-md-12">
         <div class="card">
             <div class="card-block">
-                Job ID: {{ job.data.job_id }} |
-                User ID: {{ job.data.user_id }} |
-                Account name: {{ job.data.account_name }} |
-                Project: {{ job.data.project }} |
-                Job Name: {{ job.data.job_name }}
+                Job ID: {{ job?.data?.job_id }} |
+                User ID: {{ job?.data?.user_id }} |
+                Account name: {{ job?.data?.account_name }} |
+                Project: {{ job?.data?.project }} |
+                Job Name: {{ job?.data?.job_name }}
             </div>
         </div>
     </div>
@@ -25,12 +20,24 @@
             <h4 class="card-title">Times</h4>
             <p>
                 <small>Duration: </small>
-                    <span *ngIf="duration.days">{{ duration.days }} days</span>
-                    <span *ngIf="duration.hours">{{ duration.hours }} hours</span>
-                    <span *ngIf="duration.minutes">{{ duration.minutes }} mins</span>
-                    <span *ngIf="duration.seconds">{{ duration.seconds }} secs</span></p>
+                <span *ngIf="job.data.duration.days">
+                    {{ job.data.duration.days }} days
+                </span>
+                <span *ngIf="job.data.duration.hours">
+                    {{ job.data.duration.hours }} hours
+                </span>
+                <span *ngIf="job.data.duration.minutes">
+                    {{ job.data.duration.minutes }} mins
+                </span>
+                <span *ngIf="job.data.duration.seconds">
+                    {{ job.data.duration.seconds }} secs
+                </span>
+            </p>
 
-            <p><small>Queue time:</small> {{ job.data.backup_qtime | date:'hh:mm:ss dd/MM/yy' }}</p>
+            <p>
+                <small>Queue time: </small>
+                {{ job.data.backup_qtime | date:'hh:mm:ss dd/MM/yy' }}
+            </p>
             <p><small>Start time:</small> {{ job.data.start_time | date:'hh:mm:ss dd/MM/yy' }}</p>
             <p><small>End time:</small> {{ job.data.end_time | date:'hh:mm:ss dd/MM/yy' }}</p>
             </div>
@@ -81,7 +88,7 @@
                 <div class="card openable"
                     (click)="modal.open(nodes, { windowClass: 'nodes-modal' })">
                     <div class="card-block text-center">
-                        <small class="card-title">Nodes</small>
+                        <small class="card-title">Nodes &rarr;</small>
                         <h5>{{ job.data?.nnodes_req | number }}</h5>
                     </div>
                 </div>
@@ -91,7 +98,7 @@
                 <div class="card openable"
                     (click)="modal.open(nodes, { windowClass: 'nodes-modal' })">
                     <div class="card-block text-center">
-                        <small class="card-title">Cores</small>
+                        <small class="card-title">Cores &rarr;</small>
                         <h5>{{ job.data?.ncpus_req | number }}</h5>
                     </div>
                 </div>
@@ -101,7 +108,7 @@
                 <div class="card openable"
                     (click)="modal.open(variables, {size : 'lg'})">
                     <div class="card-block text-center">
-                        <small class="card-title">Variables</small>
+                        <small class="card-title">Variables &rarr;</small>
                         <h5>{{ job.data?.vars?.length | number }}</h5>
                     </div>
                 </div>
