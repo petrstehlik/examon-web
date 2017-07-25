@@ -15,6 +15,12 @@ import { JobsLookupComponent } from './components/jobs-lookup/jobs-lookup.compon
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { GraphComponent } from './components/graph/graph.component';
 import { GeneralPublicViewComponent } from './components/general-public-view/general-public-view.component';
+import { JobDashboardComponent } from './components/job-dashboard/job-dashboard.component';
+
+import { JobService } from 'app/services/job.service';
+import { JobPerfComponent } from 'app/components/job-perf/job-perf.component';
+import { JobEnergyComponent } from 'app/components/job-energy/job-energy.component';
+import { SysadminDashboardComponent } from 'app/components/sysadmin-dashboard/sysadmin-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +30,11 @@ import { GeneralPublicViewComponent } from './components/general-public-view/gen
     JobsLookupComponent,
     NavbarComponent,
     GraphComponent,
-    GeneralPublicViewComponent
+    GeneralPublicViewComponent,
+    JobDashboardComponent,
+    JobPerfComponent,
+    JobEnergyComponent,
+    SysadminDashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +43,7 @@ import { GeneralPublicViewComponent } from './components/general-public-view/gen
     NgbModule.forRoot(),
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [],
+  providers: [JobService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
