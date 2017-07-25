@@ -1,0 +1,28 @@
+<ex-navbar></ex-navbar>
+
+<div class="alert alert-danger" *ngIf="error.status">
+    {{ error.message }}
+</div>
+
+<ngb-tabset type="pills" class="mb-3">
+    <ngb-tab>
+        <ng-template ngbTabTitle>Overview</ng-template>
+        <ng-template ngbTabContent>
+            Overview with basic and very aggregated data
+        </ng-template>
+    </ngb-tab>
+
+    <ngb-tab>
+        <ng-template ngbTabTitle>Energy</ng-template>
+        <ng-template ngbTabContent>
+            Energy related dashboard
+        </ng-template>
+    </ngb-tab>
+
+    <ngb-tab>
+        <ng-template ngbTabTitle>3D View</ng-template>
+        <ng-template ngbTabContent>
+            Here should be a 3D view of the cluster room
+        </ng-template>
+    </ngb-tab>
+</ngb-tabset>
