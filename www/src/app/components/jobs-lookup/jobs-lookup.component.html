@@ -1,18 +1,20 @@
 <div class="container-fluid" style="height: 100vh">
     <div class="row justify-content-md-center align-items-center" style="height: 100vh">
         <div class="wrapper">
-        <h2 class="text-center">Examon Web</h2>
-        <form novalidate>
-            <div class="input-group">
-                <input type="text" [(ngModel)]="jobid" name="jobid" class="form-control" placeholder="Job ID" aria-describedby="passwordHelpBlock">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-primary" (click)="lookup()">Search</button>
-                </span>
-            </div>
-            <small id="passwordHelpBlock" class="form-text text-muted text-center">
-                Enter a job ID obtained by PBS.<br/>You can try i.e. 2510763.io01, 2515563.io01, 2685519.io01 or 2694803.io01.
-            </small>
-        </form>
+            <h2 class="text-center">
+                <img src="/assets/examon_logo.png" alt="Examon" height="70"/>
+            </h2>
+            <form novalidate>
+                <div class="input-group">
+                    <input type="text" [(ngModel)]="jobid" name="jobid" class="form-control" placeholder="Job ID" aria-describedby="passwordHelpBlock">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" (click)="lookup()">Search</button>
+                    </span>
+                </div>
+                <small id="passwordHelpBlock" class="form-text text-muted text-center">
+                    Enter a job ID obtained by PBS.<br/>You can try i.e. 2510763.io01, 2515563.io01, 2685519.io01 or 2694803.io01.
+                </small>
+            </form>
         </div>
     </div>
 </div>
