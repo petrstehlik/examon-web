@@ -1,4 +1,9 @@
-import { JobSearchComponent, JobsLookupComponent, GeneralPublicViewComponent } from './components';
+import { JobInfoComponent,
+    JobsLookupComponent,
+    JobDashboardComponent,
+    GeneralPublicViewComponent,
+    SysadminDashboardComponent
+} from './components';
 import { NullComponent } from './components';
 
 export const appRoutes = [
@@ -8,7 +13,11 @@ export const appRoutes = [
     },
     {
         path : 'jobs/:jobid',
-        component : JobSearchComponent
+        component : JobDashboardComponent
+    },
+    {
+        path : 'sysadmin',
+        component : SysadminDashboardComponent
     },
     {
         path : 'public',
