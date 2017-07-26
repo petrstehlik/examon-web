@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { MessageService } from 'app/services/message.service';
+
 @Component({
   selector: 'ex-general-public-view',
   templateUrl: './general-public-view.component.html',
@@ -7,9 +9,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GeneralPublicViewComponent implements OnInit {
 
-  constructor() { }
+  constructor(private message : MessageService) { }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+        this.message.sendMessage("testing message");
+
+    }
 
 }
