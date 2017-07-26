@@ -106,7 +106,7 @@ def jobs_latest():
         Fetch all jobs that finished in last 15 minutes,
         sort them by start_time and return the last one.
     """
-    tstamp = (int(time.time()) - 1800) * 1000
+    tstamp = (int(time.time()) - 86400) * 1000
     qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
             WHERE token(user_id) > token('') and start_time >= " \
             + str(tstamp) + " ALLOW FILTERING")
@@ -115,5 +115,7 @@ def jobs_latest():
     for item in qres:
         results.append(item)
 
-    ordered = sorted(results, key = lambda k : k['start_time'])
+    ordered = sorted(results, key = lambda k : k['end_time'])
+    for item in ordered:
+        print(item["job_id"], item["end_time"])
     return(json.dumps(ordered[-1], default=default))
