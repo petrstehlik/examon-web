@@ -102,8 +102,18 @@ def jobs_hello(jobid):
 
 @jobs.route('/latest')
 def jobs_latest():
-    tstamp = (int(time.time()) - 900) * 1000
+    """
+        Fetch all jobs that finished in last 15 minutes,
+        sort them by start_time and return the last one.
+    """
+    tstamp = (int(time.time()) - 1800) * 1000
     qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
             WHERE token(user_id) > token('') and start_time >= " \
             + str(tstamp) + " ALLOW FILTERING")
-    return(json.dumps(qres[0], default=default))
+
+    results = []
+    for item in qres:
+        results.append(item)
+
+    ordered = sorted(results, key = lambda k : k['start_time'])
+    return(json.dumps(ordered[-1], default=default))
