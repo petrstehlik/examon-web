@@ -130,8 +130,8 @@
     <div class="col">
         <div class="card">
             <div class="card-block text-center">
-                <small class="card-title">Energy Consumed</small>
-                <h5>-- kJ</h5>
+                <small class="card-title">Average Power</small>
+                <h5>{{ job?.data?.job_tot_avg_power | number:'2.1-2' }} W</h5>
             </div>
         </div>
     </div>
@@ -139,8 +139,8 @@
     <div class="col">
         <div class="card">
             <div class="card-block text-center">
-                <small class="card-title">OS Utilization</small>
-                <h5>-- %</h5>
+                <small class="card-title">Sys Utilization</small>
+                <h5>{{ job?.data?.ipmi_avg_sys_util | number:'2.1-2' }} %</h5>
             </div>
         </div>
     </div>
@@ -149,7 +149,7 @@
         <div class="card">
             <div class="card-block text-center">
                 <small class="card-title">CPUs Utilization</small>
-                <h5>-- %</h5>
+                <h5>{{ job?.data?.ipmi_avg_cpu_util | number:'2.1-2'}} %</h5>
             </div>
         </div>
     </div>
@@ -157,8 +157,8 @@
     <div class="col">
         <div class="card">
             <div class="card-block text-center">
-                <small class="card-title">Ambient Temperature</small>
-                <h5>-- °C</h5>
+                <small class="card-title">Average Temperature</small>
+                <h5>{{ job?.data?.job_tot_avg_temp | number:'2.1-2'}} °C</h5>
             </div>
         </div>
     </div>

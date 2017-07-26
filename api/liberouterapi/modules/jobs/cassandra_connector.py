@@ -45,6 +45,18 @@ def prepare_statements(session):
     prepared["sel_by_job_id"] = session.prepare(
             "SELECT * FROM galileo_jobs_simplekey WHERE job_id = ? LIMIT 1")
 
+    prepared["measures"] = session.prepare(
+        """SELECT
+            ipmi_avg_io_util,
+            ipmi_avg_cpu_util,
+            ipmi_avg_sys_util,
+            ipmi_job_avg_power,
+            job_tot_avg_power,
+            job_tot_avg_load,
+            job_tot_avg_temp
+        FROM jobs_measures_aggregate
+        WHERE job_id = ?""")
+
     #    prepared["latest_job"] = session.prepare(
             #"SELECT * FROM galileo_jobs_complexkey WHERE start_time EQ 1400000000 ORDER BY start_time LIMIT 1")
     return prepared

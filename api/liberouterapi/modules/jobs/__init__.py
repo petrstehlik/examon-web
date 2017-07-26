@@ -8,6 +8,7 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import dict_factory
 import json
 import calendar, datetime
+import decimal
 
 from cassandra_connector import connect, prepare_statements
 
@@ -25,6 +26,9 @@ def default(obj):
             obj.microsecond / 1000
         )
         return millis
+    if isinstance(obj, decimal.Decimal):
+        return float(obj)
+
     raise TypeError('Not sure how to serialize %s' % (obj,))
 
 
@@ -64,27 +68,34 @@ def asoc_node_core(cores, nodes):
 
     return asoc_nodes
 
+def merge_dicts(x, y):
+    """Given two dicts, merge them into a new dict as a shallow copy."""
+    z = x.copy()
+    z.update(y)
+    return z
+
 
 @jobs.route('/<string:jobid>', methods=['GET'])
 def jobs_hello(jobid):
-    res = session.execute(prepared["sel_by_job_id"], (jobid,))
-    if len(res.current_rows) == 0:
+    info = session.execute(prepared["sel_by_job_id"], (jobid,))
+    if len(info.current_rows) == 0:
         return('', 404)
 
-
     try:
-        res[0]["asoc_nodes"] = asoc_node_core(res[0]["used_cores"], res[0]["vnode_list"])
-        res[0]["vars"] = split_list(res[0]["var_list"])
+        info[0]["asoc_nodes"] = asoc_node_core(info[0]["used_cores"], info[0]["vnode_list"])
+        info[0]["vars"] = split_list(info[0]["var_list"])
     except Exception as e:
         return(json.dumps({
                 "message" : str(e),
                 "error" : True
             }), 500)
 
-    print(res[0])
+    measures = session.execute(prepared["measures"], (jobid,))
 
-    res[0]['ctime'] = calendar.timegm(res[0]['ctime'].timetuple()) * 1000
-    return(json.dumps(res[0], default=default))
+    result = merge_dicts(info[0], measures[0])
+
+    result['ctime'] = calendar.timegm(result['ctime'].timetuple()) * 1000
+    return(json.dumps(result, default=default))
 
 @jobs.route('/latest')
 def jobs_latest():
