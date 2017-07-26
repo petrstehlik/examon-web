@@ -43,7 +43,7 @@ import { SysadminDashboardComponent } from 'app/components/sysadmin-dashboard/sy
     NgbModule.forRoot(),
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [JobService],
+  providers: [JobService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

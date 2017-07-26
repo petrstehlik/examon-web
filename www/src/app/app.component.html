@@ -1,4 +1,7 @@
 <section class="container-fluid">
+    <ngb-alert [dismissible]="true" *ngIf="message">
+        {{ message.text }}
+    </ngb-alert>
     <router-outlet></router-outlet>
 </section>
 
