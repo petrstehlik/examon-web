@@ -7,7 +7,7 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import dict_factory
 import json
-import calendar, datetime
+import calendar, datetime, time
 import decimal
 
 from cassandra_connector import connect, prepare_statements
@@ -92,12 +92,18 @@ def jobs_hello(jobid):
 
     measures = session.execute(prepared["measures"], (jobid,))
 
-    result = merge_dicts(info[0], measures[0])
+    if len(measures.current_rows) > 0:
+        result = merge_dicts(info[0], measures[0])
+    else:
+        result = info[0]
 
     result['ctime'] = calendar.timegm(result['ctime'].timetuple()) * 1000
     return(json.dumps(result, default=default))
 
 @jobs.route('/latest')
 def jobs_latest():
-    res = session.execute(prepared["latest_job"])
-    return(json.dumps(res[0], default=default))
+    tstamp = (int(time.time()) - 900) * 1000
+    qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
+            WHERE token(user_id) > token('') and start_time >= " \
+            + str(tstamp) + " ALLOW FILTERING")
+    return(json.dumps(qres[0], default=default))

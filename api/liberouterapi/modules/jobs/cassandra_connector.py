@@ -57,6 +57,12 @@ def prepare_statements(session):
         FROM jobs_measures_aggregate
         WHERE job_id = ?""")
 
+    #prepared["latest_job"] = session.prepare(
+    #    """SELECT *
+    #        FROM galileo_jobs_simplekey
+    #        WHERE token(user_id) > token('') and start_time >= ? ALLOW FILTERING
+     #   """)
+
     #    prepared["latest_job"] = session.prepare(
             #"SELECT * FROM galileo_jobs_complexkey WHERE start_time EQ 1400000000 ORDER BY start_time LIMIT 1")
     return prepared
