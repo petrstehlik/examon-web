@@ -9,18 +9,24 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { appRoutes } from './app.routes';
 
 import { AppComponent } from './app.component';
-import { NullComponent } from './components/null/null.component';
-import { JobInfoComponent } from './components';
 import { JobsLookupComponent } from './components/jobs-lookup/jobs-lookup.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { GraphComponent } from './components/graph/graph.component';
-import { GeneralPublicViewComponent } from './components/general-public-view/general-public-view.component';
-import { JobDashboardComponent } from './components/job-dashboard/job-dashboard.component';
 
 import { JobService } from 'app/services/job.service';
-import { JobPerfComponent } from 'app/components/job-perf/job-perf.component';
-import { JobEnergyComponent } from 'app/components/job-energy/job-energy.component';
-import { SysadminDashboardComponent } from 'app/components/sysadmin-dashboard/sysadmin-dashboard.component';
+import { MessageService } from 'app/services/message.service';
+
+import {
+    NullComponent,
+    JobDashboardComponent,
+    JobInfoComponent,
+    JobPerfComponent,
+    JobEnergyComponent,
+    PublicDashboardComponent,
+    PublicOverviewComponent,
+    GeneralPublicViewComponent,
+    SysadminDashboardComponent,
+    SysadminOverviewComponent } from 'app/components';
 
 @NgModule({
   declarations: [
@@ -34,7 +40,10 @@ import { SysadminDashboardComponent } from 'app/components/sysadmin-dashboard/sy
     JobDashboardComponent,
     JobPerfComponent,
     JobEnergyComponent,
-    SysadminDashboardComponent
+    SysadminDashboardComponent,
+    PublicDashboardComponent,
+    PublicOverviewComponent,
+    SysadminOverviewComponent
   ],
   imports: [
     BrowserModule,

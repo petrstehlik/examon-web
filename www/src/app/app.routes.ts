@@ -1,7 +1,7 @@
 import { JobInfoComponent,
     JobsLookupComponent,
     JobDashboardComponent,
-    GeneralPublicViewComponent,
+    PublicDashboardComponent,
     SysadminDashboardComponent
 } from './components';
 import { NullComponent } from './components';
@@ -21,7 +21,7 @@ export const appRoutes = [
     },
     {
         path : 'public',
-        component : GeneralPublicViewComponent
+        component : PublicDashboardComponent
     },
 
     {
