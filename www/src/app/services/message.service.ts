@@ -8,15 +8,15 @@ export class MessageService {
 
     constructor() { }
 
-    sendMessage(message: string) {
-        this.subject.next({ text: message });
+    send(message: string, type : "warning"|"danger"|"info"|"success" = "warning") {
+        this.subject.next({ text: message, type : type });
     }
 
-    clearMessage() {
+    clear() {
         this.subject.next();
     }
 
-    getMessage(): Observable<any> {
+    get(): Observable<any> {
         return this.subject.asObservable();
     }
 
