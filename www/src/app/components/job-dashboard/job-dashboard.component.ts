@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
+import { MessageService } from 'app/services';
 import { Job } from 'app/interfaces';
 
 @Component({
@@ -26,7 +27,8 @@ export class JobDashboardComponent implements OnInit {
     };
 
     constructor(private http : HttpClient,
-        private router : ActivatedRoute) { }
+        private router : ActivatedRoute,
+        private msg : MessageService) { }
 
     ngOnInit() {
         this.router.params.subscribe(params => {
@@ -45,8 +47,9 @@ export class JobDashboardComponent implements OnInit {
                     this.job = new Job();
 
                     if (error.status == 404) {
-                        this.error.message = "Cannot find job with job ID " + this.job.id;
-                        this.error.status = true;
+                        this.msg.send("Cannot find job with job ID " + this.job.id, "danger");
+                    } else {
+                        this.msg.send("Something went wrong fetching a job.", "danger");
                     }
                 }
             )
