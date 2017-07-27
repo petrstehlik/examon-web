@@ -12,3 +12,5 @@ export { SysadminOverviewComponent } from './sysadmin-overview/sysadmin-overview
 export { PublicDashboardComponent } from './public-dashboard/public-dashboard.component';
 export { PublicOverviewComponent } from './public-overview/public-overview.component';
 export { GeneralPublicViewComponent } from './general-public-view/general-public-view.component';
+
+export { RangepickerComponent } from './rangepicker/rangepicker.component';

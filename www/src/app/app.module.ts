@@ -14,7 +14,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { GraphComponent } from './components/graph/graph.component';
 
 import { JobService } from 'app/services/job.service';
-import { MessageService } from 'app/services/message.service';
+import { MessageService } from 'app/services';
 
 import {
     NullComponent,
@@ -26,7 +26,8 @@ import {
     PublicOverviewComponent,
     GeneralPublicViewComponent,
     SysadminDashboardComponent,
-    SysadminOverviewComponent } from 'app/components';
+    SysadminOverviewComponent,
+    RangepickerComponent } from 'app/components';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import {
     SysadminDashboardComponent,
     PublicDashboardComponent,
     PublicOverviewComponent,
-    SysadminOverviewComponent
+    SysadminOverviewComponent,
+    RangepickerComponent
   ],
   imports: [
     BrowserModule,
