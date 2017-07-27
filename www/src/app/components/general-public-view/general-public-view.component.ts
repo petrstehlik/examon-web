@@ -11,9 +11,6 @@ export class GeneralPublicViewComponent implements OnInit {
 
   constructor(private message : MessageService) { }
 
-    ngOnInit() {
-        this.message.sendMessage("testing message");
-
-    }
+    ngOnInit() { }
 
 }
