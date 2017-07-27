@@ -19,7 +19,7 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "ex",
       "styles": [
-        "styles.css",
+        "styles/styles.scss",
         "../node_modules/bootstrap/dist/css/bootstrap.min.css",
         "../node_modules/dygraphs/dist/dygraph.css"
       ],
