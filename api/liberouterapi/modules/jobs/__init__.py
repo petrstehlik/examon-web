@@ -1,7 +1,8 @@
 from liberouterapi import app
+from liberouterapi.error import ApiException
 from ..module import Module
 
-from flask import Blueprint
+from flask import Blueprint, request
 
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
@@ -11,6 +12,9 @@ import calendar, datetime, time
 import decimal
 
 from cassandra_connector import connect, prepare_statements
+
+class JobsError(ApiException):
+    status_code = 500
 
 session = connect()
 prepared = prepare_statements(session)
@@ -119,3 +123,60 @@ def jobs_latest():
     for item in ordered:
         print(item["job_id"], item["end_time"])
     return(json.dumps(ordered[-1], default=default))
+
+def get_duration(start, end):
+    """
+    Get duration in seconds from two datetimes
+    """
+
+    return (end - start).total_seconds()
+
+@jobs.route('/stats/total', methods=['GET'])
+def jobs_total():
+    """
+        Analyze jobs in given period
+
+        GET params:
+            from (required) UNIX timestamp in milliseconds
+            to (optional) UNIX timestamp in milliseconds
+    """
+    args = request.args.to_dict()
+
+    if "from" in args:
+        # Convert to int so we can compare it
+        args["from"] = int(args["from"])
+    else:
+        raise JobsError("Missing 'from' in GET parameters")
+
+    if "to" not in args:
+        # Generate timestamp
+        args["to"] = int(time.time()) * 1000
+
+    if args["to"] < args["from"]:
+        raise JobsError("'from' time cannot precede 'to' time")
+
+    qres = session.execute("SELECT job_id, nnodes_req, ncpus_req, ngpus_req, nmics_req, start_time, end_time \
+        FROM galileo_jobs_complexkey \
+        WHERE token(user_id) > token('') AND \
+            start_time >= " + str(args["from"]) + " AND \
+            start_time <= " + str(args["to"]) + " ALLOW FILTERING")
+
+    results = {
+            "duration" : 0,
+            "nodes" : 0,
+            "cpus" : 0,
+            "gpus" : 0,
+            "mics" : 0,
+            "from" : args["from"],
+            "to" : args["to"]
+        }
+
+    for item in qres:
+        results["duration"] += get_duration(item["start_time"], item["end_time"]) * item["ncpus_req"]
+        results["nodes"] += item["nnodes_req"]
+        results["cpus"] += item["ncpus_req"]
+        results["gpus"] += item["ngpus_req"]
+        results["mics"] += item["nmics_req"]
+
+    return(json.dumps(results))
+
