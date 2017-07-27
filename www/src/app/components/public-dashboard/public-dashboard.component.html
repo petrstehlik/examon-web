@@ -1,10 +1,14 @@
 <ex-navbar></ex-navbar>
 
+{{ data?.total | json }}
+
+<ex-rangepicker (onSelect)="onSelect($event)"></ex-rangepicker>
+
 <ngb-tabset type="pills" class="mb-3">
     <ngb-tab>
         <ng-template ngbTabTitle>Overview</ng-template>
         <ng-template ngbTabContent>
-            <ex-public-overview></ex-public-overview>
+            <ex-public-overview [data]="data"></ex-public-overview>
         </ng-template>
     </ngb-tab>
 
