@@ -168,7 +168,8 @@ def jobs_total():
             "gpus" : 0,
             "mics" : 0,
             "from" : args["from"],
-            "to" : args["to"]
+            "to" : args["to"],
+            "jobs" : len(qres.current_rows)
         }
 
     for item in qres:
