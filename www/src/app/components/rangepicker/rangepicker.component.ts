@@ -1,6 +1,11 @@
 import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { NgbDateStruct, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 
+interface Time {
+    from : number;
+    to : number;
+}
+
 @Component({
     selector: 'ex-rangepicker',
     templateUrl: './rangepicker.component.html',
@@ -20,10 +25,7 @@ export class RangepickerComponent implements OnInit {
     from_time: NgbTimeStruct;
     to_date: NgbDateStruct;
     to_time: NgbTimeStruct;
-    query : Object = {
-        to: null,
-        from: null
-    };
+    query : Time;
 
     constructor() { }
 
