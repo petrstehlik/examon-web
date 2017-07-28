@@ -13,7 +13,7 @@
     min-height: 250px;
 }
 
-.labels {
+/deep/ .labels {
     border: 1px solid darken(#FFF, 10%);
     border-radius: 2px;
     position: fixed;
@@ -21,4 +21,12 @@
     padding: 0.5em;
     font-size: 0.75em;
     display: none;
+
+    span {
+        display: none;
+
+        &.highlight, b span {
+            display: inline;
+        }
+    }
 }

@@ -14,79 +14,85 @@ var labelsDiv : ElementRef = null;
 })
 export class GraphComponent implements OnInit {
 
-    @Input() data;
-    @Input() title;
-    @Input() labelY;
+    /**
+     * Data to render in the graph
+     *
+     * The data item is expected to have the first item in array a Date object
+     *
+     * format: {
+     *      "labels" : [],
+     *      "data" : []
+     * }
+     */
+    private data : Object;
+
+    @Input('data')
+    set setData(data) {
+        if (data != undefined && data != {}) {
+            console.log(Object.assign({}, data));
+            this.data = data;
+            if (this.graphRef == undefined) {
+                this.config["labels"] = this.data["labels"];
+
+                this.graphRef = new Dygraph(
+                    this.chart.nativeElement,
+                    this.data["data"],
+                    this.config);
+            } else {
+                this.graphRef.updateOptions({
+                    file : this.data["data"],
+                    labels : this.data["labels"]
+                });
+            }
+        }
+    };
+
+    @Input() title = "Untitled Chart";
+    @Input() labels = ["Date"];
+    @Input() labelY = "Untitled Y axis";
 
     @ViewChild('chart') chart : ElementRef;
     @ViewChild('chartLabels') labelsDivRef : ElementRef;
 
     private graphRef;
-
+    private config : Object;
     constructor(private http : HttpClient) { }
 
     ngOnInit() {
-
+        this.initConfig();
         labelsDiv = this.labelsDivRef;
+    }
 
-        this.http.get('/api/kairos/basic').subscribe(
-            data => {
-                this.data = data;
-                console.log(this.data)
-
-                let values = this.extractData(this.data);
-                let plot_data = [];
-
-                let point = this.data["queries"][0]["results"];
-
-                for (var i = 0; i < values.length; i++) {
-                    // Add date
-                    let tmp = [];
-                    tmp.push(new Date(point[0]["values"][i][0]*1000));
-
-                    for (var j = 0; j < point.length; j++) {
-                        tmp.push(point[j]["values"][i][1]);
-                    }
-
-                    plot_data.push(tmp);
-                }
-
-                let labels = ["Time"]
-
-                for (var i = 0; i < point.length; i++) {
-                labels.push(point[i]["group_by"][0]["group"]["node"] + "/" +
-                    point[i]["group_by"][0]["group"]["core"])
-                }
-
-                this.graphRef = new Dygraph(this.chart.nativeElement, plot_data, {
-                    labels : labels,
-                    hideOverlayOnMouseOut : true,
-                    ylabel: this.labelY,
-                    title : this.title,
-                    legend: 'follow',
-                    labelsDiv : labelsDiv.nativeElement,
-                    labelsSeparateLines : true,
-                    highlightCallback : this.moveLabel,
-                    gridLineColor : "rgb(242, 242, 242)"
-                });
-
-                console.log(plot_data);
-                console.log(labels);
-            });
+    private initConfig() {
+        this.config = {
+            labels : this.labels,
+            hideOverlayOnMouseOut : true,
+            ylabel: this.labelY,
+            title : this.title,
+            legend: 'follow',
+            labelsDiv : this.labelsDivRef.nativeElement,
+            highlightCallback : this.moveLabel,
+            gridLineColor : "rgb(242, 242, 242)",
+            highlightCircleSize: 2,
+            strokeWidth: 1,
+            strokeBorderWidth : 1,
+            highlightSeriesOpts: {
+              strokeWidth: 2,
+              strokeBorderWidth: 0,
+              highlightCircleSize: 2
+            }
+        }
     }
 
     private moveLabel(event, x, points, row, seriesName) {
+        console.log(points);
+        console.log(row);
         labelsDiv.nativeElement.style.display = "block";
         labelsDiv.nativeElement.style.left = (event.clientX + 5) + "px";
         labelsDiv.nativeElement.style.top = (event.clientY + 5) + "px";
     }
 
     private legendFormatter(data) : void {
-        console.log(data);
-
-        if (data.x != undefined) {
-            console.log((new Date(data.x)).toISOString());
-        }
         return data;
     }
 
