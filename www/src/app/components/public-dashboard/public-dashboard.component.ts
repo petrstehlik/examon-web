@@ -8,21 +8,20 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 })
 export class PublicDashboardComponent implements OnInit {
 
-    data : Object = {};
+    timewindow : Object = undefined;
 
     constructor(private http : HttpClient) { }
 
     ngOnInit() {
+        this.timewindow = {
+            from : (+Date.now() - 900000), // -15 mins
+            to : +Date.now()
+        };
+        console.log(this.timewindow)
     }
 
     public onSelect(time : Object) : void {
-        this.http.get('/api/jobs/stats/total', {
-            params: new HttpParams()
-                        .set('from', time['from'])
-                        .set('to', time['to'])
-        }).subscribe(data => {
-            this.data["total"] = data;
-        })
+        this.timewindow = time;
     }
 
 }
