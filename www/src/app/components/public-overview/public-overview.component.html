@@ -1,27 +1,58 @@
 <div class="row mb-3">
     <div class="col">
-        <div class="card text-center number">
-            Total jobs run
+        <div class="card text-center">
+            <div class="card-block text-center">
+                <small class="card-title"># of jobs</small>
+                <h4>{{ data.total?.jobs | number:'1.0' }}</h4>
+            </div>
         </div>
     </div>
 
     <div class="col">
-        <div class="card text-center number">
-            Total used time
+        <div class="card text-center">
+            <div class="card-block text-center">
+                <small class="card-title">Used core time</small>
+                <h4>{{ data.total?.duration | number:'1.0' }} s</h4>
+            </div>
         </div>
     </div>
 
     <div class="col">
-        <div class="card text-center number">
-            Total required nodes
+        <div class="card text-center">
+            <div class="card-block text-center">
+                <small class="card-title"># of required nodes</small>
+                <h4>{{ data.total?.nodes | number:'1.0' }}</h4>
+            </div>
         </div>
     </div>
 
     <div class="col">
-        <div class="card text-center number">
-            Total required cores
+        <div class="card text-center">
+            <div class="card-block text-center">
+                <small class="card-title"># of required cores</small>
+                <h4>{{ data.total?.cpus | number:'1.0' }}</h4>
+            </div>
         </div>
     </div>
+
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-block text-center">
+                <small class="card-title"># of required GPUs</small>
+                <h4>{{ data.total?.gpus | number:'1.0' }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-block text-center">
+                <small class="card-title"># of required MICs</small>
+                <h4>{{ data.total?.mics | number:'1.0' }}</h4>
+            </div>
+        </div>
+    </div>
+
 
     <div class="col">
         <div class="card text-center number">
@@ -39,8 +70,8 @@
 
 <div class="row mb-3">
     <div class="col">
-        <div class="card text-center timeseries">
-            Cluster load
+        <div class="card text-center">
+            <ex-graph [data]="chart_data?.cluster_load" title="Cluster Load" labelY="Load (%)"></ex-graph>
         </div>
     </div>
 
