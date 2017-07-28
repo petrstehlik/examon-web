@@ -2,14 +2,17 @@ from __future__ import print_function
 import sys
 import pkgutil
 from getpass import getpass
-from flask import request
+from flask import request, Blueprint
 from bson import json_util
 
-from liberouterapi import app, config
+from liberouterapi import app
+from .configurator import Config
 from .modules.module import Module
 from .error import ApiException
 from .dbConnector import dbConnector
 from .Auth import Auth
+
+config = Config()
 
 def routes():
     """
@@ -37,11 +40,10 @@ def import_modules():
             loaded_mod = __import__("liberouterapi." +
                     config['api']['modules'].split('/')[-1] + "." +  mod_name,
                     fromlist=[str(mod_name)])
-            print("   > Imported module \"" + mod_name + "\"")
 
             for obj in vars(loaded_mod).values():
-                if isinstance(obj, Module):
-                    print(obj)
+                if isinstance(obj, Blueprint):
+                    print("   > Imported module \"" + mod_name + "\"")
                     app.register_blueprint(obj)
 
 def ask_for_username():

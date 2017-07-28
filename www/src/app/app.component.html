@@ -1,9 +1,8 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Examon Web
-  </h1>
+<ngb-alert [type]="type" *ngIf="message" (close)="close(alert)">
+    {{ message }}
+</ngb-alert>
 
-  <router-outlet></router-outlet>
+<section class="container-fluid">
+    <router-outlet></router-outlet>
+</section>
 
-</div>

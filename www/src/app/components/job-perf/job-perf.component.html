@@ -1,0 +1,91 @@
+<div class="row mb-3">
+    <div class="col-4">
+        <div class="card text-center bullet" style="height: 200px">
+            Bullet charts for sys/cpu/mem/io_utilization for current/last values
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="card text-center timeseries" style="height: 200px">
+            Time serie chart for sys/cpu/mem/io_utilization aggregated
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-6">
+        <div class="card text-center timeseries" style="height: 200px">
+            CPU utilization per node/core averaged by 5 seconds (if time > 60s)
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="card text-center timeseries" style="height: 200px">
+            Memory utilization per node/core averaged by 5 seconds (if time > 60s)
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-3">
+        <div class="card text-center align-items-center donut" style="height: 200px">
+            Bound shares total
+        </div>
+    </div>
+
+    <div class="col-9 row">
+
+        <div class="col-12">
+            <div class="card text-center timeseries" style="height: 100px">
+                Front-end bound per node/core averaged by 5 seconds (if time > 60s)
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card text-center timeseries" style="height: 100px">
+                Back-end bound per node/core averaged by 5 seconds (if time > 60s)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card text-center timeseries" style="height: 100px">
+           IPS per node/core averaged by 5 seconds (if time > 60s)
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center timeseries" style="height: 100px">
+            Per core load in each node
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center timeseries" style="height: 100px">
+            Per core load in each node
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-center timeseries" style="height: 100px">
+            Per core load in each node
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card text-center timeseries" style="height: 100px">
+           C6 & C3 states with current clock per node/core averaged by 5 seconds (if time > 60s)
+        </div>
+    </div>
+</div>
+
+
+
+
+<!--pre>{{ job | json }}</pre-->
+
+

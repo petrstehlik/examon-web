@@ -1,0 +1,200 @@
+<section class="job-info" *ngIf="job?.loaded">
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-block">
+                Job ID: {{ job?.data?.job_id }} |
+                User ID: {{ job?.data?.user_id }} |
+                Account name: {{ job?.data?.account_name }} |
+                Project: {{ job?.data?.project }} |
+                Job Name: {{ job?.data?.job_name }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card time">
+            <div class="card-block">
+            <h4 class="card-title">Times</h4>
+            <p>
+                <small>Duration: </small>
+                <span *ngIf="job.data.duration.days">
+                    {{ job.data.duration.days }} days
+                </span>
+                <span *ngIf="job.data.duration.hours">
+                    {{ job.data.duration.hours }} hours
+                </span>
+                <span *ngIf="job.data.duration.minutes">
+                    {{ job.data.duration.minutes }} mins
+                </span>
+                <span *ngIf="job.data.duration.seconds">
+                    {{ job.data.duration.seconds }} secs
+                </span>
+            </p>
+
+            <p>
+                <small>Queue time: </small>
+                {{ job.data.backup_qtime | date:'HH:mm:ss dd/MM/yy' }}
+            </p>
+            <p><small>Start time:</small> {{ job.data.start_time | date:'HH:mm:ss dd/MM/yy' }}</p>
+            <p><small>End time:</small> {{ job.data.end_time | date:'HH:mm:ss dd/MM/yy' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="row mb-3">
+            <div class="col">
+                <div class="card">
+                    <div class="card-block text-center">
+                        <small class="card-title">Memory</small>
+                        <h5>{{ job.data?.mem_req | number }} MB</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card">
+                    <div class="card-block text-center">
+                        <small class="card-title">Time</small>
+                        <h5>{{ job.data?.req_time | number }} s</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card">
+                    <div class="card-block text-center">
+                        <small class="card-title">GPUs</small>
+                        <h5>{{ job.data?.ngpus_req | number }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card">
+                    <div class="card-block text-center">
+                        <small class="card-title">MICs</small>
+                        <h5>{{ job.data?.nmics_req | number }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+
+            <div class="col">
+                <div class="card openable"
+                    (click)="modal.open(nodes, { windowClass: 'nodes-modal' })">
+                    <div class="card-block text-center">
+                        <small class="card-title">Nodes &rarr;</small>
+                        <h5>{{ job.data?.nnodes_req | number }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card openable"
+                    (click)="modal.open(nodes, { windowClass: 'nodes-modal' })">
+                    <div class="card-block text-center">
+                        <small class="card-title">Cores &rarr;</small>
+                        <h5>{{ job.data?.ncpus_req | number }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card openable"
+                    (click)="modal.open(variables, {size : 'lg'})">
+                    <div class="card-block text-center">
+                        <small class="card-title">Variables &rarr;</small>
+                        <h5>{{ job.data?.vars?.length | number }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card">
+                    <div class="card-block text-center">
+                        <small class="card-title">MPI Processes</small>
+                        <h5>{{ job.data?.mpiprocs | number }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Average Power</small>
+                <h5>{{ job?.data?.job_tot_avg_power | number:'2.1-2' }} W</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Sys Utilization</small>
+                <h5>{{ job?.data?.ipmi_avg_sys_util | number:'2.1-2' }} %</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">CPUs Utilization</small>
+                <h5>{{ job?.data?.ipmi_avg_cpu_util | number:'2.1-2'}} %</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Average Temperature</small>
+                <h5>{{ job?.data?.job_tot_avg_temp | number:'2.1-2'}} °C</h5>
+            </div>
+        </div>
+    </div>
+
+</div>
+</section>
+
+<ng-template #nodes let-c="close">
+  <div class="modal-header">
+    <h4 class="modal-title">Assigned Nodes and cores</h4>
+    <button type="button" class="close" aria-label="Close" (click)="c()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngFor="let node of job.data.asoc_nodes" class="mb-3">
+          <h5>{{ node.node }} <small>| # of cores: {{ node.cores.length }}</small></h5>
+          <div class="row">
+              <span class="core col-3" *ngFor="let core of node.cores">
+                  {{ core }}
+              </span>
+          </div>
+      </div>
+  </div>
+</ng-template>
+
+<ng-template #variables let-c="close">
+  <div class="modal-header">
+    <h4 class="modal-title">Variables</h4>
+    <button type="button" class="close" aria-label="Close" (click)="c()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <ul class="varlist">
+          <li *ngFor="let variable of job.data.vars">{{ variable }}</li>
+      </ul>
+  </div>
+</ng-template>
