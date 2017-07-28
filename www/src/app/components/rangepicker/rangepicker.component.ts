@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { NgbDateStruct, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
+import { environment as env } from 'environments/environment';
 
 interface Time {
     from : number;
@@ -76,7 +77,7 @@ export class RangepickerComponent implements OnInit {
         const to_time = new Date();
 
         this.query = {
-            from : +Date.now() - 60000,
+            from : +Date.now() - env.timeoffset,
             to : +Date.now()
         }
 

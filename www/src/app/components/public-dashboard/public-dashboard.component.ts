@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
+import { environment as env } from 'environments/environment';
+
 @Component({
   selector: 'ex-public-dashboard',
   templateUrl: './public-dashboard.component.html',
@@ -14,7 +16,7 @@ export class PublicDashboardComponent implements OnInit {
 
     ngOnInit() {
         this.timewindow = {
-            from : (+Date.now() - 900000), // -15 mins
+            from : (+Date.now() - env.timeoffset), // -15 mins
             to : +Date.now()
         };
         console.log(this.timewindow)
