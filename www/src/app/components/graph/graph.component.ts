@@ -28,7 +28,7 @@ export class GraphComponent implements OnInit {
 
     @Input('data')
     set setData(data) {
-        if (data != undefined && data != {}) {
+        if (data != undefined && Object.keys(data).length !== 0) {
             console.log(Object.assign({}, data));
             this.data = data;
             if (this.graphRef == undefined) {
@@ -85,8 +85,6 @@ export class GraphComponent implements OnInit {
     }
 
     private moveLabel(event, x, points, row, seriesName) {
-        console.log(points);
-        console.log(row);
         labelsDiv.nativeElement.style.display = "block";
         labelsDiv.nativeElement.style.left = (event.clientX + 5) + "px";
         labelsDiv.nativeElement.style.top = (event.clientY + 5) + "px";
