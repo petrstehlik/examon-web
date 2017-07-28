@@ -1,6 +1,21 @@
 import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
+interface Total {
+    jobs: number;
+    to : number;
+    from : number;
+    duration : number;
+    gpus : number;
+    nodes: number;
+    mics : number;
+    cpus : number
+}
+
+interface Data {
+    total : Total;
+}
+
 @Component({
     selector: 'ex-public-overview',
     templateUrl: './public-overview.component.html',
@@ -9,11 +24,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 export class PublicOverviewComponent implements OnInit {
 
     private time : Object;
-    public data : Object = {
-        total : null
-    }
-
-    public chart_data = {};
+    public data : Data;
+    public chart_data = {
+        cluster_load : {}
+    };
 
     @Input('time')
     set setData(time) {
@@ -30,12 +44,14 @@ export class PublicOverviewComponent implements OnInit {
     ngOnInit() { }
 
     private fetchTotal() {
-        this.http.get('/api/jobs/stats/total', {
+        this.http.get<Total>('/api/jobs/stats/total', {
             params: new HttpParams()
                         .set('from', this.time['from'])
                         .set('to', this.time['to'])
         }).subscribe(data => {
-            this.data["total"] = data;
+            this.data = {
+                total : data
+            };
         })
     }
 
