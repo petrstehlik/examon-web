@@ -37,6 +37,7 @@ export class PublicOverviewComponent implements OnInit {
             this.time = time;
             this.fetchTotal();
             this.fetchClusterLoad();
+            this.fetchClusterTemp();
         }
     };
 
@@ -58,10 +59,12 @@ export class PublicOverviewComponent implements OnInit {
 
     private fetchClusterLoad() {
         this.chart_data["cluster_load_loading"] = true;
-        this.http.get('/api/kairos/load', {
+        this.http.get('/api/kairos/node', {
             params : new HttpParams()
                         .set('from', this.time['from'])
                         .set('to', this.time['to'])
+                        .set('metric', 'load_core')
+                        .set('aggregate', '10')
         }).subscribe(data => {
             let tmp_data = [];
 
@@ -74,8 +77,36 @@ export class PublicOverviewComponent implements OnInit {
                 "data" : tmp_data
             }
 
+            console.log(tmp)
+
             this.chart_data["cluster_load"]  = tmp;
             this.chart_data["cluster_load_loading"] = false;
+        });
+
+    }
+
+    private fetchClusterTemp() {
+        this.chart_data["cluster_temp_loading"] = true;
+        this.http.get('/api/kairos/cluster', {
+            params : new HttpParams()
+                        .set('from', this.time['from'])
+                        .set('to', this.time['to'])
+                        .set('metric', 'PCH_Temp')
+                        .set('aggregate', '1')
+        }).subscribe(data => {
+            let tmp_data = [];
+
+            for(let key of Object.keys(data["points"])) {
+                tmp_data.push([new Date(+key * 1000), ...data["points"][key]])
+            }
+
+            let tmp = {
+                "labels" : ["Date", ...data["labels"]],
+                "data" : tmp_data
+            }
+
+            this.chart_data["cluster_temp"]  = tmp;
+            this.chart_data["cluster_temp_loading"] = false;
         });
 
     }
