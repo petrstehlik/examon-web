@@ -47,6 +47,8 @@ export class GraphComponent implements OnInit {
         }
     };
 
+    @Input('loading') loading : boolean;
+
     @Input() title = "Untitled Chart";
     @Input() labels = ["Date"];
     @Input() labelY = "Untitled Y axis";

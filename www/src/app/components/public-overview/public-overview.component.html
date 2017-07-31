@@ -71,7 +71,10 @@
 <div class="row mb-3">
     <div class="col">
         <div class="card text-center">
-            <ex-graph [data]="chart_data.cluster_load" title="Cluster Load" labelY="Load (%)"></ex-graph>
+            <ex-graph
+                [data]="chart_data.cluster_load"
+                [loading]="chart_data.cluster_load_loading"
+                title="Cluster Load" labelY="Load (%)"></ex-graph>
         </div>
     </div>
 

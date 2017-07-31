@@ -26,7 +26,8 @@ export class PublicOverviewComponent implements OnInit {
     private time : Object;
     public data : Data;
     public chart_data = {
-        cluster_load : {}
+        cluster_load : {},
+        cluster_load_loading : false
     };
 
     @Input('time')
@@ -56,6 +57,7 @@ export class PublicOverviewComponent implements OnInit {
     }
 
     private fetchClusterLoad() {
+        this.chart_data["cluster_load_loading"] = true;
         this.http.get('/api/kairos/load', {
             params : new HttpParams()
                         .set('from', this.time['from'])
@@ -73,6 +75,7 @@ export class PublicOverviewComponent implements OnInit {
             }
 
             this.chart_data["cluster_load"]  = tmp;
+            this.chart_data["cluster_load_loading"] = false;
         });
 
     }

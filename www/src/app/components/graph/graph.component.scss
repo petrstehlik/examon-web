@@ -11,6 +11,14 @@
     position: relative;
     display: block;
     min-height: 250px;
+
+    .spinner {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 16px;
+        height: auto;
+    }
 }
 
 /deep/ .labels {
