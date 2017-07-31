@@ -3,10 +3,6 @@ declare const Dygraph;
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-// We need labels div reference outside the class since it is need in a callback function
-// outside the component class
-var labelsDiv : ElementRef = null;
-
 @Component({
   selector: 'ex-graph',
   templateUrl: './graph.component.html',
@@ -58,11 +54,11 @@ export class GraphComponent implements OnInit {
 
     private graphRef;
     private config : Object;
+
     constructor(private http : HttpClient) { }
 
     ngOnInit() {
         this.initConfig();
-        labelsDiv = this.labelsDivRef;
     }
 
     private initConfig() {
@@ -86,10 +82,15 @@ export class GraphComponent implements OnInit {
         }
     }
 
-    private moveLabel(event, x, points, row, seriesName) {
-        labelsDiv.nativeElement.style.display = "block";
-        labelsDiv.nativeElement.style.left = (event.clientX + 5) + "px";
-        labelsDiv.nativeElement.style.top = (event.clientY + 5) + "px";
+    public moveLabel(event, x, points, row, seriesName) {
+        // Use event's DOM to find the labels div to operate with
+        // This way we can have multiple graphs on the same page
+        let label = (event.composedPath())[1].lastChild
+
+        // Set styles
+        label.style.display = "block";
+        label.style.left = (event.clientX + 5) + "px";
+        label.style.top = (event.clientY + 5) + "px";
     }
 
     private legendFormatter(data) : void {
