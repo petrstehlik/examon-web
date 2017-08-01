@@ -2,6 +2,7 @@ declare const Dygraph;
 
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment as env } from 'environments/environment';
 
 @Component({
   selector: 'ex-graph',
@@ -25,7 +26,6 @@ export class GraphComponent implements OnInit {
     @Input('data')
     set setData(data) {
         if (data != undefined && Object.keys(data).length !== 0) {
-            console.log(Object.assign({}, data));
             this.data = data;
             if (this.graphRef == undefined) {
                 this.config["labels"] = this.data["labels"];
@@ -45,9 +45,17 @@ export class GraphComponent implements OnInit {
 
     @Input('loading') loading : boolean;
 
-    @Input() title = "Untitled Chart";
+    @Input() topTitle = "Untitled Chart";
     @Input() labels = ["Date"];
     @Input() labelY = "Untitled Y axis";
+
+    // The trick with 100.5 is to display the 100 tick in the graph
+    @Input() range = [0,100.5];
+
+    // Set height of chart's div so the chart itself will resize to it
+    @Input() height = 320;
+
+    @Input() stacked : boolean = false;
 
     @ViewChild('chart') chart : ElementRef;
     @ViewChild('chartLabels') labelsDivRef : ElementRef;
@@ -66,7 +74,7 @@ export class GraphComponent implements OnInit {
             labels : this.labels,
             hideOverlayOnMouseOut : true,
             ylabel: this.labelY,
-            title : this.title,
+            title : this.topTitle,
             legend: 'follow',
             labelsDiv : this.labelsDivRef.nativeElement,
             highlightCallback : this.moveLabel,
@@ -74,6 +82,8 @@ export class GraphComponent implements OnInit {
             highlightCircleSize: 2,
             strokeWidth: 1,
             strokeBorderWidth : 1,
+            valueRange : this.range,
+            stackedGraph : this.stacked,
             highlightSeriesOpts: {
               strokeWidth: 2,
               strokeBorderWidth: 0,
@@ -89,8 +99,8 @@ export class GraphComponent implements OnInit {
 
         // Set styles
         label.style.display = "block";
-        label.style.left = (event.clientX + 5) + "px";
-        label.style.top = (event.clientY + 5) + "px";
+        label.style.left = (event.clientX + env.labels.offsetX) + "px";
+        label.style.top = (event.clientY + env.labels.offsetY) + "px";
     }
 
     private legendFormatter(data) : void {
