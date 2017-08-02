@@ -74,6 +74,41 @@ def core_level():
 
     return(json.dumps(join_data(res)))
 
+@app.route("/kairos/cpu")
+def cpu_level():
+    """
+    Load data on per-cpu level in dygraphs-friendly format
+    Designed for association with job info where you pick the nodes (at least!)
+
+    Params:
+        from    <required>  timestamp
+        to                  timestamp
+        metric  <required>  metric by which to query
+        node    <list>      list of nodes to query
+        cpu     <list>      list of cpus to query
+        raw                 return KairosDB data format (no post-processing)
+        aggregate   <def:5> size of time window (s) in which to aggregate data (and alignment of timestamps)
+    """
+    args = request.args.to_dict()
+
+    args["node"] = request.args.getlist("node")
+    metrics = request.args.getlist("metric")
+
+    res = list()
+
+    if len(args["node"]) == 0:
+        raise JobsError("Node list must be specified")
+
+    args["cpu"] = request.args.getlist("cpu")
+
+    for item in metrics:
+        args["metric"] = [item]
+        res.append(query(args, 25, ['node', 'cpu'], tags = {
+                "node" : args["node"]
+            }))
+
+    return(json.dumps(join_data(res)))
+
 @app.route("/kairos/node")
 def load_base():
     """
