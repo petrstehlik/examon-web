@@ -16,7 +16,7 @@ export class PublicDashboardComponent implements OnInit {
 
     ngOnInit() {
         this.timewindow = {
-            from : (+Date.now() - env.timeoffset), // -15 mins
+            from : (+Date.now() - env.timeoffset),
             to : +Date.now()
         };
         console.log(this.timewindow)
