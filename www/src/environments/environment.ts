@@ -16,6 +16,8 @@ export const environment = {
             offsetY : 20        // Y-axis offset for label position (px)
         }
     },
+
+    // Aggregation window sizes for each MQTT publisher
     window : {
         ipmi : 20,
         pmu : 2,
