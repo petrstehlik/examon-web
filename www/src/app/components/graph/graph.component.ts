@@ -53,7 +53,7 @@ export class GraphComponent implements OnInit {
     @Input() range = [0,100.5];
 
     // Set height of chart's div so the chart itself will resize to it
-    @Input() height = 320;
+    @Input() height = env.chart.height;
 
     @Input() stacked : boolean = false;
 
@@ -99,8 +99,8 @@ export class GraphComponent implements OnInit {
 
         // Set styles
         label.style.display = "block";
-        label.style.left = (event.clientX + env.labels.offsetX) + "px";
-        label.style.top = (event.clientY + env.labels.offsetY) + "px";
+        label.style.left = (event.clientX + env.chart.labels.offsetX) + "px";
+        label.style.top = (event.clientY + env.chart.labels.offsetY) + "px";
     }
 
     private legendFormatter(data) : void {
