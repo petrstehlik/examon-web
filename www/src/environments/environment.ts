@@ -6,5 +6,10 @@
 export const environment = {
     production: false,
     // Default time offset for rangepicker
-    timeoffset : 900000
+    timeoffset : 900000,
+
+    labels : {
+        offsetX : 10,
+        offsetY : 20
+    }
 }
