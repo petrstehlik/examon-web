@@ -3,8 +3,8 @@
         <div class="card text-center">
             Power per node/core averaged by 5 seconds (if time > 60s)
             <ex-graph
-                [data]="data.job_power"
-                [loading]="data.loading_power"
+                [data]="data['job_power']"
+                [loading]="data['loading_power']"
                 [range]="null"
                 topTitle="Power consumption"
                 labelY="Consumption (W)">
@@ -24,8 +24,8 @@
         <div class="card text-center">
             chipset (pch_temp) temperature per node
             <ex-graph
-                [data]="data.job_temp"
-                [loading]="data.loading_temp"
+                [data]="data['job_temp']"
+                [loading]="data['loading_temp']"
                 [range]="null"
                 topTitle="Chipset Temperature"
                 labelY="Temp (°C)">
@@ -60,8 +60,8 @@
         <div class="card text-center">
             dram power per node
             <ex-graph
-                [data]="data.job_cpu_dram_power"
-                [loading]="data.loading_cpu_dram_power"
+                [data]="data['job_cpu_dram_power']"
+                [loading]="data['loading_cpu_dram_power']"
                 [range]="null"
                 topTitle="CPU and DRAM Power"
                 labelY="Power (W)">

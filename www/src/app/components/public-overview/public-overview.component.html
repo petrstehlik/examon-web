@@ -58,8 +58,8 @@
     <div class="col">
         <div class="card text-center">
             <ex-graph
-                [data]="chart_data.cluster_load"
-                [loading]="chart_data.cluster_load_loading"
+                [data]="chart_data['cluster_load']"
+                [loading]="chart_data['cluster_load_loading']"
                 topTitle="Cluster Load" labelY="Load (%)"></ex-graph>
         </div>
     </div>
@@ -92,8 +92,8 @@
     <div class="col">
         <div class="card text-center">
             <ex-graph
-                [data]="chart_data.cluster_temp"
-                [loading]="chart_data.cluster_temp_loading"
+                [data]="chart_data['cluster_temp']"
+                [loading]="chart_data['cluster_temp_loading']"
                 [range]="null"
                 topTitle="Cluster Temperature" labelY="Temperature (°C)"></ex-graph>
         </div>
