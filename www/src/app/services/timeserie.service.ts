@@ -17,12 +17,19 @@ export class TimeserieService {
     fetch(job, dict_name, endpoint, metric : string|string[], aggregate : number = null) {
         let params = new HttpParams();
 
-        for (let key of job["data"]["asoc_nodes"]) {
-            params = params.append('node', key["node"]);
-        }
+        console.log(Object.keys(job).includes("asoc_nodes"));
 
-        params = params.set('from', job['data']["start_time"])
-            .set('to', job['data']["end_time"])
+        if ("data" in job) {
+            for (let key of job["data"]["asoc_nodes"]) {
+                params = params.append('node', key["node"]);
+            }
+
+            params = params.set('from', job['data']["start_time"])
+                .set('to', job['data']["end_time"])
+        } else {
+            params = params.set('from', job["from"])
+                .set('to', job["to"])
+        }
 
         if (metric.constructor == Array) {
             for (let item of metric) {
