@@ -67,6 +67,7 @@ export class PublicOverviewComponent implements OnInit {
                         .set('aggregate', '10')
         }).subscribe(data => {
             let tmp_data = [];
+            console.log(data)
 
             for(let key of Object.keys(data["points"])) {
                 tmp_data.push([new Date(+key * 1000), ...data["points"][key]])

@@ -60,7 +60,7 @@
             <ex-graph
                 [data]="chart_data.cluster_load"
                 [loading]="chart_data.cluster_load_loading"
-                title="Cluster Load" labelY="Load (%)"></ex-graph>
+                topTitle="Cluster Load" labelY="Load (%)"></ex-graph>
         </div>
     </div>
 
@@ -94,7 +94,8 @@
             <ex-graph
                 [data]="chart_data.cluster_temp"
                 [loading]="chart_data.cluster_temp_loading"
-                title="Cluster Temperature" labelY="Temperature (°C)"></ex-graph>
+                [range]="null"
+                topTitle="Cluster Temperature" labelY="Temperature (°C)"></ex-graph>
         </div>
     </div>
 
