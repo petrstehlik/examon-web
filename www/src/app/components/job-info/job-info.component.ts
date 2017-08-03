@@ -18,11 +18,9 @@ export class JobInfoComponent implements OnInit {
 
     @Input("job")
     set setJob(data) {
-        if (data != undefined) {
-            console.log(data);
+        if (data != undefined && data.loaded) {
             this.job = data;
             this.fetchRaw("load_core", "core", "load_core", this.aggWindow()*10);
-            console.log(this.data)
         }
     }
 
