@@ -1,12 +1,26 @@
 <div class="row mb-3">
-    <div class="col-4">
-        <div class="card text-center bullet" style="height: 200px">
-            Bullet charts for sys/cpu/mem/io_utilization for current/last values
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_load_core']"
+                [loading]="data['loading_load_core']"
+                topTitle="Allocated Cores' Load"
+                labelY="Load (%)">
+            </ex-graph>
+             <ex-graph
+                [data]="data['job_load_core_cluster']"
+                [loading]="data['loading_load_core_cluster']"
+                topTitle="Allocated Cluster's Load"
+                height="100"
+                labelY="Load (%)">
+            </ex-graph>
         </div>
     </div>
-    <div class="col-8">
+</div>
+
+<div class="row mb-3">
+    <div class="col">
         <div class="card text-center">
-            Time serie chart for sys/cpu/mem/io_utilization aggregated
             <ex-graph
                 [data]="data['job_utils']"
                 [loading]="data['loading_utils']"
@@ -19,54 +33,48 @@
 </div>
 
 <div class="row mb-3">
-    <div class="col">
-        <div class="card text-center">
-            CPU utilization per node/core averaged by 5 seconds (if time > 60s)
+    <div class="col row">
 
-            <ex-graph
-                [data]="data['job_load_core']"
-                [loading]="data['loading_load_core']"
-                topTitle="Cluster Load"
-                labelY="Load (%)">
-            </ex-graph>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col-3">
-        <div class="card text-center align-items-center donut" style="height: 200px">
-            Bound shares total
-        </div>
-    </div>
-
-    <div class="col-9 row">
-
-        <div class="col-12 mb-3">
+        <div class="col-12 mb-1">
             <div class="card text-center">
-                Front-end bound per node/core averaged by 5 seconds (if time > 60s)
                 <ex-graph
                     [data]="data['job_fe_bound']"
                     [loading]="data['loading_fe_bound']"
                     height="150"
                     topTitle="Front-end Bound"
-                    labelY="Utilization (%)">
+                    labelY="Bounds (%)">
                 </ex-graph>
             </div>
         </div>
 
         <div class="col-12">
             <div class="card text-center">
-                Back-end bound per node/core averaged by 5 seconds (if time > 60s)
                 <ex-graph
                     [data]="data['job_be_bound']"
                     [loading]="data['loading_be_bound']"
                     height="150"
                     topTitle="Back-end Bound"
+                    labelY="Bounds (%)">
+                </ex-graph>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col row">
+        <div class="col-12">
+            <div class="card text-center">
+                <ex-graph
+                    [data]="data['job_febe_bound']"
+                    [loading]="data['loading_febe_bound']"
+                    height="150"
+                    stacked="true"
+                    topTitle="Front/Back-end Bound"
                     labelY="Utilization (%)">
                 </ex-graph>
             </div>
         </div>
+
     </div>
 </div>
 

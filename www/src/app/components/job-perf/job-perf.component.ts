@@ -20,11 +20,13 @@ export class JobPerfComponent implements OnInit {
     set setJob(job : Job) {
         if (job != null) {
             this.job = job;
-            this.fetch('utils', 'node', ['Mem_Utilization', 'CPU_Utilization', 'IO_Utilization', 'Sys_Utilization'], env.window.ipmi);
             this.fetch('load_core', 'core', 'load_core');
+            this.fetch('load_core_cluster', 'cluster', 'load_core', env.window.pmu);
+            this.fetch('utils', 'node', ['Mem_Utilization', 'CPU_Utilization', 'IO_Utilization', 'Sys_Utilization'], env.window.ipmi + 5);
             this.fetch('fe_bound', 'core', 'front_end_bound');
             this.fetch('be_bound', 'core', 'back_end_bound');
-            this.fetch('ips', 'core', 'ips');
+            this.fetch('febe_bound', 'cluster', ['retiring', 'L1L2_bound', 'L3_bound']);
+            this.fetch('ips', 'core', ['ips', 'freq']);
             this.fetch('cstates', 'node', ['C3res', 'C6res']);
         }
     }
