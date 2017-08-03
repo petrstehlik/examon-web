@@ -21,8 +21,7 @@
       "styles": [
         "styles/styles.scss",
         "../node_modules/bootstrap/dist/css/bootstrap.min.css",
-        "../node_modules/dygraphs/dist/dygraph.css",
-        "assets/b4w/"
+        "../node_modules/dygraphs/dist/dygraph.css"
       ],
       "scripts": [
         "../node_modules/dygraphs/dist/dygraph.js",
