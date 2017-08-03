@@ -21,10 +21,12 @@
       "styles": [
         "styles/styles.scss",
         "../node_modules/bootstrap/dist/css/bootstrap.min.css",
-        "../node_modules/dygraphs/dist/dygraph.css"
+        "../node_modules/dygraphs/dist/dygraph.css",
+        "assets/b4w/"
       ],
       "scripts": [
-        "../node_modules/dygraphs/dist/dygraph.js"
+        "../node_modules/dygraphs/dist/dygraph.js",
+        "assets/b4w/b4w.simple.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
