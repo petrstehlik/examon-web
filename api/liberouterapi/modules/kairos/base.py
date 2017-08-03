@@ -156,14 +156,23 @@ def cluster_level():
         aggregate   <def:5> size of time window (s) in which to aggregate data (and alignment of timestamps)
     """
     args = request.args.to_dict()
+    args["node"] = request.args.getlist("node")
     metrics = request.args.getlist("metric")
-    res = list()
+    res_list = list()
 
-    for item in metrics:
-        args["metric"] = [item]
-        res.append(query(args, 5, ['cluster']))
+    if len(args["node"]) > 0:
+        for item in metrics:
+            args["metric"] = [item]
+            res_list.append(query(args, 5, ['cluster'], tags = {
+                "node" : args["node"]
+            }))
 
-    return(json.dumps(join_data(res)))
+        return(json.dumps(join_data(res_list)))
+    else:
+        args["metric"] = [args["metric"]]
+        res_list.append(query(args, 5, ['node']))
+
+    return(json.dumps(join_data(res_list)))
 
 def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags = None):
     check_times(args)
