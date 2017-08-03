@@ -14,10 +14,27 @@ export class TimeserieService {
      *
      * Some transformations must be done anyway but still better than doing everything in front-end
      */
-    fetch(job, dict_name, endpoint, metric : string|string[], aggregate : number = null) {
-        let params = new HttpParams();
+    fetch(job,
+        dict_name,
+        endpoint,
+        metric : string|string[],
+        aggregate : number = null,
+        raw : boolean = false) {
+        return new Observable(observer =>
+            this.http.get('/api/kairos/' + endpoint, {
+              params : this.prepareParams(job, metric, aggregate)
+            }).subscribe(data => {
+                if (raw)
+                    observer.next(data);
+                else
+                    observer.next(this.parseData(data));
+            }, error => {
+                this.msg.send("Something went wrong for '" + dict_name + "' (status: " + String(error.status) +")", "danger");
+            }));
+    }
 
-        console.log(Object.keys(job).includes("asoc_nodes"));
+    private prepareParams(job, metric, aggregate) : HttpParams {
+        let params = new HttpParams();
 
         if ("data" in job) {
             for (let key of job["data"]["asoc_nodes"]) {
@@ -43,24 +60,21 @@ export class TimeserieService {
             params = params.set('aggregate', String(aggregate));
         }
 
-        return new Observable(observer =>
-            this.http.get('/api/kairos/' + endpoint, {
-              params : params
-            }).subscribe(data => {
-                let tmp_data = [];
+        return params;
+    }
 
-                for(let key of Object.keys(data["points"])) {
-                    tmp_data.push([new Date(+key * 1000), ...data["points"][key]]);
-                }
+    private parseData(data : Object) : Object {
+        let tmp_data = [];
 
-                let tmp = {
-                    "labels" : ["Date", ...data["labels"]],
-                    "data" : tmp_data
-                }
+        for(let key of Object.keys(data["points"])) {
+            tmp_data.push([new Date(+key * 1000), ...data["points"][key]]);
+        }
 
-                observer.next(tmp);
-            }, error => {
-                this.msg.send("Something went wrong for '" + dict_name + "' (status: " + String(error.status) +")", "danger");
-            }));
+        let tmp = {
+            "labels" : ["Date", ...data["labels"]],
+            "data" : tmp_data
+        }
+
+        return tmp;
     }
 }
