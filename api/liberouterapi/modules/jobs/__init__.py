@@ -98,6 +98,7 @@ def jobs_hello(jobid):
 
     if len(measures.current_rows) > 0:
         result = merge_dicts(info[0], measures[0])
+        result["asoc_power"] = asoc_node_core(result["job_node_avg_powerlist"], result["vnode_list"])
     else:
         result = info[0]
 
@@ -120,8 +121,6 @@ def jobs_latest():
         results.append(item)
 
     ordered = sorted(results, key = lambda k : k['end_time'])
-    for item in ordered:
-        print(item["job_id"], item["end_time"])
     return(json.dumps(ordered[-1], default=default))
 
 def get_duration(start, end):

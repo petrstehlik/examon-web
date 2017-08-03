@@ -51,6 +51,7 @@ def prepare_statements(session):
             ipmi_avg_cpu_util,
             ipmi_avg_sys_util,
             ipmi_job_avg_power,
+            job_node_avg_powerlist,
             job_tot_avg_power,
             job_tot_avg_load,
             job_tot_avg_temp
