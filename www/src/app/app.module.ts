@@ -27,7 +27,8 @@ import {
     GeneralPublicViewComponent,
     SysadminDashboardComponent,
     SysadminOverviewComponent,
-    RangepickerComponent } from 'app/components';
+    RangepickerComponent,
+    RenderComponent } from 'app/components';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import {
     PublicDashboardComponent,
     PublicOverviewComponent,
     SysadminOverviewComponent,
-    RangepickerComponent
+    RangepickerComponent,
+    RenderComponent
   ],
   imports: [
     BrowserModule,

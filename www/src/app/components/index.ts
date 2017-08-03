@@ -14,3 +14,5 @@ export { PublicOverviewComponent } from './public-overview/public-overview.compo
 export { GeneralPublicViewComponent } from './general-public-view/general-public-view.component';
 
 export { RangepickerComponent } from './rangepicker/rangepicker.component';
+
+export { RenderComponent } from './render/render.component';
