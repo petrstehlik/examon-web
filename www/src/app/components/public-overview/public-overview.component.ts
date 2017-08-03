@@ -59,7 +59,7 @@ export class PublicOverviewComponent implements OnInit {
 
     private fetchClusterLoad() {
         this.chart_data["cluster_load_loading"] = true;
-        this.http.get('/api/kairos/node', {
+        this.http.get('/api/kairos/cluster', {
             params : new HttpParams()
                         .set('from', this.time['from'])
                         .set('to', this.time['to'])
@@ -93,7 +93,7 @@ export class PublicOverviewComponent implements OnInit {
                         .set('from', this.time['from'])
                         .set('to', this.time['to'])
                         .set('metric', 'PCH_Temp')
-                        .set('aggregate', '1')
+                        .set('aggregate', '30')
         }).subscribe(data => {
             let tmp_data = [];
 
