@@ -17,7 +17,7 @@ export class RenderComponent implements OnInit, OnDestroy {
         if (!b4w.module_check("Galileo_main"))
             this.register();
          // import the app module and start the app by calling the init method
-        //b4w.require("Galileo_main").init();
+        b4w.require("Galileo_main").init();
     }
 
     /**
@@ -46,6 +46,7 @@ export class RenderComponent implements OnInit, OnDestroy {
         // automatically detect assets path
         var APP_ASSETS_PATH = m_cfg.get_assets_path("Galileo");
 
+        var _selected_obj;
         /**
          * export the method to initialize the app (called at the bottom of this file)
          */
@@ -118,16 +119,27 @@ export class RenderComponent implements OnInit, OnDestroy {
                 e.preventDefault();
 
             var x = m_mouse.get_coords_x(e);
-            var y = m_mouse.get_coords_y(e);
+            // The shift in coords is needed because the canvas is moved from 0,0
+            // under a header which is 150 px high.
+            var y = m_mouse.get_coords_y(e) - 150;
 
             var obj = m_scenes.pick_object(x, y);
 
-            if (obj) {
-                console.log(obj.name);
+            if (m_scenes.check_object_by_name(obj.name) && obj.name.slice(0,4) == "node") {
+                console.log(obj);
 
                 let label = document.getElementById("label");
 
                 label.innerText = "Selected node: " + obj.name;
+
+                if (_selected_obj != obj) {
+                    if (_selected_obj)
+                            m_scenes.clear_outline_anim(_selected_obj);
+                    if (obj)
+                            m_scenes.apply_outline_anim_def(obj);
+
+                    _selected_obj = obj;
+                }
             }
         }
 
