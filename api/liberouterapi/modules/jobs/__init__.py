@@ -10,14 +10,19 @@ from cassandra.query import dict_factory
 import json
 import calendar, datetime, time
 import decimal
+import logging
 
 from cassandra_connector import connect, prepare_statements
 
+log = logging.getLogger(__name__)
+
 class JobsError(ApiException):
     status_code = 500
-
-session = connect()
-prepared = prepare_statements(session)
+try:
+    session = connect()
+    prepared = prepare_statements(session)
+except Exception as e:
+    log.error("Failed to connect to Cassandra: %s" % str(e))
 
 def default(obj):
     """Default JSON serializer."""
