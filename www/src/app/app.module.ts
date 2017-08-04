@@ -6,6 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 
+import { ChartsModule } from 'ng2-charts/ng2-charts';
+
 import { appRoutes } from './app.routes';
 
 import { AppComponent } from './app.component';
@@ -53,6 +55,7 @@ import {
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    ChartsModule,
     NgbModule.forRoot(),
     RouterModule.forRoot(appRoutes)
   ],

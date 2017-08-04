@@ -25,6 +25,7 @@
       ],
       "scripts": [
         "../node_modules/dygraphs/dist/dygraph.js",
+        "../node_modules/chart.js/dist/chart.min.js",
         "assets/b4w/b4w.simple.min.js"
       ],
       "environmentSource": "environments/environment.ts",
