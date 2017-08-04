@@ -118,10 +118,12 @@ export class RenderComponent implements OnInit, OnDestroy {
             if (e.preventDefault)
                 e.preventDefault();
 
-            var x = m_mouse.get_coords_x(e);
+            var offset = getOffset(document.getElementById("main_canvas_container"));
+
+            var x = m_mouse.get_coords_x(e) - offset['left'];
             // The shift in coords is needed because the canvas is moved from 0,0
             // under a header which is 150 px high.
-            var y = m_mouse.get_coords_y(e) - 150;
+            var y = m_mouse.get_coords_y(e) - offset['top'];
 
             var obj = m_scenes.pick_object(x, y);
 
@@ -142,6 +144,17 @@ export class RenderComponent implements OnInit, OnDestroy {
                 }
             }
         }
+
+            function getOffset( el ) {
+                var _x = 0;
+                var _y = 0;
+                while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
+                            _x += el.offsetLeft - el.scrollLeft;
+                            _y += el.offsetTop - el.scrollTop;
+                            el = el.offsetParent;
+                        }
+                return { top: _y, left: _x };
+            }
 
 
         });
