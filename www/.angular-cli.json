@@ -26,6 +26,7 @@
       "scripts": [
         "../node_modules/dygraphs/dist/dygraph.js",
         "../node_modules/chart.js/dist/chart.min.js",
+        "../node_modules/socket.io-client/dist/socket.io.slim.js",
         "assets/b4w/b4w.simple.min.js"
       ],
       "environmentSource": "environments/environment.ts",
