@@ -100,13 +100,30 @@ class Holder():
                         nodeID : {
                                 "value" : float(data[0]),
                                 "timestamp" : data[1]
-                            }
+                            },
+                        "max" : float(data[0]),
+                        "min" : float(data[0])
                         }
+
+            value = self.db[topic[-1]][nodeID]["value"]
+
+            if value > self.db[topic[-1]]["max"]:
+                self.db[topic[-1]]["max"] = value
+
+            elif value < self.db[topic[-1]]["min"]:
+                self.db[topic[-1]]["min"] = value
+
             self.on_store(nodeID, metric, self.db[metric][nodeID])
 
         except Exception as e:
             self.log.error(str(e))
             raise
+
+    def minmax(self, metric):
+        return({
+                'min' : self.db[metric]['min'],
+                'max' : self.db[metric]['max']
+            })
 
     def default_on_store(self, nodeID, metric, payload):
         pass
