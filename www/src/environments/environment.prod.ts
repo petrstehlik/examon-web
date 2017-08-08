@@ -17,5 +17,7 @@ export const environment = {
         ipmi : 20,
         pmu : 2,
         tmam : 2
-    }
+    },
+    active_metric : 'Ambient_Temp',
+    active_metric_name : 'Ambient Temperature'
 }
