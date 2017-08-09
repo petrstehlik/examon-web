@@ -5,6 +5,7 @@ import { HSVtoRGB, calcOffset } from 'app/utils/colors';
 
 declare const b4w;
 declare const io;
+var socket;
 
 @Component({
   selector: 'ex-render',
@@ -42,7 +43,7 @@ export class RenderComponent implements OnInit, OnDestroy {
 
         if (!b4w.module_check("Galileo_main"))
             this.register();
-         // import the app module and start the app by calling the init method
+        // import the app module and start the app by calling the init method
         b4w.require("Galileo_main").init();
     }
 
@@ -63,7 +64,8 @@ export class RenderComponent implements OnInit, OnDestroy {
         var m_scenes    = require("scenes");
         var m_mat       = require("material");
 
-        var socket = io('localhost:5555/render', {reconnection:true});
+            socket = io(env.ws.host + ':' + env.ws.port + '/render',
+                {reconnection:true});
         var node_data = {};
         var active_metric = env.active_metric;
         var active_metric_name = env.active_metric_name;
@@ -104,7 +106,7 @@ export class RenderComponent implements OnInit, OnDestroy {
         });
 
         socket.on('error', function(data) {
-            console.error("SOCKET DATA", data);
+            console.error("Error occured", data);
         });
 
         // detect application mode
@@ -245,6 +247,10 @@ export class RenderComponent implements OnInit, OnDestroy {
 
             var obj = m_scenes.pick_object(x, y);
 
+            highlightNode(obj);
+        }
+
+        function highlightNode(obj) {
             if (obj &&
                 m_scenes.check_object_by_name(obj.name) &&
                 obj.name.slice(0,4) == "node") {
@@ -302,11 +308,13 @@ export class RenderComponent implements OnInit, OnDestroy {
             if (node in node_data) {
                 let color = node_data[node]['color_rgb'];
                 label.innerHTML = "<h4>Node: " + node + "</h4>" +
-                    active_metric_name + ": " + node_data[node]['value'].toFixed(2) +
-                    "<span class='color-bar' style='background-color: rgb(" +
+                    active_metric_name + ": " + node_data[node]['value'].toFixed(2);
+                if (color != undefined) {
+                    label.innerHTML += "<span class='color-bar' style='background-color: rgb(" +
                         (color['r']) + "," +
                         (color['g']) + "," +
-                    (color['b']) + ");'></span>";
+                        (color['b']) + ");'></span>";
+                }
 
                 if (!env.production) {
                     label.innerHTML += "<small>Time of last value: " + new Date(+node_data[node]['timestamp'] * 1000) + "</small>";
