@@ -6,7 +6,7 @@
 
 #main_canvas_container {
   width: 100%;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 150px);
   position: relative;
   margin-top: 1em;
 }
@@ -30,4 +30,10 @@
     .hide {
         display: none;
     }
+}
+
+.selector {
+    top: 80px;
+    right: 15px;
+    position: absolute;
 }

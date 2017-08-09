@@ -2,12 +2,16 @@
 
 <div id="label" class="hide"></div>
 
-<select id="select-metric">
-    <option *ngFor="let item of metrics" value="{{ item.value }}">{{ item.name }}</option>
-</select>
-<button class="btn btn-primary" id="set-metric">
-    Change metric
-</button>
+<div class="selector form-inline">
+    <select id="select-metric" class="form-control mr-2">
+        <option *ngFor="let item of metrics" value="{{ item.value }}">
+            {{ item.name }}
+        </option>
+    </select>
+    <button class="btn btn-primary" id="set-metric">
+        Change metric
+    </button>
+</div>
 <!--div *ngFor="let color of colors">
     <span style.background-color="rgb({{color?.r}}, {{color?.g}}, {{color?.b}})"
         style="display: block; width: 10px; height: 100px; float:left"
