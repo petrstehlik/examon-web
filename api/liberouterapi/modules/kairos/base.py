@@ -170,7 +170,7 @@ def cluster_level():
         return(json.dumps(join_data(res_list)))
     else:
         args["metric"] = [args["metric"]]
-        res_list.append(query(args, 5, ['node']))
+        res_list.append(query(args, 5, ['cluster']))
 
     return(json.dumps(join_data(res_list)))
 
