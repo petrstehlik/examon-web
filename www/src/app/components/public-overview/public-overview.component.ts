@@ -14,10 +14,6 @@ interface Total {
     cpus : number
 }
 
-interface Data {
-    total : Total;
-}
-
 @Component({
     selector: 'ex-public-overview',
     templateUrl: './public-overview.component.html',
@@ -27,7 +23,28 @@ interface Data {
 export class PublicOverviewComponent implements OnInit {
 
     private time : Object;
-    public data = {};
+    public data = {
+        total : <Total>{},
+
+        load : {},
+        loading_load : true,
+
+        load_total : {},
+        loading_load_total : true,
+
+        temp : {},
+        loading_temp : true,
+
+        temp_total : {},
+        loading_temp_total : true,
+
+        power : {},
+        loading_power : true,
+
+        power_total : {},
+        loading_power_total : true
+    };
+
     public chart_data = {
         cluster_load : {},
         cluster_load_loading : false
@@ -35,14 +52,10 @@ export class PublicOverviewComponent implements OnInit {
 
     @Input('time')
     set setData(time) {
-        console.log(time);
         if (time != undefined) {
             this.time = time;
 
             this.fetchTotal();
-
-            //this.fetchClusterLoad();
-            //this.fetchClusterTemp();
 
             this.fetch('load', 'cluster', 'load_core', 20);
             this.fetch('load_total', 'cluster', 'load_core', this.time['to'] - this.time['from'] + 10);
@@ -50,8 +63,6 @@ export class PublicOverviewComponent implements OnInit {
             this.fetch('temp_total', 'cluster',  'temp_pkg', this.time['to'] - this.time['from'] + 10);
             this.fetch('power', 'cluster', 'Avg_Power', 20);
             this.fetch('power_total', 'cluster', 'Avg_Power', this.time['to'] - this.time['from'] + 10);
-
-            console.log(this.data['power_total'])
         }
     };
 
@@ -75,9 +86,7 @@ export class PublicOverviewComponent implements OnInit {
                         .set('from', this.time['from'])
                         .set('to', this.time['to'])
         }).subscribe(data => {
-            this.data = {
-                total : data
-            };
+            this.data.total = data;
         })
     }
 }
