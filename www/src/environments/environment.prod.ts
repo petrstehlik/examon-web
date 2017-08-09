@@ -1,7 +1,7 @@
 export const environment = {
     production: true,
     // Default time offset for rangepicker
-    timeoffset : 900000,
+    timeoffset : 1800000,
 
     // Defaults for chart configuration
     chart : {
@@ -12,12 +12,16 @@ export const environment = {
         }
     },
 
-    // Aggregation window sizes for each MQTT publisher    
+    // Aggregation window sizes for each MQTT publisher
     window : {
         ipmi : 20,
         pmu : 2,
         tmam : 2
     },
     active_metric : 'Ambient_Temp',
-    active_metric_name : 'Ambient Temperature'
+    active_metric_name : 'Ambient Temperature',
+    ws : {
+        host : window.location.hostname,
+        port : 5555
+    }
 }

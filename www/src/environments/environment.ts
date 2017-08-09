@@ -24,5 +24,9 @@ export const environment = {
         tmam : 2
     },
     active_metric : 'Ambient_Temp',
-    active_metric_name : 'Ambient Temperature'
+    active_metric_name : 'Ambient Temperature',
+    ws : {
+        host : window.location.hostname,
+        port : 5555
+    }
 }
