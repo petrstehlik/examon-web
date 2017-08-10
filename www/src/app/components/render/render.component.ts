@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { environment as env } from 'environments/environment';
 
-import { HSVtoRGB, calcOffset } from 'app/utils/colors';
+import { HSVtoRGB, calcOffset, getOffset } from 'app/utils/colors';
+import { metrics } from './metrics';
 
 declare const b4w;
 declare const io;
@@ -15,75 +16,15 @@ var socket;
 export class RenderComponent implements OnInit, OnDestroy {
 
     public colors = [];
-    public metrics = [{
-            name : "Ambient Temperature",
-            value : "Ambient_Temp"
-        },
-        {
-            name : "PIB Ambient Temperature",
-            value : "PIB_Ambient_Temp"
-        },
-        {
-            name : "Power Consumption",
-            value : "Avg_Power"
-        },
-        {
-            name : "CPU Load",
-            value : "CPU_Utilization"
-        },
-        {
-            name : "System Load",
-            value : "Sys_Utilization"
-        },
-        {
-            name : "Memory Load",
-            value : "Mem_Utilization"
-        },
-        {
-            name : "IO Load",
-            value : "IO_Utilization"
-        },
-        {
-            name : "Chipset Temperature",
-            value : "PCH_Temp"
-        },
-        {
-            name : "HDD Inlet Temperature",
-            value : "HDD_Inlet_Temp"
-        },
-        {
-            name : "PCI Riser 1 Temperature",
-            value : "PCI_Riser_1_Temp"
-        },
-        {
-            name : "PCI Riser 2 Temperature",
-            value : "PCI_Riser_2_Temp"
-        },
-        {
-            name : "GPU Outlet Temperature",
-            value : "GPU_Outlet_Temp"
-        },
-        {
-            name : "CPU #1 Temperature",
-            value : "CPU1_Temp"
-        },
-        {
-            name : "CPU #2 Temperature",
-            value : "CPU2_Temp"
-        },
-        {
-            name : "CPU Temperature",
-            value : "temp_pkg"
-        },
-]
+    public metrics = metrics;
 
     constructor() { }
 
     ngOnInit() {
         b4w.require("main").reset();
 
-        if (!b4w.module_check("Galileo_main"))
-            this.register();
+        this.register();
+
         // import the app module and start the app by calling the init method
         b4w.require("Galileo_main").init();
     }
@@ -93,7 +34,7 @@ export class RenderComponent implements OnInit, OnDestroy {
      */
     register() {
         // register the application module
-        b4w.register("Galileo_main", function(exports, require) {
+    b4w.register("Galileo_main", function(exports, require) {
 
         // import modules used by the app
         var m_app       = require("app");
@@ -105,50 +46,11 @@ export class RenderComponent implements OnInit, OnDestroy {
         var m_scenes    = require("scenes");
         var m_mat       = require("material");
 
-            socket = io(env.ws.host + ':' + env.ws.port + '/render',
-                {reconnection:true});
         var node_data = {};
+
+        // Metric selection init
         var active_metric = env.active_metric;
         var active_metric_name = env.active_metric_name;
-
-        socket.on('connect', function() {
-            console.debug("Connected");
-
-            socket.emit('subscribe-metric', {metric : active_metric});
-        });
-
-        socket.on('initial-data', function(data) {
-            console.log("SOCKET DATA", data);
-
-            // Create a deep copy of original data
-            let tmp_data = Object.assign({}, node_data);
-
-            node_data = data;
-
-            // We must clear the model
-            /*if (Object.keys(tmp_data).length > 0) {
-                for (const key of Object.keys(node_data)) {
-                    if (key == 'max' || key == 'min')
-                        continue;
-
-                    if (key in data) {
-                        //color_node(key, {
-                        //    min : data['min'],
-                        //    max : data['max'],
-                        //    value : data[key]['value']
-                        //})
-                    } else {
-                        console.log("cleaning color")
-                        var obj = m_scenes.get_object_by_name(key);
-                        m_mat.set_diffuse_color(obj, "node", [1, 1, 1]);
-                    }
-                }
-            }*/
-        });
-
-        socket.on('error', function(data) {
-            console.error("Error occured", data);
-        });
 
         // detect application mode
         var DEBUG = env.production;
@@ -157,6 +59,51 @@ export class RenderComponent implements OnInit, OnDestroy {
         var APP_ASSETS_PATH = m_cfg.get_assets_path("Galileo");
 
         var _selected_obj;
+
+
+        socket = io(env.ws.host + ':' + env.ws.port + '/render', { reconnection:true });
+        // Connect to a websocket and subscribe to the active metric
+        socket.on('connect', function() {
+            console.debug("Connected");
+
+            socket.emit('subscribe-metric', {metric : active_metric});
+        });
+
+        socket.on('initial-data', function(data) {
+            console.debug("SOCKET DATA", data);
+
+            // Create a deep copy of original data
+            let tmp_data = Object.assign({}, node_data);
+
+            node_data = data;
+
+            // We must clear the model
+            if (Object.keys(tmp_data).length > 0) {
+                for (const key of Object.keys(tmp_data)) {
+                    if (key == 'max' || key == 'min')
+                        continue;
+
+                    var obj = m_scenes.get_object_by_name(key);
+                    m_mat.set_diffuse_color(obj, "node", [1, 1, 1]);
+                }
+
+                for (const key of Object.keys(node_data)) {
+                    if (key == 'min' || key == 'max')
+                        continue;
+
+                    color_node(key, {
+                        value : node_data[key]['value'],
+                        min : node_data['min'],
+                        max : node_data['max']
+                    })
+                }
+            }
+        });
+
+        socket.on('error', function(data) {
+            console.error("Error occured", data);
+        });
+
         /**
          * export the method to initialize the app (called at the bottom of this file)
          */
@@ -212,6 +159,7 @@ export class RenderComponent implements OnInit, OnDestroy {
             canvas_elem.addEventListener("touchstart", canvas_click, false);
             document.getElementById("set-metric").addEventListener("click", swichMetric);
 
+            // Model is initialized so we can color the nodes
             for (const key of Object.keys(node_data)) {
                 if (key == 'min' || key == 'max')
                     continue;
@@ -225,17 +173,18 @@ export class RenderComponent implements OnInit, OnDestroy {
 
             // Register the data reception via websocket only when everything is loaded
             socket.on('data', function(data) {
-                color_node(data['node'], {
-                    value : data['data']['value'],
-                    min : data['range']['min'],
-                    max : data['range']['max']
-                });
-
+                console.log(new Date(), new Date( data['data']['timestamp'] * 1000), data['node']);
                 if (!(data['node'] in node_data))
                     node_data[data['node']] = data
 
                 node_data[data['node']]['value'] = data['data']['value'];
                 node_data[data['node']]['timestamp'] = data['data']['timestamp'];
+
+                color_node(data['node'], {
+                    value : data['data']['value'],
+                    min : data['range']['min'],
+                    max : data['range']['max']
+                });
 
                 if (_selected_obj && data['node'] == _selected_obj.name) {
                     fillLabel(data['node']);
@@ -311,6 +260,9 @@ export class RenderComponent implements OnInit, OnDestroy {
         }
 
         function swichMetric(e) {
+            if (_selected_obj)
+                m_scenes.clear_outline_anim(_selected_obj);
+            _selected_obj = null;
             socket.emit('unsubscribe-metric', {metric : active_metric});
             let sel = <HTMLSelectElement>document.getElementById("select-metric");
 
@@ -318,27 +270,6 @@ export class RenderComponent implements OnInit, OnDestroy {
             active_metric_name = sel.options[sel.selectedIndex].innerText;
 
             socket.emit('subscribe-metric', {metric : active_metric});
-
-            for(const key of Object.keys(node_data)) {
-                var obj = m_scenes.get_object_by_name(key);
-
-                if (obj != undefined)
-                    m_mat.set_diffuse_color(obj, "node", [1, 1, 1]);
-            }
-
-            setTimeout(function() {
-                for (const key of Object.keys(node_data)) {
-                    if (key == 'min' || key == 'max')
-                        continue;
-
-                    color_node(key, {
-                        value : node_data[key]['value'],
-                        min : node_data['min'],
-                        max : node_data['max']
-                    })
-                }
-
-            }, 1000);
         }
 
         function fillLabel(node) {
@@ -369,28 +300,14 @@ export class RenderComponent implements OnInit, OnDestroy {
         function hideLabel() {
             var label = document.getElementById('label');
 
-            label.classList.add("hide")
+            label.classList.add("hide");
         }
         function showLabel() {
             var label = document.getElementById('label');
 
-            label.classList.remove("hide")
+            label.classList.remove("hide");
         }
-
-        // https://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
-        function getOffset( el ) {
-            var _x = 0;
-            var _y = 0;
-            while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
-                        _x += el.offsetLeft - el.scrollLeft;
-                        _y += el.offsetTop - el.scrollTop;
-                        el = el.offsetParent;
-                    }
-            return { top: _y, left: _x };
-        }
-
-
-        });
+    });
     }
 
     ngOnDestroy() {
