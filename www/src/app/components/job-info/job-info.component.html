@@ -166,21 +166,24 @@
 
 </div>
 
-<div class="barcharts row mb-3">
-    <div class="col">
-        <div class="card">
-            <div class="card-block text-center">
-                 <ex-graph
-                    [data]="data['job_load_core']"
-                    [loading]="data['loading_load_core']"
-                    topTitle="Node "
-                    bar=true
-                    labelY="Load (%)">
-                </ex-graph>
-            </div>
+<div class="row mb-3">
+    <div class="col" *ngIf="!data?.loading_load_core">
+        <div class="card" style="height: 400px">
+            <canvas baseChart
+                [datasets]="[{
+                    'data' : data?.job_load_core?.data,
+                    'label' : 'Cores\' Load'
+                }]"
+                [labels]='data?.job_load_core?.labels'
+                [options]="load_core_options"
+                [colors]='[{backgroundColor: "#3ebf9b"}]'
+                chartType="bar">
+            </canvas>
         </div>
     </div>
 </div>
+
+
 </section>
 
 <ng-template #nodes let-c="close">

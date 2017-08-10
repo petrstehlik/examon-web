@@ -16,11 +16,48 @@ export class JobInfoComponent implements OnInit {
     public job : Job = new Job();
     public data : Object = {};
 
+    private default_chart_options = {
+        legend : false,
+        title : {
+            display : true,
+            text : '',
+            fontSize: 16,
+            fontColor : "#000"
+        },
+        layout : {
+            padding : {
+                left : 0,
+                right : 0,
+                top : 0,
+                bottom : 0
+            }
+        },
+        maintainAspectRatio: false,
+        responsive : true,
+        scales : {
+            yAxes : [{
+                ticks: {
+                    min : 0,
+                    max : 100,
+                    stepSize : 10
+                },
+                labelString : 'Load (%)'
+            }],
+            xAxes : [{
+                ticks : {
+                    autoSkip : false
+                }
+            }]
+        }
+    };
+
+    public load_core_options = this.default_chart_options;
+
     @Input("job")
     set setJob(data) {
         if (data != undefined && data.loaded) {
             this.job = data;
-            this.fetchRaw("load_core", "core", "load_core", this.aggWindow()*10);
+            this.fetchRaw("load_core", "core", "load_core", this.aggWindow());
         }
     }
 
@@ -28,6 +65,7 @@ export class JobInfoComponent implements OnInit {
         private timeserie : TimeserieService) { }
 
     ngOnInit() {
+        this.load_core_options['title']['text'] = 'Cores\' Load'
     }
 
     private fetch(dict_name,
@@ -57,16 +95,13 @@ export class JobInfoComponent implements OnInit {
             aggregate,
             true)
             .subscribe(data => {
+                console.log(data)
                 let tmp_data = {data : [], labels : []};
 
                 let key = Object.keys(data["points"])[0];
 
-                for (var i = 0; i < data["labels"].length; i++) {
-                    tmp_data["data"].push([i, data["points"][key][i]]);
-                }
-
-                //tmp_data["data"] = data["points"][Object.keys(data["points"])[0]];
-                tmp_data["labels"] = ["Core", "Load"]//data["labels"];
+                tmp_data["data"] = data["points"][key];
+                tmp_data["labels"] = data["labels"];
 
                 this.data["job_" + dict_name] = tmp_data;
                 this.data["loading_" + dict_name] = false;
