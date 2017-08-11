@@ -33,7 +33,8 @@ class Holder():
 
         self.broker = mqtt_broker
         self.port = mqtt_port
-        self.topics = [(topic,0) for topic in mqtt_topics]
+        self.topics = [(str(topic),0) for topic in mqtt_topics]
+        self.log.debug(self.topics)
 
         self.db = dict()
         self.alfa = alfa
@@ -52,7 +53,15 @@ class Holder():
         self.client.loop_start()
 
     def on_connect(self, client, userdata, flags, rc):
-        client.subscribe(self.topics)
+        """
+        Subscribe to all topics
+        """
+        result, mid = client.subscribe(self.topics)
+
+        if result == mqtt.MQTT_ERR_SUCCESS:
+            self.log.info("Successfully subscribed to all topics")
+        else:
+            self.log.error("Failed to subscribe to topics")
 
     def on_message(self, client, userdata, msg):
         """
@@ -60,8 +69,10 @@ class Holder():
 
         Parses topics and extracts data
         """
+        # self.log.debug("Received MQTT message from topic %s" % msg.topic)
+
         if msg.payload == "CK":
-            #self.log.debug("Received CK msg from %s" % str(msg.topic) )
+            self.log.debug("Received CK msg from %s" % str(msg.topic) )
             topic = str(msg.topic).split('/')
             nodeID = topic[topic.index("node") + 1]
 

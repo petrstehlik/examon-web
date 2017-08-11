@@ -1,26 +1,27 @@
-from liberouterapi import app, socketio
+from liberouterapi import app, socketio, config
 from liberouterapi.error import ApiException
 from ..module import Module
+from Holder import Holder
 
 from flask import Blueprint, request
 from flask_socketio import send, emit, join_room, leave_room
-
-from Holder import Holder
-
 import json
+import logging
 
 class MqttError(ApiException):
     status_code = 500
 
 mqtt = Blueprint('mqtt', __name__, url_prefix = '/mqtt')
 
+log = logging.getLogger(__name__)
 
-subscribed_metrics = list()
+subscribed_metrics = dict()
 
 def emit_data(node, metric, data):
     global subscribed_metrics
 
-    if metric in subscribed_metrics:
+    if metric in subscribed_metrics and subscribed_metrics[metric] > 0:
+        log.debug("Unsubscribed metric: %s", json.dumps(subscribed_metrics[metric]))
         socketio.server.emit('data', {
             'metric' : metric,
             'node' : node,
@@ -30,7 +31,9 @@ def emit_data(node, metric, data):
             namespace='/render',
             room = metric)
 
-holder = Holder("130.186.13.80", mqtt_topics = ["org/cineca/cluster/galileo/node/+/plugin/#"])
+# Initialize Holder with config topics
+holder = Holder(config['mqtt']['server'],
+        mqtt_topics = json.loads(config['mqtt']['topics']))
 holder.on_store = emit_data
 
 def split_list(values, delim = ","):
@@ -47,38 +50,56 @@ def merge_dicts(x, y):
 
 @mqtt.route('/metric/<string:metric>')
 def get_metric(metric):
-    print(metric)
-
-    return(json.dumps(holder.db[metric]))
+    """
+    Return given metric data from a holder
+    """
+    try:
+        return(json.dumps(holder.db[metric]))
+    except KeyError as e:
+        raise MqttError("Metric %s not found in holder's DB" % metric, status_code=404)
 
 @mqtt.route('/node')
 def get_nodes():
     return(json.dumps(holder.nodes))
 
 @socketio.on('subscribe-metric', namespace='/render')
-def handle_my_custom_event(json):
+def subscribe_metric(json):
     global subscribed_metrics
     if 'metric' in json:
+        metric = json['metric']
         try:
-            subscribed_metrics.append(json['metric'])
-            join_room(json['metric'])
-            emit('initial-data', holder.db[json['metric']], room = json['metric'])
+            if metric in subscribed_metrics:
+                subscribed_metrics[metric] += 1
+            else:
+                subscribed_metrics[metric] = 1
+
+            join_room(metric)
+            emit('initial-data', holder.db[metric], room = metric)
         except KeyError as e:
-            emit('error', "Cannot find given metric '%s'" % json['metric'])
+            emit('error', "Cannot find given metric '%s'" % metric)
 
     else:
         emit('error', "Missing metric in request")
 
 @socketio.on('unsubscribe-metric', namespace='/render')
-def handle_my_custom_event(json):
+def unsubscribe_metric(json):
     global subscribed_metrics
     if 'metric' in json:
+        metric = json['metric']
         try:
-            print("UNSUBSCRIBING")
-            #subscribed_metrics.append(json['metric'])
-            leave_room(json['metric'])
+            log.info("Unsubscribing from %s" % metric)
+
+            if metric in subscribed_metrics:
+                if subscribed_metrics[metric] > 0:
+                    subscribed_metrics[metric] -= 1
+                else:
+                    emit('error', "No subscriber in the room")
+            else:
+                emit('error', "Room doesn't exist")
+
+            leave_room(metric)
         except KeyError as e:
-            emit('error', "Cannot find given metric '%s'", json['metric'])
+            emit('error', "Cannot find given metric '%s'" % metric)
 
     else:
         emit('error', "Missing metric in request")
