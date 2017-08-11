@@ -219,7 +219,7 @@ class JobManager():
 
         # In case there is a previous correct event in the DB move it to failed
         if jobid in self.db:
-            self.db_fail[jobid] = self.db[jobid]
+            self.db_fail[jobid] = copy.deepcopy(self.db[jobid])
             del self.db[jobid]
 
         if "exc_begin" in self.db_fail[jobid]:
@@ -233,7 +233,7 @@ class JobManager():
 
         # In case there is a previous correct event in the DB move it to failed
         if jobid in self.db:
-            self.db_fail[jobid] = self.db[jobid]
+            self.db_fail[jobid] = copy.deepcopy(self.db[jobid])
             del self.db[jobid]
 
         if "exc_end" in self.db_fail[jobid]:
