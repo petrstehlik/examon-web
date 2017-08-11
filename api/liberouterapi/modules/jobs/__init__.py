@@ -120,11 +120,18 @@ def jobs_hello(jobid):
 @jobs.route('/latest')
 def jobs_latest():
     """
-        Fetch all jobs that finished in last 15 minutes,
+        Fetch all jobs that finished in last 300 minutes,
         sort them by start_time and return the last one.
     """
-    tstamp = (int(time.time()) - 86400) * 1000
+    tstamp = (int(time.time()) - 1800) * 1000
     qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
+            WHERE token(user_id) > token('') and start_time >= " \
+            + str(tstamp) + " ALLOW FILTERING")
+
+    if qres.current_rows == 0:
+        # No jobs finished in last 30 minutes, try 6 hours
+        tstamp = (int(time.time()) - 21600) * 1000
+        qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
             WHERE token(user_id) > token('') and start_time >= " \
             + str(tstamp) + " ALLOW FILTERING")
 
