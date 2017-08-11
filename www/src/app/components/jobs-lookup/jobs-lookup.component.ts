@@ -38,8 +38,10 @@ interface Job {
 })
 export class JobsLookupComponent implements OnInit {
 
-    public jobid : string;
+    public jobid : string = "";
     public lastjob : Job;
+    public active_jobs = {};
+    public active_jobs_id = [];
 
     constructor(private router : Router,
         private http : HttpClient,
@@ -54,6 +56,12 @@ export class JobsLookupComponent implements OnInit {
                 console.log(error);
                 this.msg.send("Cannot fetch latest job", "danger");
             });
+
+        this.http.get('/api/jobs/active').subscribe(data => {
+            this.active_jobs = data;
+            this.active_jobs_id = Object.keys(data);
+        });
+
     }
 
     public lookup() {

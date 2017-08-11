@@ -1,24 +1,51 @@
 <div class="container-fluid" style="height: 100vh">
     <div class="row justify-content-md-center align-items-center" style="height: 100vh">
         <div class="wrapper">
-            <h2 class="text-center">
+            <h2 class="text-center mb-4">
                 <img src="assets/examon_logo.png" alt="Examon" height="70"/>
             </h2>
-            <form novalidate>
+            <form novalidate style="min-width: 350px;">
                 <div class="input-group">
-                    <input type="text" [(ngModel)]="jobid" name="jobid" class="form-control" placeholder="Job ID" aria-describedby="passwordHelpBlock">
+                    <input type="text"
+                        [(ngModel)]="jobid"
+                        name="jobid"
+                        class="form-control"
+                        placeholder="Enter a job ID obtained by PBS">
                     <span class="input-group-btn">
-                        <button type="button" class="btn btn-primary" (click)="lookup()">Search</button>
+                        <button type="button"
+                            class="btn btn-primary"
+                            (click)="lookup()">
+                            Search
+                        </button>
                     </span>
                 </div>
-                <small id="passwordHelpBlock" class="form-text text-muted text-center">
-                    Enter a job ID obtained by PBS.<br/>You can try i.e. 2510763.io01, 2515563.io01, 2685519.io01 or 2694803.io01.
-                </small>
 
-                <small>
-                    Last job finished: {{ lastjob?.job_id }}
-                </small>
+                <div class="text-center mt-3">
+                    <a class="btn btn-secondary text-center"
+                        [routerLink]="['/public']">
+                        Public Dashboard
+                    </a>
+                </div>
             </form>
+
+            <br />
+
+            <div style="max-width: 600px">
+                <h4>Active jobs</h4>
+                <span *ngFor="let job of active_jobs_id "
+                    class="btn btn-secondary btn-sm mr-2 mb-2">
+                    <a [routerLink]="['/jobs', job]" >{{ job }}</a>
+                </span>
+
+                <span *ngIf="active_jobs_id.lenght == 0">
+                    <small>No active jobs :(</small>
+                </span>
+            </div>
+
+            <small *ngIf="lastjob">
+                Last job finished: <a [routerLink]="['/jobs', lastjob?.job_id]" >{{  lastjob?.job_id }}</a>
+            </small>
+
         </div>
     </div>
 </div>
