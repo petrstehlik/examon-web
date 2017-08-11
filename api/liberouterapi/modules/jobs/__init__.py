@@ -1,4 +1,4 @@
-from liberouterapi import app
+from liberouterapi import app, config
 from liberouterapi.error import ApiException
 from ..module import Module
 
@@ -14,10 +14,17 @@ import logging
 
 from cassandra_connector import connect, prepare_statements
 
+from .JobManager import JobManager
+
+jobman = JobManager(config['jobs']['server'],
+        1883,
+        json.loads(config['jobs']['topics']))
+
 log = logging.getLogger(__name__)
 
 class JobsError(ApiException):
     status_code = 500
+
 try:
     session = connect()
     prepared = prepare_statements(session)
@@ -185,3 +192,14 @@ def jobs_total():
 
     return(json.dumps(results))
 
+@jobs.route('/active', methods=['GET'])
+def get_active_jobs():
+    return(json.dumps(jobman.db))
+
+@jobs.route('/failed', methods=['GET'])
+def get_failed_jobs():
+    return(json.dumps(jobman.db_fail))
+
+@jobs.route('/finished', methods=['GET'])
+def get_finished_jobs():
+    return(json.dumps(jobman.finished))
