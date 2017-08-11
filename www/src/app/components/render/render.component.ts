@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { environment as env } from 'environments/environment';
 
 import { HSVtoRGB, calcOffset, getOffset } from 'app/utils/colors';
@@ -7,6 +7,21 @@ import { metrics } from './metrics';
 declare const b4w;
 declare const io;
 var socket;
+var active_metric = env.active_metric;
+
+window.onbeforeunload = function (e) {
+    var e = e || window.event;
+
+        socket.emit('unsubscribe-metric', {metric : active_metric})
+        socket.disconnect();
+
+    /*if (e) {
+              e.returnValue = 'Are you sure?';
+            }
+
+      // For Safari
+      return 'Are you sure?';*/
+};
 
 @Component({
   selector: 'ex-render',
@@ -17,6 +32,12 @@ export class RenderComponent implements OnInit, OnDestroy {
 
     public colors = [];
     public metrics = metrics;
+
+    @HostListener('window:onunload', ['$event'])
+    beforeunloadHandler(event) {
+        socket.emit('unsubscribe-metric', {metric : active_metric})
+        socket.disconnect();
+    }
 
     constructor() { }
 
@@ -49,7 +70,6 @@ export class RenderComponent implements OnInit, OnDestroy {
         var node_data = {};
 
         // Metric selection init
-        var active_metric = env.active_metric;
         var active_metric_name = env.active_metric_name;
 
         // detect application mode
@@ -173,7 +193,7 @@ export class RenderComponent implements OnInit, OnDestroy {
 
             // Register the data reception via websocket only when everything is loaded
             socket.on('data', function(data) {
-                console.log(new Date(), new Date( data['data']['timestamp'] * 1000), data['node']);
+                // console.log(new Date(), new Date( data['data']['timestamp'] * 1000), data['node']);
                 if (!(data['node'] in node_data))
                     node_data[data['node']] = data
 
@@ -311,7 +331,8 @@ export class RenderComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        console.log("bye bye");
+        b4w.require("main").reset();
+        socket.emit('unsubscribe-metric', {metric : active_metric})
     }
 
 }
