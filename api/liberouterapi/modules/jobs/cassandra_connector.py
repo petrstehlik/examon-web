@@ -27,7 +27,8 @@ def connect():
     cluster = Cluster(
             contact_points=([conf["cassandradb"].get("server")]),
             auth_provider = auth,
-            connect_timeout = 10)
+            connect_timeout = 30.0,
+            control_connection_timeout = 10.0)
     session = cluster.connect(conf["cassandradb"].get("cluster"))
 
     logger.info("Successfully connected to Cassanda cluster")
