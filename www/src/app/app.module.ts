@@ -18,6 +18,8 @@ import { GraphComponent } from './components/graph/graph.component';
 import { JobService } from 'app/services/job.service';
 import { MessageService } from 'app/services';
 
+import { MapToIterable, ObjectSize } from 'app/utils/keyIterable';
+
 import {
     NullComponent,
     JobDashboardComponent,
@@ -49,7 +51,9 @@ import {
     PublicOverviewComponent,
     SysadminOverviewComponent,
     RangepickerComponent,
-    RenderComponent
+    RenderComponent,
+    MapToIterable,
+    ObjectSize
   ],
   imports: [
     BrowserModule,
