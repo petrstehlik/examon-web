@@ -57,6 +57,13 @@ export class JobInfoComponent implements OnInit {
     set setJob(data) {
         if (data != undefined && data.loaded) {
             this.job = data;
+
+            console.log(this.job)
+            this.job["data"]["qtime"] = this.job["data"]["qtime"] * 1000;
+
+            if (this.job['data']['active'])
+                console.log("Fetched job is active!");
+
             this.fetchRaw("load_core", "core", "load_core", this.aggWindow());
         }
     }
@@ -88,6 +95,15 @@ export class JobInfoComponent implements OnInit {
     {
         this.data["loading_" + dict_name] = true;
 
+        console.log(this.job)
+        this.job['from'] = this.job['data']["qtime"];
+
+        if (this.job['data']['active'])
+            this.job['to'] = +Date.now()
+        else
+            this.job['to'] = this.job['data']["end_time"]
+
+
         this.timeserie.fetch(this.job,
             dict_name,
             endpoint,
@@ -113,7 +129,11 @@ export class JobInfoComponent implements OnInit {
      * Get an exact time duration of the job in order to aggregate to one single number
      */
     private aggWindow() : number {
-        return(Math.floor(this.job["data"]["end_time"] - this.job["data"]["backup_qtime"])/1000);
+        if (this.job["data"]["active"])
+            return(Math.floor(
+                (+Date.now() - (this.job["data"]["qtime"]))/1000))
+        else
+            return(Math.floor(this.job["data"]["end_time"] - (this.job["data"]["qtime"]))/1000);
     }
 
 }

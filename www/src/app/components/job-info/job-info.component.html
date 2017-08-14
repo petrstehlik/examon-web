@@ -37,7 +37,7 @@
 
             <p>
                 <small>Queue time: </small>
-                {{ job.data.backup_qtime | date:'HH:mm:ss dd/MM/yy' }}
+                {{ job.data.qtime | date:'HH:mm:ss dd/MM/yy' }}
             </p>
             <p><small>Start time:</small> {{ job.data.start_time | date:'HH:mm:ss dd/MM/yy' }}</p>
             <p><small>End time:</small> {{ job.data.end_time | date:'HH:mm:ss dd/MM/yy' }}</p>
@@ -110,7 +110,7 @@
                     (click)="modal.open(variables, {size : 'lg'})">
                     <div class="card-block text-center">
                         <small class="card-title">Variables &rarr;</small>
-                        <h5>{{ job?.data?.vars?.length | number }}</h5>
+                        <h5>{{ job?.data?.variable_list | objectSize }}</h5>
                     </div>
                 </div>
             </div>
@@ -193,7 +193,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" *ngIf="(job.data.asoc_nodes | objectSize)">
       <div *ngFor="let node of job.data.asoc_nodes" class="mb-3">
           <h5>{{ node.node }} <small>| # of cores: {{ node.cores.length }}</small></h5>
           <div class="row">
@@ -202,6 +202,9 @@
               </span>
           </div>
       </div>
+  </div>
+  <div class="modal-body" *ngIf="(job.data.asoc_nodes | objectSize) == 0">
+      No info about nodes and cores
   </div>
 </ng-template>
 
@@ -214,7 +217,7 @@
   </div>
   <div class="modal-body">
       <ul class="varlist">
-          <li *ngFor="let variable of job.data.vars">{{ variable }}</li>
+          <li *ngFor="let variable of job.data.variable_list | mapToIterable">{{ variable['key'] }} : {{ variable['value'] }}</li>
       </ul>
   </div>
 </ng-template>
