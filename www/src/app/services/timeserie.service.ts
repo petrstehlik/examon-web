@@ -37,16 +37,14 @@ export class TimeserieService {
         let params = new HttpParams();
 
         if ("data" in job) {
-            for (let key of job["data"]["asoc_nodes"]) {
-                params = params.append('node', key["node"]);
+            //for (let key of job["data"]["asoc_nodes"]) {
+            for (let key of job["data"]["vnode_list"]) {
+                params = params.append('node', key);
             }
-
-            params = params.set('from', job['data']["start_time"])
-                .set('to', job['data']["end_time"])
-        } else {
-            params = params.set('from', job["from"])
-                .set('to', job["to"])
         }
+
+        params = params.set('from', job["from"])
+                    .set('to', job["to"])
 
         if (metric.constructor == Array) {
             for (let item of metric) {
