@@ -6,8 +6,8 @@ import { MessageService } from 'app/services';
 @Injectable()
 export class TimeserieService {
 
-    constructor(private http : HttpClient,
-         private msg : MessageService) { }
+    constructor(private http: HttpClient,
+         private msg: MessageService) { }
 
     /**
      * General method for fetching data from API in a dygraphs-friendly format
@@ -17,9 +17,9 @@ export class TimeserieService {
     fetch(job,
         dict_name,
         endpoint,
-        metric : string|string[],
-        aggregate : number = null,
-        raw : boolean = false) {
+        metric: string|string[],
+        aggregate: number = null,
+        raw: boolean = false) {
         return new Observable(observer =>
             this.http.get('/api/kairos/' + endpoint, {
               params : this.prepareParams(job, metric, aggregate)
@@ -29,25 +29,25 @@ export class TimeserieService {
                 else
                     observer.next(this.parseData(data));
             }, error => {
-                this.msg.send("Something went wrong for '" + dict_name + "' (status: " + String(error.status) +")", "danger");
+                this.msg.send('Something went wrong for \'' + dict_name + '\' (status: ' + String(error.status) + ')', 'danger');
             }));
     }
 
-    private prepareParams(job, metric, aggregate) : HttpParams {
+    private prepareParams(job, metric, aggregate): HttpParams {
         let params = new HttpParams();
 
-        if ("data" in job) {
+        if ('data' in job) {
             //for (let key of job["data"]["asoc_nodes"]) {
-            for (let key of job["data"]["vnode_list"]) {
+            for (const key of job['data']['vnode_list']) {
                 params = params.append('node', key);
             }
         }
 
-        params = params.set('from', job["from"])
-                    .set('to', job["to"])
+        params = params.set('from', job['from'])
+                    .set('to', job['to']);
 
         if (metric.constructor == Array) {
-            for (let item of metric) {
+            for (const item of metric) {
                 params = params.append('metric', item);
             }
         } else {
@@ -61,17 +61,17 @@ export class TimeserieService {
         return params;
     }
 
-    private parseData(data : Object) : Object {
-        let tmp_data = [];
+    private parseData(data: Object): Object {
+        const tmp_data = [];
 
-        for(let key of Object.keys(data["points"])) {
-            tmp_data.push([new Date(+key * 1000), ...data["points"][key]]);
+        for (const key of Object.keys(data['points'])) {
+            tmp_data.push([new Date(+key * 1000), ...data['points'][key]]);
         }
 
-        let tmp = {
-            "labels" : ["Date", ...data["labels"]],
-            "data" : tmp_data
-        }
+        const tmp = {
+            'labels' : ['Date', ...data['labels']],
+            'data' : tmp_data
+        };
 
         return tmp;
     }

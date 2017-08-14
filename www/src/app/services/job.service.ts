@@ -8,9 +8,9 @@ import { Job } from 'app/interfaces';
 export class JobService {
 
     public error = {
-        message : "",
+        message : '',
         status : false
-    }
+    };
 
     public job = new Job();
 
@@ -21,9 +21,9 @@ export class JobService {
         seconds : 0
     };
 
-    constructor(public http : HttpClient) { }
+    constructor(public http: HttpClient) { }
 
-    fetch(jobid : string) {
+    fetch(jobid: string) {
         return new Observable(
             observer => this.http.get('/api/jobs/' + jobid).subscribe(
                 data => {
@@ -39,7 +39,7 @@ export class JobService {
                     this.job.data = {};
 
                     if (error.status == 404) {
-                        this.error.message = "Cannot find job with job ID " + this.job.id;
+                        this.error.message = 'Cannot find job with job ID ' + this.job.id;
                         this.error.status = true;
                     }
                 }
@@ -56,10 +56,10 @@ export class JobService {
     }
 
     private calcDuration() {
-        let qTime = new Date(this.job.data["backup_qtime"])
-        let eTime = new Date(this.job.data["end_time"])
+        const qTime = new Date(this.job.data['backup_qtime']);
+        const eTime = new Date(this.job.data['end_time']);
 
-        let difference = eTime.getTime() - qTime.getTime();
+        const difference = eTime.getTime() - qTime.getTime();
         this.duration.days = Math.floor(difference / (1000 * 60 * 60 * 24));
         this.duration.hours = Math.floor(difference / (1000 * 60 * 60) % 24);
         this.duration.minutes = Math.floor(difference / (1000 * 60) % 60);

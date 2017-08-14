@@ -13,8 +13,8 @@ import { TimeserieService } from 'app/services/timeserie.service';
 })
 export class JobInfoComponent implements OnInit {
 
-    public job : Job = new Job();
-    public data : Object = {};
+    public job: Job = new Job();
+    public data: Object = {};
 
     private default_chart_options = {
         legend : false,
@@ -22,7 +22,7 @@ export class JobInfoComponent implements OnInit {
             display : true,
             text : '',
             fontSize: 16,
-            fontColor : "#000"
+            fontColor : '#000'
         },
         layout : {
             padding : {
@@ -53,55 +53,55 @@ export class JobInfoComponent implements OnInit {
 
     public load_core_options = this.default_chart_options;
 
-    @Input("job")
+    @Input('job')
     set setJob(data) {
         if (data != undefined && data.loaded) {
             this.job = data;
 
-            console.log(this.job)
-            this.job["data"]["qtime"] = this.job["data"]["qtime"] * 1000;
+            console.log(this.job);
+            this.job['data']['qtime'] = this.job['data']['qtime'] * 1000;
 
             if (this.job['data']['active'])
-                console.log("Fetched job is active!");
+                console.log('Fetched job is active!');
 
-            this.fetchRaw("load_core", "core", "load_core", this.aggWindow());
+            this.fetchRaw('load_core', 'core', 'load_core', this.aggWindow());
         }
     }
 
     constructor(private modal: NgbModal,
-        private timeserie : TimeserieService) { }
+        private timeserie: TimeserieService) { }
 
     ngOnInit() {
-        this.load_core_options['title']['text'] = 'Cores\' Load'
+        this.load_core_options['title']['text'] = 'Cores\' Load';
     }
 
     private fetch(dict_name,
         endpoint,
-        metric : string|string[],
-        aggregate : number = null)
+        metric: string|string[],
+        aggregate: number = null)
     {
-        this.data["loading_" + dict_name] = true;
+        this.data['loading_' + dict_name] = true;
 
         this.timeserie.fetch(this.job, dict_name, endpoint, metric, aggregate).subscribe(data => {
-            this.data["job_" + dict_name] = data;
-            this.data["loading_" + dict_name] = false;
+            this.data['job_' + dict_name] = data;
+            this.data['loading_' + dict_name] = false;
         });
     }
 
     private fetchRaw(dict_name,
         endpoint,
-        metric : string|string[],
-        aggregate : number = null)
+        metric: string|string[],
+        aggregate: number = null)
     {
-        this.data["loading_" + dict_name] = true;
+        this.data['loading_' + dict_name] = true;
 
-        console.log(this.job)
-        this.job['from'] = this.job['data']["qtime"];
+        console.log(this.job);
+        this.job['from'] = this.job['data']['qtime'];
 
         if (this.job['data']['active'])
-            this.job['to'] = +Date.now()
+            this.job['to'] = +Date.now();
         else
-            this.job['to'] = this.job['data']["end_time"]
+            this.job['to'] = this.job['data']['end_time'];
 
 
         this.timeserie.fetch(this.job,
@@ -111,16 +111,16 @@ export class JobInfoComponent implements OnInit {
             aggregate,
             true)
             .subscribe(data => {
-                console.log(data)
-                let tmp_data = {data : [], labels : []};
+                console.log(data);
+                const tmp_data = {data : [], labels : []};
 
-                let key = Object.keys(data["points"])[0];
+                const key = Object.keys(data['points'])[0];
 
-                tmp_data["data"] = data["points"][key];
-                tmp_data["labels"] = data["labels"];
+                tmp_data['data'] = data['points'][key];
+                tmp_data['labels'] = data['labels'];
 
-                this.data["job_" + dict_name] = tmp_data;
-                this.data["loading_" + dict_name] = false;
+                this.data['job_' + dict_name] = tmp_data;
+                this.data['loading_' + dict_name] = false;
             });
     }
 
@@ -128,12 +128,12 @@ export class JobInfoComponent implements OnInit {
     /**
      * Get an exact time duration of the job in order to aggregate to one single number
      */
-    private aggWindow() : number {
-        if (this.job["data"]["active"])
+    private aggWindow(): number {
+        if (this.job['data']['active'])
             return(Math.floor(
-                (+Date.now() - (this.job["data"]["qtime"]))/1000))
+                (+Date.now() - (this.job['data']['qtime'])) / 1000));
         else
-            return(Math.floor(this.job["data"]["end_time"] - (this.job["data"]["qtime"]))/1000);
+            return(Math.floor(this.job['data']['end_time'] - (this.job['data']['qtime'])) / 1000);
     }
 
 }

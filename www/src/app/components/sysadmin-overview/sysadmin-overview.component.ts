@@ -10,8 +10,8 @@ import { TimeserieService } from 'app/services/timeserie.service';
 })
 export class SysadminOverviewComponent implements OnInit {
 
-    public data : Object = {};
-    time : Object;
+    public data: Object = {};
+    time: Object;
 
     @Input('time')
     set setData(time) {
@@ -22,18 +22,18 @@ export class SysadminOverviewComponent implements OnInit {
             this.fetch('temp', 'cluster', 'PCH_Temp', env.window.ipmi);
             this.fetch('power', 'node', 'Avg_Power', env.window.ipmi + 10);
         }
-    };
+    }
 
-    constructor(private timeserie : TimeserieService) { }
+    constructor(private timeserie: TimeserieService) { }
 
     ngOnInit() { }
 
-    private fetch(dict_name, endpoint, metric : string|string[], aggregate : number = null) {
-        this.data["loading_" + dict_name] = true;
+    private fetch(dict_name, endpoint, metric: string|string[], aggregate: number = null) {
+        this.data['loading_' + dict_name] = true;
 
         this.timeserie.fetch(this.time, dict_name, endpoint, metric, aggregate).subscribe(data => {
-            this.data["job_" + dict_name] = data;
-            this.data["loading_" + dict_name] = false;
+            this.data['job_' + dict_name] = data;
+            this.data['loading_' + dict_name] = false;
         });
     }
 }

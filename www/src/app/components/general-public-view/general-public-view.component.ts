@@ -9,7 +9,7 @@ import { MessageService } from 'app/services/message.service';
 })
 export class GeneralPublicViewComponent implements OnInit {
 
-  constructor(private message : MessageService) { }
+  constructor(private message: MessageService) { }
 
     ngOnInit() { }
 

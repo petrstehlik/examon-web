@@ -4,31 +4,31 @@ import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'app/services';
 
 interface Job {
-    qtime : number;
-    start_time : number;
-    end_time : number;
-    backup_qtime : number;
-    ctime : number;
-    mean_power : any;
-    var_list : string;
-    qlist : string;
-    account_name : string;
-    project : string;
-    user_id : string;
-    job_id : string;
-    job_name : string;
-    queue : string;
-    nmics_req : number;
-    ngpus_req : number;
-    ncpus_req : number;
-    nnodess_req : number;
-    mem_req : number;
-    req_time : number;
-    mpiprocs : number;
-    node_list : string;
-    vnode_list : string;
-    used_nodes : string;
-    used_cores : string;
+    qtime: number;
+    start_time: number;
+    end_time: number;
+    backup_qtime: number;
+    ctime: number;
+    mean_power: any;
+    var_list: string;
+    qlist: string;
+    account_name: string;
+    project: string;
+    user_id: string;
+    job_id: string;
+    job_name: string;
+    queue: string;
+    nmics_req: number;
+    ngpus_req: number;
+    ncpus_req: number;
+    nnodess_req: number;
+    mem_req: number;
+    req_time: number;
+    mpiprocs: number;
+    node_list: string;
+    vnode_list: string;
+    used_nodes: string;
+    used_cores: string;
 }
 
 @Component({
@@ -38,14 +38,14 @@ interface Job {
 })
 export class JobsLookupComponent implements OnInit {
 
-    public jobid : string = "";
-    public lastjob : Job;
+    public jobid = '';
+    public lastjob: Job;
     public active_jobs = {};
     public active_jobs_id = [];
 
-    constructor(private router : Router,
-        private http : HttpClient,
-        private msg : MessageService) { }
+    constructor(private router: Router,
+        private http: HttpClient,
+        private msg: MessageService) { }
 
     ngOnInit() {
         this.http.get<Job>('/api/jobs/latest').subscribe(
@@ -54,7 +54,7 @@ export class JobsLookupComponent implements OnInit {
             },
             error => {
                 console.log(error);
-                this.msg.send("Cannot fetch latest job", "danger");
+                this.msg.send('Cannot fetch latest job', 'danger');
             });
 
         this.http.get('/api/jobs/active').subscribe(data => {
@@ -66,7 +66,7 @@ export class JobsLookupComponent implements OnInit {
 
     public lookup() {
         // Strip whitespace and go to given route
-        this.router.navigate(["/jobs", this.jobid.trim()])
+        this.router.navigate(['/jobs', this.jobid.trim()]);
     }
 
 }

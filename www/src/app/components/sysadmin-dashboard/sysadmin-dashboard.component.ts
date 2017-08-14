@@ -10,9 +10,9 @@ import { MessageService } from 'app/services/message.service';
 })
 export class SysadminDashboardComponent implements OnInit {
 
-    public timewindow : Object = undefined;
+    public timewindow: Object = undefined;
 
-    constructor(private msg : MessageService) { }
+    constructor(private msg: MessageService) { }
 
     ngOnInit() {
         this.timewindow = {
@@ -21,7 +21,7 @@ export class SysadminDashboardComponent implements OnInit {
         };
     }
 
-    public onSelect(time : Object) : void {
+    public onSelect(time: Object): void {
         this.timewindow = time;
     }
 }

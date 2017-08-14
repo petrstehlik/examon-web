@@ -13,11 +13,11 @@ import { Job } from 'app/interfaces';
 })
 export class JobPerfComponent implements OnInit {
 
-    private job : Job;
+    private job: Job;
     public data = {};
 
-    @Input("job")
-    set setJob(job : Job) {
+    @Input('job')
+    set setJob(job: Job) {
         if (job != null) {
             this.job = job;
             this.fetch('load_core', 'core', 'load_core');
@@ -31,16 +31,16 @@ export class JobPerfComponent implements OnInit {
         }
     }
 
-    constructor(private timeserie : TimeserieService) { }
+    constructor(private timeserie: TimeserieService) { }
 
     ngOnInit() { }
 
-    private fetch(dict_name, endpoint, metric : string|string[], aggregate : number = null) {
-        this.data["loading_" + dict_name] = true;
+    private fetch(dict_name, endpoint, metric: string|string[], aggregate: number = null) {
+        this.data['loading_' + dict_name] = true;
 
         this.timeserie.fetch(this.job, dict_name, endpoint, metric, aggregate).subscribe(data => {
-            this.data["job_" + dict_name] = data;
-            this.data["loading_" + dict_name] = false;
+            this.data['job_' + dict_name] = data;
+            this.data['loading_' + dict_name] = false;
         });
     }
 }

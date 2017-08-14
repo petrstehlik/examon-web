@@ -8,7 +8,7 @@ export class MessageService {
 
     constructor() { }
 
-    send(message: string, type : "warning"|"danger"|"info"|"success" = "warning") {
+    send(message: string, type: 'warning'|'danger'|'info'|'success' = 'warning') {
         this.subject.next({ text: message, type : type });
     }
 
