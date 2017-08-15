@@ -94,6 +94,9 @@ def unsubscribe_metric(json):
                     subscribed_metrics[metric] -= 1
                 else:
                     emit('error', "No subscriber in the room")
+
+                if subscribed_metrics[metric] == 0:
+                    del subscribed_metrics[metric]
             else:
                 emit('error', "Room doesn't exist")
 
