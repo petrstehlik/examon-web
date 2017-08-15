@@ -1,9 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { environment as env } from 'environments/environment';
 
 import { Job } from 'app/interfaces/job';
 
 import { TimeserieService } from 'app/services/timeserie.service';
+
+declare const io;
 
 @Component({
     selector: 'ex-job-info',
@@ -11,10 +15,12 @@ import { TimeserieService } from 'app/services/timeserie.service';
     styleUrls: ['./job-info.component.scss'],
     providers : [TimeserieService]
 })
-export class JobInfoComponent implements OnInit {
+export class JobInfoComponent implements OnInit, OnDestroy {
 
     public job: Job = new Job();
     public data: Object = {};
+
+    private socket;
 
     private default_chart_options = {
         legend : false,
@@ -57,14 +63,7 @@ export class JobInfoComponent implements OnInit {
     set setJob(data) {
         if (data != undefined && data.loaded) {
             this.job = data;
-
-            this.job['data']['qtime'] = this.job['data']['qtime'] * 1000;
-            this.job['from'] = this.job['data']['qtime'];
-
-            if (this.job['data']['active'])
-                console.log('Fetched job is active!');
-
-            this.fetchRaw('load_core', 'core', 'load_core', this.aggWindow());
+            this.processJob();
         }
     }
 
@@ -73,6 +72,31 @@ export class JobInfoComponent implements OnInit {
 
     ngOnInit() {
         this.load_core_options['title']['text'] = 'Cores\' Load';
+    }
+
+    private processJob() {
+        this.job['from'] = this.job['data']['backup_qtime'];
+
+        if (this.job['data']['active']) {
+            console.log('Fetched job is active!');
+            this.startSocket();
+        }
+
+        this.fetchRaw('load_core', 'core', 'load_core', this.aggWindow());
+    }
+
+    private startSocket() {
+        this.socket = io(env.ws.host + ':' + env.ws.port + '/jobs');
+
+        this.socket.on('connect', () => {
+            console.debug("Socket connected");
+            this.socket.emit('subscribe', {jobid : this.job['data']['job_id']});
+        })
+
+        this.socket.on('data', (data) => {
+            console.debug(JSON.parse(data));
+            this.job['data'] = Object.assign(this.job['data'], JSON.parse(data));
+        })
     }
 
     private fetch(dict_name,
@@ -130,4 +154,10 @@ export class JobInfoComponent implements OnInit {
             return(Math.floor(this.job['data']['end_time'] - this.job['from']) / 1000);
     }
 
+    ngOnDestroy() {
+        if (this.socket != undefined) {
+            this.socket.emit('unsubscribe', {jobid : this.job['data']['job_id']});
+            this.socket.disconnect();
+        }
+    }
 }
