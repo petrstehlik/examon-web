@@ -58,8 +58,8 @@ export class JobInfoComponent implements OnInit {
         if (data != undefined && data.loaded) {
             this.job = data;
 
-            console.log(this.job);
             this.job['data']['qtime'] = this.job['data']['qtime'] * 1000;
+            this.job['from'] = this.job['data']['qtime'];
 
             if (this.job['data']['active'])
                 console.log('Fetched job is active!');
@@ -95,14 +95,11 @@ export class JobInfoComponent implements OnInit {
     {
         this.data['loading_' + dict_name] = true;
 
-        console.log(this.job);
-        this.job['from'] = this.job['data']['qtime'];
 
         if (this.job['data']['active'])
             this.job['to'] = +Date.now();
         else
             this.job['to'] = this.job['data']['end_time'];
-
 
         this.timeserie.fetch(this.job,
             dict_name,
@@ -110,18 +107,16 @@ export class JobInfoComponent implements OnInit {
             metric,
             aggregate,
             true)
-            .subscribe(data => {
-                console.log(data);
-                const tmp_data = {data : [], labels : []};
+        .subscribe(data => {
+            const key = Object.keys(data['points'])[0];
 
-                const key = Object.keys(data['points'])[0];
+            this.data['job_' + dict_name] = {
+                data : data['points'][key],
+                labels : data['labels']
+            };
 
-                tmp_data['data'] = data['points'][key];
-                tmp_data['labels'] = data['labels'];
-
-                this.data['job_' + dict_name] = tmp_data;
-                this.data['loading_' + dict_name] = false;
-            });
+            this.data['loading_' + dict_name] = false;
+        });
     }
 
 
@@ -130,10 +125,9 @@ export class JobInfoComponent implements OnInit {
      */
     private aggWindow(): number {
         if (this.job['data']['active'])
-            return(Math.floor(
-                (+Date.now() - (this.job['data']['qtime'])) / 1000));
+            return(Math.floor((+Date.now() - this.job['from']) / 1000));
         else
-            return(Math.floor(this.job['data']['end_time'] - (this.job['data']['qtime'])) / 1000);
+            return(Math.floor(this.job['data']['end_time'] - this.job['from']) / 1000);
     }
 
 }
