@@ -1,4 +1,5 @@
-import calendar, datetime, time
+import calendar, time
+from datetime import datetime
 import decimal
 import copy
 
@@ -22,8 +23,7 @@ def get_duration(start, end):
 
 def time_serializer(obj):
     """Default JSON serializer."""
-
-    if isinstance(obj, datetime.datetime):
+    if isinstance(obj, datetime):
         if obj.utcoffset() is not None:
             obj = obj - obj.utcoffset()
         millis = int(
@@ -65,29 +65,35 @@ def asoc_node_core(cores, nodes):
     return asoc_nodes
 
 def transform_live_job(jobid, jobman):
-    job = jobman.db[jobid]
-    job_tmplt = copy.deepcopy(job['runjob'][0])
-    job_tmplt['active'] = True
-    job_tmplt['asoc_nodes'] = list()
-    job_tmplt['backup_qtime'] = calendar.timegm((datetime.datetime.strptime(job_tmplt['backup_qtime'], "%Y-%m-%d %H:%M:%S")).timetuple()) * 1000
+    job_raw = jobman.db[jobid]
+
+    # Get the basic info from a job
+    job = copy.deepcopy(job_raw['runjob'][0])
+
+    # Set its active status
+    job['active'] = True
+
+    job['backup_qtime'] = datetime.strptime(job['backup_qtime'], "%Y-%m-%d %H:%M:%S")
 
     if "exc_begin" in job:
-        for item in job['exc_begin']:
-            job_tmplt['asoc_nodes'].append({
+        job['exc_begin'] = True
+        job['asoc_nodes'] = list()
+
+        for item in job_raw['exc_begin']:
+            job['asoc_nodes'].append({
                 "node" : item['node_id'],
                 "cores" : item['job_cores']
                 })
 
-        job_tmplt = merge_dicts(job_tmplt, job['exc_begin'][0])
-        job_tmplt['start_time'] = calendar.timegm((datetime.datetime.strptime(job['exc_begin'][0]['start_time'], "%Y-%m-%d %H:%M:%S")).timetuple()) * 1000
+        job = merge_dicts(job, job_raw['exc_begin'][0])
+        job['start_time'] = datetime.strptime(job['start_time'], "%Y-%m-%d %H:%M:%S")
 
-    job_tmplt['ngpus_req'] = job_tmplt['ngpus']
-    job_tmplt['ncpus_req'] = job_tmplt['req_cpus']
-    job_tmplt['nmics_req'] = job_tmplt['nmics']
-    job_tmplt['mem_req'] = job_tmplt['req_mem']
-    job_tmplt['nnodes_req'] = len(job_tmplt['vnode_list'])
-    job_tmplt['user_id'] = job_tmplt['job_owner']
+    job['ngpus_req']  = job['ngpus']
+    job['ncpus_req']  = job['req_cpus']
+    job['nmics_req']  = job['nmics']
+    job['nnodes_req'] = len(job['vnode_list'])
+    job['mem_req']    = job['req_mem']
+    job['user_id']    = job['job_owner']
 
-    return(job_tmplt)
-
+    return(job)
 
