@@ -10,17 +10,8 @@ let socket;
 let active_metric = env.active_metric;
 
 window.onbeforeunload = function (e) {
-    const e = e || window.event;
-
-        socket.emit('unsubscribe-metric', {metric : active_metric});
-        socket.disconnect();
-
-    /*if (e) {
-              e.returnValue = 'Are you sure?';
-            }
-
-      // For Safari
-      return 'Are you sure?';*/
+    socket.emit('unsubscribe-metric', {metric : active_metric});
+    socket.disconnect();
 };
 
 @Component({
