@@ -3,6 +3,7 @@ from liberouterapi.error import ApiException
 from ..module import Module
 from ..utils import *
 
+
 from flask import Blueprint, request
 
 from cassandra.cluster import Cluster
@@ -22,6 +23,10 @@ jobman = JobManager(config['jobs']['server'],
         1883,
         json.loads(config['jobs']['topics']))
 
+from .sockets import *
+
+jobman.on_receive = emit_data
+
 log = logging.getLogger(__name__)
 
 class JobsError(ApiException):
@@ -40,10 +45,8 @@ jobs = Blueprint('jobs', __name__, url_prefix = '/jobs')
 def jobs_hello(jobid):
 
     if jobid in jobman.db:
-        """
-        The job is currently running, we can fetch the info we need
-        """
-        return(json.dumps(transform_live_job(jobid, jobman)))
+        # The job is currently running, we can fetch the info we need
+        return(json.dumps(transform_live_job(jobid, jobman), default=time_serializer))
 
     info = session.execute(prepared["sel_by_job_id"], (jobid,))
     if len(info.current_rows) == 0:
@@ -55,12 +58,14 @@ def jobs_hello(jobid):
         log.error(str(info[0]))
         info[0]["asoc_nodes"] = dict()
 
-    info[0]["vnode_list"] = split_list(info[0]["vnode_list"])
     variables = [item.split("->") for item in split_list(info[0]["var_list"])]
+
+    # Create variable list which is actually a dict
     info[0]["variable_list"] = dict()
     for item in variables:
         info[0]["variable_list"][item[0]] = item[1]
 
+    # Try to fetch measurements from DB
     measures = session.execute(prepared["measures"], (jobid,))
 
     if len(measures.current_rows) > 0:
@@ -68,9 +73,14 @@ def jobs_hello(jobid):
         result["asoc_power"] = asoc_node_core(result["job_node_avg_powerlist"], result["vnode_list"])
     else:
         result = info[0]
+    print(result)
 
+    result["vnode_list"] = split_list(result["vnode_list"])
     result['ctime'] = calendar.timegm(result['ctime'].timetuple()) * 1000
     result['active'] = False
+
+    print(result)
+
     return(json.dumps(result, default=time_serializer))
 
 @jobs.route('/latest')
@@ -91,10 +101,7 @@ def jobs_latest():
             WHERE token(user_id) > token('') and start_time >= " \
             + str(tstamp) + " ALLOW FILTERING")
 
-    results = list()
-
-    for item in qres:
-        results.append(item)
+    results = [item for item in qres]
 
     ordered = sorted(results, key = lambda k : k['end_time'])
     return(json.dumps(ordered[-1], default=time_serializer))
