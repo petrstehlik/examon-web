@@ -76,7 +76,7 @@ class JobManager():
             jobs_exc_begin
             jobs_exc_end
         """
-        self.log.info("Received message '%s': %s " % (msg.topic, json.dumps(msg.payload)))
+        self.log.info("Received message '%s': %s " % (msg.topic, msg.payload))
 
         topic = str(msg.topic).split('/')
 
@@ -103,7 +103,9 @@ class JobManager():
 
         # Process end event of job exec
         elif topic[-1] == "jobs_exc_end":
-            if jobid in self.db and "jobs_exc_begin" in self.db[jobid]:
+            if jobid in self.db and \
+                "exc_begin" in self.db[jobid] and \
+                len(self.db[jobid]["exc_begin"]) == len(payload["vnode_list"]):
                 self.process_exc_end(jobid, payload)
             else:
                 self.log.warn("Job '%s' - missing exc_begin or runjob event" % jobid)
@@ -112,7 +114,6 @@ class JobManager():
         # We received unknown message
         else:
             self.log.warn("Received unknown topic '%s'" % msg.topic)
-
 
     def process_runjob(self, jobid, payload):
         """
@@ -156,6 +157,8 @@ class JobManager():
                     "runjob" : [payload]
                 }
 
+        self.on_receive(jobid)
+
     def process_exc_begin(self, jobid, payload):
         """
         Example payload: "org/cineca/cluster/galileo/jobs_exc_begin":{
@@ -196,22 +199,25 @@ class JobManager():
             "real_walltime":41
         }
         """
-        self.db[jobid]["exc_end"] = payload
-
         if "exc_end" in self.db[jobid]:
             self.db[jobid]["exc_end"].append(payload)
         else:
             self.db[jobid]["exc_end"] = [payload]
 
-        self.on_end(jobid)
+        # Check if all "exc_end" messages are in the DB
+        # if everything is in place we can trigger the on_end method and remove it from active
+        self.on_receive(jobid)
 
-        # All is done, remove the job from DB
-        self.log.info("Removing job %s from DB" % jobid)
+        if len(self.db[jobid]["exc_end"]) == len(self.db[jobid]["exc_end"][0]["vnode_list"]):
+            self.on_end(jobid)
 
-        # DEVEL only to see finished jobs
-        self.finished[jobid] = copy.deepcopy(self.db[jobid])
+            # All is done, remove the job from DB
+            self.log.info("Removing job %s from DB" % jobid)
 
-        del self.db[jobid]
+            # DEVEL only to see finished jobs
+            self.finished[jobid] = copy.deepcopy(self.db[jobid])
+
+            del self.db[jobid]
 
     def process_exc_begin_fail(self, jobid, payload):
         if jobid not in self.db_fail:
