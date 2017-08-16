@@ -1,6 +1,7 @@
 from liberouterapi import app, socketio, config
 from liberouterapi.error import ApiException
 from ..module import Module
+from ..utils import split_list, merge_dicts
 from Holder import Holder
 
 from flask import Blueprint, request
@@ -35,18 +36,6 @@ def emit_data(node, metric, data):
 holder = Holder(config['mqtt']['server'],
         mqtt_topics = json.loads(config['mqtt']['topics']))
 holder.on_store = emit_data
-
-def split_list(values, delim = ","):
-    """
-    Remove all whitespaces and split by delimiter
-    """
-    return values.replace(" ", "").split(delim)
-
-def merge_dicts(x, y):
-    """Given two dicts, merge them into a new dict as a shallow copy."""
-    z = x.copy()
-    z.update(y)
-    return z
 
 @mqtt.route('/metric/<string:metric>')
 def get_metric(metric):
