@@ -65,7 +65,7 @@ export class JobDashboardComponent implements OnInit {
      * After calcution new property is set to the job data.
      */
     private calcDuration(): void {
-        const qTime = new Date(this.job.data['qtime'] * 1000);
+        const qTime = new Date(this.job.data['backup_qtime']);
         const eTime = new Date(this.job.data['end_time']);
 
         if (this.job.data['active']) {
