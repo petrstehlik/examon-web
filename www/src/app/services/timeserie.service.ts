@@ -29,7 +29,11 @@ export class TimeserieService {
                 else
                     observer.next(this.parseData(data));
             }, error => {
-                this.msg.send('Something went wrong for \'' + dict_name + '\' (status: ' + String(error.status) + ')', 'danger');
+                if (error.status === 404) {
+                    this.msg.send('No data for \'' + dict_name + '\'.', 'danger');
+                } else {
+                    this.msg.send('Something went wrong for \'' + dict_name + '\' (status: ' + String(error.status) + ').', 'danger');
+                }
             }));
     }
 
