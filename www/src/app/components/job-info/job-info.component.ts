@@ -21,6 +21,7 @@ export class JobInfoComponent implements OnInit, OnDestroy {
     public data: Object = {};
 
     private socket;
+    private fetchInt;
 
     private default_chart_options = {
         legend : false,
@@ -80,8 +81,10 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         if (this.job['data']['active']) {
             console.log('Fetched job is active!');
             this.startSocket();
+            this.fetchInt = setInterval(() => {
+                this.startFetchRaw('load_core', 'core', 'load_core', this.aggWindow());
+            }, env.interval)
         }
-
         this.fetchRaw('load_core', 'core', 'load_core', this.aggWindow());
     }
 
@@ -99,16 +102,16 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         })
     }
 
-    private fetch(dict_name,
+    private startFetchRaw(dict_name,
         endpoint,
-        metric: string|string[],
-        aggregate: number = null)
+        metric : string|string[],
+        aggregate : number = null)
     {
-        this.data['loading_' + dict_name] = true;
+        this.timeserie.fetch(this.job, dict_name, endpoint, metric, aggregate, true)
+        .subscribe(data => {
+            const key = Object.keys(data['points'])[0];
 
-        this.timeserie.fetch(this.job, dict_name, endpoint, metric, aggregate).subscribe(data => {
-            this.data['job_' + dict_name] = data;
-            this.data['loading_' + dict_name] = false;
+            this.data['job_' + dict_name]['data'] = data['points'][key];
         });
     }
 
@@ -118,7 +121,6 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         aggregate: number = null)
     {
         this.data['loading_' + dict_name] = true;
-
 
         if (this.job['data']['active'])
             this.job['to'] = +Date.now();
@@ -148,13 +150,16 @@ export class JobInfoComponent implements OnInit, OnDestroy {
      * Get an exact time duration of the job in order to aggregate to one single number
      */
     private aggWindow(): number {
-        if (this.job['data']['active'])
+        if (this.job['data']['active']) {
             return(Math.floor((+Date.now() - this.job['from']) / 1000));
-        else
+        } else {
             return(Math.floor(this.job['data']['end_time'] - this.job['from']) / 1000);
+        }
     }
 
     ngOnDestroy() {
+        clearInterval(this.fetchInt);
+
         if (this.socket != undefined) {
             this.socket.emit('unsubscribe', {jobid : this.job['data']['job_id']});
             this.socket.disconnect();
