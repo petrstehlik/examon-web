@@ -76,9 +76,9 @@ def transform_live_job(jobid, jobman):
     # Set its active status
     job['active'] = True
 
-    job['backup_qtime'] = datetime.strptime(job['backup_qtime'], "%Y-%m-%d %H:%M:%S")
+    job['backup_qtime'] = parse(job['backup_qtime'])
 
-    if "exc_begin" in job:
+    if "exc_begin" in job_raw:
         job['exc_begin'] = True
         job['asoc_nodes'] = list()
 
@@ -89,7 +89,15 @@ def transform_live_job(jobid, jobman):
                 })
 
         job = merge_dicts(job, job_raw['exc_begin'][0])
-        job['start_time'] = datetime.strptime(job['start_time'], "%Y-%m-%d %H:%M:%S")
+        job['start_time'] = parse(job['start_time'])
+
+    if "exc_end" in job_raw:
+        job['exc_end'] = True
+        job = merge_dicts(job, job_raw['exc_end'][0])
+
+    if 'variable_list ' in job:
+        job['variable_list'] = copy.deepcopy(job['variable_list '])
+        del job['variable_list ']
 
     job['ngpus_req']  = job['ngpus']
     job['ncpus_req']  = job['req_cpus']
