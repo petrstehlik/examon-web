@@ -2,6 +2,7 @@ import calendar, time
 from datetime import datetime
 import decimal
 import copy
+from dateutil.parser import parse
 
 def split_list(values, delim = ","):
     """
@@ -24,12 +25,14 @@ def get_duration(start, end):
 def time_serializer(obj):
     """Default JSON serializer."""
     if isinstance(obj, datetime):
+        millis = 0
         if obj.utcoffset() is not None:
             obj = obj - obj.utcoffset()
-        millis = int(
-            calendar.timegm(obj.timetuple()) * 1000 +
-            obj.microsecond / 1000
-        )
+
+        millis = int(calendar.timegm(obj.timetuple()) * 1000 + obj.microsecond / 1000)
+
+        if obj.utcoffset() is None:
+            millis += (time.altzone * 1000)
         return millis
     if isinstance(obj, decimal.Decimal):
         return float(obj)
