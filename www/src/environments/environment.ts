@@ -28,5 +28,6 @@ export const environment = {
     ws : {
         host : window.location.hostname,
         port : 5555
-    }
-}
+    },
+    interval : 5000    // Interval in miliseconds to resfresh data in job info
+};
