@@ -22,12 +22,12 @@ def emit_data(node, metric, data):
     global subscribed_metrics
 
     if metric in subscribed_metrics and subscribed_metrics[metric] > 0:
-        log.debug("Unsubscribed metric: %s", json.dumps(subscribed_metrics[metric]))
+        log.debug("Metric: %s (subscribers: %s)", (metric, subscribed_metrics[metric]))
         socketio.server.emit('data', {
-            'metric' : metric,
-            'node' : node,
-            'data' : data,
-            'range' : holder.minmax(metric)
+                'metric' : metric,
+                'node' : node,
+                'data' : data,
+                'range' : holder.minmax(metric)
             },
             namespace='/render',
             room = metric)
