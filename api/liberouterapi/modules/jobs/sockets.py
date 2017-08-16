@@ -44,7 +44,7 @@ def unsubscribe_job(json_data):
     if 'jobid' in json_data:
         jobid = json_data['jobid']
         try:
-            log.info("Unsubscribing from %s" % metric)
+            log.info("Unsubscribing from %s" % jobid)
 
             if jobid in subscribed_jobs:
                 if subscribed_jobs[jobid] > 0:
@@ -57,12 +57,12 @@ def unsubscribe_job(json_data):
             else:
                 emit('error', "Room doesn't exist")
 
-            leave_room(metric)
+            leave_room(jobid)
         except KeyError as e:
-            emit('error', "Cannot find given metric '%s'" % metric)
+            emit('error', "Cannot find given job '%s'" % jobid)
 
     else:
-        emit('error', "Missing metric in request")
+        emit('error', "Missing 'jobid' in request")
 
 def emit_data(jobid):
     global subscribed_jobs
