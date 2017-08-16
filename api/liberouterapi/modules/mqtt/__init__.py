@@ -47,7 +47,7 @@ def get_metric(metric):
     except KeyError as e:
         raise MqttError("Metric %s not found in holder's DB" % metric, status_code=404)
 
-@mqtt.route('/node')
+@mqtt.route('/nodes')
 def get_nodes():
     return(json.dumps(holder.nodes))
 
