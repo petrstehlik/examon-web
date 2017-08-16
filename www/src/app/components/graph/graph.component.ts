@@ -25,9 +25,9 @@ export class GraphComponent implements OnInit {
 
     @Input('data')
     set setData(data) {
-        if (data != undefined && Object.keys(data).length !== 0) {
+        if (data !== undefined && Object.keys(data).length !== 0) {
             this.data = data;
-            if (this.graphRef == undefined) {
+            if (this.graphRef === undefined) {
                 this.config['labels'] = this.data['labels'];
 
                 this.graphRef = new Dygraph(

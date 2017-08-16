@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { environment as env } from 'environments/environment';
@@ -21,9 +21,9 @@ export class MessageService {
         });
 
         this.socket.on('error', (data) => {
-            console.error("ERROR", data);
+            console.error('ERROR', data);
             this.subject.next({ text: data, type : 'danger' });
-        })
+        });
     }
 
     send(message: string, type: 'warning'|'danger'|'info'|'success' = 'warning') {

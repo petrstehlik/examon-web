@@ -83,7 +83,7 @@ export class JobInfoComponent implements OnInit, OnDestroy {
             this.startSocket();
             this.fetchInt = setInterval(() => {
                 this.startFetchRaw('load_core', 'core', 'load_core', this.aggWindow());
-            }, env.interval)
+            }, env.interval);
         }
         this.fetchRaw('load_core', 'core', 'load_core', this.aggWindow());
     }
@@ -92,20 +92,20 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         this.socket = io(env.ws.host + ':' + env.ws.port + '/jobs');
 
         this.socket.on('connect', () => {
-            console.debug("Socket connected");
+            console.debug('Socket connected');
             this.socket.emit('subscribe', {jobid : this.job['data']['job_id']});
-        })
+        });
 
         this.socket.on('data', (data) => {
             console.debug(JSON.parse(data));
             this.job['data'] = Object.assign(this.job['data'], JSON.parse(data));
-        })
+        });
     }
 
     private startFetchRaw(dict_name,
         endpoint,
-        metric : string|string[],
-        aggregate : number = null)
+        metric: string|string[],
+        aggregate: number = null)
     {
         this.timeserie.fetch(this.job, dict_name, endpoint, metric, aggregate, true)
         .subscribe(data => {

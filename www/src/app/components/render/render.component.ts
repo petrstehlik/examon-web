@@ -91,16 +91,18 @@ export class RenderComponent implements OnInit, OnDestroy {
             // We must clear the model
             if (Object.keys(tmp_data).length > 0) {
                 for (const key of Object.keys(tmp_data)) {
-                    if (key == 'max' || key == 'min')
+                    if (key === 'max' || key === 'min') {
                         continue;
+                    }
 
                     const obj = m_scenes.get_object_by_name(key);
                     m_mat.set_diffuse_color(obj, 'node', [1, 1, 1]);
                 }
 
                 for (const key of Object.keys(node_data)) {
-                    if (key == 'min' || key == 'max')
+                    if (key === 'min' || key === 'max') {
                         continue;
+                    }
 
                     color_node(key, {
                         value : node_data[key]['value'],
@@ -172,8 +174,9 @@ export class RenderComponent implements OnInit, OnDestroy {
 
             // Model is initialized so we can color the nodes
             for (const key of Object.keys(node_data)) {
-                if (key == 'min' || key == 'max')
+                if (key === 'min' || key === 'max') {
                     continue;
+                }
 
                 color_node(key, {
                     value : node_data[key]['value'],
@@ -185,8 +188,9 @@ export class RenderComponent implements OnInit, OnDestroy {
             // Register the data reception via websocket only when everything is loaded
             socket.on('data', function(data) {
                 // console.log(new Date(), new Date( data['data']['timestamp'] * 1000), data['node']);
-                if (!(data['node'] in node_data))
+                if (!(data['node'] in node_data)) {
                     node_data[data['node']] = data;
+                }
 
                 node_data[data['node']]['value'] = data['data']['value'];
                 node_data[data['node']]['timestamp'] = data['data']['timestamp'];
@@ -197,7 +201,7 @@ export class RenderComponent implements OnInit, OnDestroy {
                     max : data['range']['max']
                 });
 
-                if (_selected_obj && data['node'] == _selected_obj.name) {
+                if (_selected_obj && data['node'] === _selected_obj.name) {
                     fillLabel(data['node']);
                 }
             });
@@ -237,8 +241,9 @@ export class RenderComponent implements OnInit, OnDestroy {
         }
 
         function canvas_click(e) {
-            if (e.preventDefault)
+            if (e.preventDefault) {
                 e.preventDefault();
+            }
 
             const offset = getOffset(document.getElementById('main_canvas_container'));
 
@@ -254,7 +259,7 @@ export class RenderComponent implements OnInit, OnDestroy {
         function highlightNode(obj) {
             if (obj &&
                 m_scenes.check_object_by_name(obj.name) &&
-                obj.name.slice(0, 4) == 'node') {
+                obj.name.slice(0, 4) === 'node') {
                 fillLabel(obj.name);
 
                 if (_selected_obj != obj) {
@@ -271,8 +276,9 @@ export class RenderComponent implements OnInit, OnDestroy {
         }
 
         function swichMetric(e) {
-            if (_selected_obj)
+            if (_selected_obj) {
                 m_scenes.clear_outline_anim(_selected_obj);
+            }
             _selected_obj = null;
             socket.emit('unsubscribe-metric', {metric : active_metric});
             const sel = <HTMLSelectElement>document.getElementById('select-metric');
@@ -292,7 +298,7 @@ export class RenderComponent implements OnInit, OnDestroy {
                 const color = node_data[node]['color_rgb'];
                 label.innerHTML = '<h4>Node: ' + node + '</h4>' +
                     active_metric_name + ': ' + node_data[node]['value'].toFixed(2);
-                if (color != undefined) {
+                if (color !== undefined) {
                     label.innerHTML += '<span class=\'color-bar\' style=\'background-color: rgb(' +
                         (color['r']) + ',' +
                         (color['g']) + ',' +

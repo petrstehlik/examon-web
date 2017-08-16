@@ -72,10 +72,10 @@ export class JobDashboardComponent implements OnInit {
             this.fillDuration(+Date.now() - qTime.getTime());
 
             setInterval(() => {
-                this.fillDuration(+Date.now() - qTime.getTime())
+                this.fillDuration(+Date.now() - qTime.getTime());
             }, 1000);
         } else {
-            this.fillDuration(eTime.getTime() - qTime.getTime())
+            this.fillDuration(eTime.getTime() - qTime.getTime());
         }
     }
 

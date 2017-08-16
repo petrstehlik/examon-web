@@ -5,8 +5,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export class MapToIterable implements PipeTransform {
     transform(map: { [key: string]: any }, ...parameters: any[]) {
-        if (!map)
+        if (!map) {
             return undefined;
+        }
         return Object.keys(map)
             .map((key) => ({ 'key': key, 'value': map[key] }));
     }
@@ -17,8 +18,9 @@ export class MapToIterable implements PipeTransform {
 })
 export class ObjectSize implements PipeTransform {
     transform(map: { [key: string]: any }, ...parameters: any[]) {
-        if (!map)
+        if (!map) {
             return 0;
+        }
         return Object.keys(map).length;
     }
 }
