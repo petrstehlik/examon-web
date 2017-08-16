@@ -73,13 +73,10 @@ def jobs_hello(jobid):
         result["asoc_power"] = asoc_node_core(result["job_node_avg_powerlist"], result["vnode_list"])
     else:
         result = info[0]
-    print(result)
 
     result["vnode_list"] = split_list(result["vnode_list"])
     result['ctime'] = calendar.timegm(result['ctime'].timetuple()) * 1000
     result['active'] = False
-
-    print(result)
 
     return(json.dumps(result, default=time_serializer))
 
