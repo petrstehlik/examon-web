@@ -322,8 +322,9 @@ export class RenderComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        b4w.require('main').reset();
         socket.emit('unsubscribe-metric', {metric : active_metric});
+        socket.disconnect();
+        b4w.require('main').reset();
     }
 
 }
