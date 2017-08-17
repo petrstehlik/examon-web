@@ -15,9 +15,9 @@ export class JobDashboardComponent implements OnInit {
     public job = null;
 
     public error = {
-        message : "",
+        message : '',
         status : false
-    }
+    };
 
     public duration = {
         days : 0,
@@ -26,16 +26,16 @@ export class JobDashboardComponent implements OnInit {
         seconds : 0
     };
 
-    constructor(private http : HttpClient,
-        private router : ActivatedRoute,
-        private msg : MessageService) { }
+    constructor(private http: HttpClient,
+        private router: ActivatedRoute,
+        private msg: MessageService) { }
 
     ngOnInit() {
         this.router.params.subscribe(params => {
 
-            this.http.get('/api/jobs/' + params["jobid"]).subscribe(
+            this.http.get('/api/jobs/' + params['jobid']).subscribe(
                 data => {
-                    this.job = new Job(params["jobid"]);
+                    this.job = new Job(params['jobid']);
                     this.job.load(data);
                     this.calcDuration();
                     this.error.status = false;
@@ -47,12 +47,12 @@ export class JobDashboardComponent implements OnInit {
                     this.job = new Job();
 
                     if (error.status == 404) {
-                        this.msg.send("Cannot find job with job ID " + this.job.id, "danger");
+                        this.msg.send('Cannot find job with job ID ' + this.job.id, 'danger');
                     } else {
-                        this.msg.send("Something went wrong fetching a job.", "danger");
+                        this.msg.send('Something went wrong fetching a job.', 'danger');
                     }
                 }
-            )
+            );
         });
     }
 
@@ -64,17 +64,28 @@ export class JobDashboardComponent implements OnInit {
      *
      * After calcution new property is set to the job data.
      */
-    private calcDuration() : void {
-        let qTime = new Date(this.job.data["backup_qtime"])
-        let eTime = new Date(this.job.data["end_time"])
+    private calcDuration(): void {
+        const qTime = new Date(this.job.data['backup_qtime']);
+        const eTime = new Date(this.job.data['end_time']);
 
-        let difference = eTime.getTime() - qTime.getTime();
+        if (this.job.data['active']) {
+            this.fillDuration(+Date.now() - qTime.getTime());
+
+            setInterval(() => {
+                this.fillDuration(+Date.now() - qTime.getTime());
+            }, 1000);
+        } else {
+            this.fillDuration(eTime.getTime() - qTime.getTime());
+        }
+    }
+
+    private fillDuration(difference) {
         this.duration.days = Math.floor(difference / (1000 * 60 * 60 * 24));
         this.duration.hours = Math.floor(difference / (1000 * 60 * 60) % 24);
         this.duration.minutes = Math.floor(difference / (1000 * 60) % 60);
         this.duration.seconds = Math.floor(difference / (1000) % 60);
 
-        this.job.data["duration"] = this.duration;
+        this.job.data['duration'] = this.duration;
     }
 
 }

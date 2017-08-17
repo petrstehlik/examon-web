@@ -10,12 +10,12 @@ import { MessageService } from './services/message.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-    message : string;
-    type : string;
+    message: string;
+    type: string;
     subscription: Subscription;
 
-    constructor(private msg : MessageService,
-        private router : Router) { }
+    constructor(private msg: MessageService,
+        private router: Router) { }
 
     ngOnInit() {
         this.subscription = this.msg.get().subscribe(
@@ -32,7 +32,7 @@ export class AppComponent implements OnInit {
             if (val instanceof NavigationStart) {
                 this.msg.clear();
             }
-        })
+        });
     }
 
     close(reason) {

@@ -28,4 +28,4 @@ export const appRoutes = [
         path : '**',
         component : NullComponent
     },
-]
+];

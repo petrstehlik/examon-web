@@ -17,6 +17,8 @@ The basic steps:
 """
 
 from .Router import Router
+from flask_socketio import SocketIO
+
 print("# Setting up the application")
 app = Router(__name__)
 
@@ -60,6 +62,7 @@ if (config["auth"].getboolean("enabled")):
 
 print("# Configuring server app")
 app.config.from_object(config)
+socketio = SocketIO(app)
 
 if config['api'].getboolean('cors', False):
 	print("# CORS enabled")

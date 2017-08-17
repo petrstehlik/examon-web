@@ -3,7 +3,7 @@
         <div class="card text-center">
             <div class="card-block text-center">
                 <small class="card-title"># of jobs</small>
-                <h4>{{ data?.total?.jobs | number:'1.0' }}</h4>
+                <h4>{{ data?.total?.jobs + data.active_jobs | number:'1.0' }}</h4>
             </div>
         </div>
     </div>
@@ -52,46 +52,130 @@
             </div>
         </div>
     </div>
-
-
-    <div class="col">
-        <div class="card text-center number">
-            Total energy used
-        </div>
-    </div>
-
-    <div class="col">
-        <div class="card text-center number">
-            current energy usage
-        </div>
-    </div>
-
 </div>
 
 <div class="row mb-3">
-    <div class="col">
+    <div class="col-10">
         <div class="card text-center">
-            <ex-graph [data]="chart_data.cluster_load" title="Cluster Load" labelY="Load (%)"></ex-graph>
+            <ex-graph
+                [data]="data?.load"
+                [loading]="data?.loading_load"
+                topTitle="Cluster Load" labelY="Load (%)"></ex-graph>
         </div>
     </div>
 
     <div class="col-2">
-        <div class="card text-center number">
-            Current cluster load
+        <div class="card mb-1">
+            <div class="card-block text-center">
+                <small class="card-title">Average Load</small>
+                <h4>
+                    <span *ngIf="!data?.loading_load_total">
+                        {{ data?.load_total?.data[0][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_load_total">--</span>
+                    %
+                </h4>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current Load</small>
+                <h4>
+                    <span *ngIf="!data?.loading_load">
+                        {{ data?.load?.data[data['load']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_load">--</span>
+                    %
+                </h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-10">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data?.temp"
+                [loading]="data?.loading_temp"
+                [range]="null"
+                topTitle="Cluster Temperature"
+                labelY="Temperature (°C)">
+            </ex-graph>
+        </div>
+    </div>
+
+    <div class="col-2">
+        <div class="card mb-1">
+            <div class="card-block text-center">
+                <small class="card-title">Average Temperature</small>
+                <h4>
+                    <span *ngIf="!data?.loading_temp_total">
+                        {{ data?.temp_total?.data[0][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_temp_total">--</span>
+                    °C
+                </h4>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current Temperature</small>
+                <h4>
+                    <span *ngIf="!data?.loading_temp">
+                        {{ data?.temp?.data[data['temp']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_temp">--</span>
+                    °C
+                </h4>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="row mb-3">
-    <div class="col">
-        <div class="card text-center timeseries">
-            Cluster temperature with room temperature
+    <div class="col-10">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data?.power"
+                [loading]="data?.loading_power"
+                [range]="null"
+                topTitle="Average Power Consumption Per Node"
+                labelY="Power (W)">
+            </ex-graph>
         </div>
     </div>
 
+
     <div class="col-2">
-        <div class="card text-center number">
-            Current cluster temp
+        <div class="card mb-1">
+            <div class="card-block text-center">
+                <small class="card-title">Average power consumption</small>
+                <h4>
+                    <span *ngIf="!data?.loading_power_total">
+                        {{ data?.power_total?.data[0][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_power_total">--</span>
+                    W
+                </h4>
+            </div>
         </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current power consumption</small>
+                <h4>
+                    <span *ngIf="!data?.loading_power">
+                        {{ data?.power?.data[data['power']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_power">--</span>
+                    W
+                </h4>
+            </div>
+        </div>
+
     </div>
 </div>

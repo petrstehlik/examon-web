@@ -64,16 +64,50 @@
 
 <div class="row mb-3">
     <div class="col">
-        <div class="card text-center timeseries">
+        <div class="card text-center">
             sys/io/cpu/mem utilization stacked
+
+            <ex-graph
+                [data]="data['job_utils']"
+                [loading]="data['loading_utils']"
+                topTitle="Utilization"
+                labelY="Utilization (%)">
+            </ex-graph>
         </div>
     </div>
 </div>
 
 <div class="row mb-3">
     <div class="col">
-        <div class="card text-center timeseries">
+        <div class="card text-center">
             Cluster temperature chipset, room temperature
+
+            <ex-graph
+                [data]="data['job_temp']"
+                [loading]="data['loading_temp']"
+                topTitle="Temperature"
+                [range]="null"
+                labelY="Temp (%)">
+            </ex-graph>
+
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            Consumption
+
+            <ex-graph
+                [data]="data['job_power']"
+                [loading]="data['loading_power']"
+                topTitle="Power"
+                [range]="null"
+                [stacked]="false"
+                labelY="Power (W)">
+            </ex-graph>
+
         </div>
     </div>
 </div>

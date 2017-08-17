@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { environment as env } from 'environments/environment';
+
 import { MessageService } from 'app/services/message.service';
 
 @Component({
@@ -8,7 +10,18 @@ import { MessageService } from 'app/services/message.service';
 })
 export class SysadminDashboardComponent implements OnInit {
 
-    constructor(private msg : MessageService) { }
+    public timewindow: Object = undefined;
 
-    ngOnInit() { }
+    constructor(private msg: MessageService) { }
+
+    ngOnInit() {
+        this.timewindow = {
+            from : (+Date.now() - env.timeoffset), // -15 mins
+            to : +Date.now()
+        };
+    }
+
+    public onSelect(time: Object): void {
+        this.timewindow = time;
+    }
 }

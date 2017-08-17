@@ -1,10 +1,12 @@
 <ex-navbar></ex-navbar>
 
+<ex-rangepicker (onSelect)="onSelect($event)"></ex-rangepicker>
+
 <ngb-tabset type="pills" class="mb-3">
     <ngb-tab>
         <ng-template ngbTabTitle>Overview</ng-template>
         <ng-template ngbTabContent>
-            <ex-sysadmin-overview></ex-sysadmin-overview>
+            <ex-sysadmin-overview [time]="timewindow"></ex-sysadmin-overview>
         </ng-template>
     </ngb-tab>
 

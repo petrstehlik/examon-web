@@ -1,11 +1,10 @@
 <ex-navbar></ex-navbar>
 
-<ex-rangepicker (onSelect)="onSelect($event)"></ex-rangepicker>
-
 <ngb-tabset type="pills" class="mb-3">
     <ngb-tab>
         <ng-template ngbTabTitle>Overview</ng-template>
         <ng-template ngbTabContent>
+            <ex-rangepicker (onSelect)="onSelect($event)"></ex-rangepicker>
             <ex-public-overview [time]="timewindow"></ex-public-overview>
         </ng-template>
     </ngb-tab>
@@ -13,7 +12,7 @@
     <ngb-tab>
         <ng-template ngbTabTitle>3D View</ng-template>
         <ng-template ngbTabContent>
-            Here should be a 3D view of the cluster room
+            <ex-render></ex-render>
         </ng-template>
     </ngb-tab>
 </ngb-tabset>

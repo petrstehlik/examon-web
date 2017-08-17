@@ -93,3 +93,8 @@ CREATE TABLE jobs\_measures\_aggregate (
   PRIMARY KEY ((job\_id))
 )
 ```
+
+## How to run API as uwsgi
+Must have installed uwsgi with ssl support and gevent
+
+`uwsgi --http :5555 --gevent 1000 --http-websockets --wsgi-file wsgi.py  `

@@ -10,19 +10,18 @@ import { environment as env } from 'environments/environment';
 })
 export class PublicDashboardComponent implements OnInit {
 
-    timewindow : Object = undefined;
+    timewindow: Object = undefined;
 
-    constructor(private http : HttpClient) { }
+    constructor(private http: HttpClient) { }
 
     ngOnInit() {
         this.timewindow = {
-            from : (+Date.now() - env.timeoffset), // -15 mins
+            from : (+Date.now() - env.timeoffset),
             to : +Date.now()
         };
-        console.log(this.timewindow)
     }
 
-    public onSelect(time : Object) : void {
+    public onSelect(time: Object): void {
         this.timewindow = time;
     }
 

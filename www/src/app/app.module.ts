@@ -4,7 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { ChartsModule } from 'ng2-charts/ng2-charts';
 
 import { appRoutes } from './app.routes';
 
@@ -15,6 +17,8 @@ import { GraphComponent } from './components/graph/graph.component';
 
 import { JobService } from 'app/services/job.service';
 import { MessageService } from 'app/services';
+
+import { MapToIterable, ObjectSize } from 'app/utils/keyIterable';
 
 import {
     NullComponent,
@@ -27,7 +31,8 @@ import {
     GeneralPublicViewComponent,
     SysadminDashboardComponent,
     SysadminOverviewComponent,
-    RangepickerComponent } from 'app/components';
+    RangepickerComponent,
+    RenderComponent } from 'app/components';
 
 @NgModule({
   declarations: [
@@ -45,12 +50,16 @@ import {
     PublicDashboardComponent,
     PublicOverviewComponent,
     SysadminOverviewComponent,
-    RangepickerComponent
+    RangepickerComponent,
+    RenderComponent,
+    MapToIterable,
+    ObjectSize
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    ChartsModule,
     NgbModule.forRoot(),
     RouterModule.forRoot(appRoutes)
   ],

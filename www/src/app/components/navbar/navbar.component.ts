@@ -10,14 +10,14 @@ import { Job } from 'app/interfaces';
 })
 export class NavbarComponent implements OnInit {
 
-    public job : Job = new Job("");
+    public job: Job = new Job('');
 
-  constructor(private router : ActivatedRoute) { }
+  constructor(private router: ActivatedRoute) { }
 
   ngOnInit() {
       this.router.params.subscribe(params => {
-            this.job.id = params["jobid"];
-        })
+            this.job.id = params['jobid'];
+        });
   }
 
 }
