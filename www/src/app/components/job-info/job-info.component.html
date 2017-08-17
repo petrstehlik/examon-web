@@ -19,28 +19,35 @@
         <div class="card time">
             <div class="card-block">
             <h4 class="card-title">Times</h4>
-            <p>
-                <small>Duration: </small>
-                <span *ngIf="job.data.duration.days">
-                    {{ job.data.duration.days }} days
-                </span>
-                <span *ngIf="job.data.duration.hours">
-                    {{ job.data.duration.hours }} hours
-                </span>
-                <span *ngIf="job.data.duration.minutes">
-                    {{ job.data.duration.minutes }} mins
-                </span>
-                <span *ngIf="job.data.duration.seconds">
-                    {{ job.data.duration.seconds }} secs
-                </span>
-            </p>
+                <p>
+                    <small>Duration: </small>
+                    <span *ngIf="job.data.duration.days">
+                        {{ job.data.duration.days }} day<span *ngIf="job.data.duration.days > 1">s</span>
+                    </span>
+                    <span *ngIf="job.data.duration.hours">
+                        {{ job.data.duration.hours }} hour<span *ngIf="job.data.duration.hours > 1">s</span>
 
-            <p>
-                <small>Queue time: </small>
-                {{ job.data.backup_qtime | date:'HH:mm:ss dd/MM/yy' }}
-            </p>
-            <p><small>Start time:</small> {{ job.data.start_time | date:'HH:mm:ss dd/MM/yy' }}</p>
-            <p><small>End time:</small> {{ job.data.end_time | date:'HH:mm:ss dd/MM/yy' }}</p>
+                    </span>
+                    <span *ngIf="job.data.duration.minutes">
+                        {{ job.data.duration.minutes }} min<span *ngIf="job.data.duration.minutes > 1">s</span>
+                    </span>
+                    <span *ngIf="job.data.duration.seconds">
+                        {{ job.data.duration.seconds }} sec<span *ngIf="job.data.duration.seconds > 1">s</span>
+                    </span>
+                </p>
+
+                <p>
+                    <small>Queue time: </small>
+                    {{ job.data.backup_qtime | date:'HH:mm:ss dd/MM/yy' }}
+                </p>
+                <p>
+                    <small>Start time:</small>
+                    {{ job.data.start_time | date:'HH:mm:ss dd/MM/yy' }}
+                </p>
+                <p>
+                    <small>End time:</small>
+                    {{ job.data.end_time | date:'HH:mm:ss dd/MM/yy' }}
+                </p>
             </div>
         </div>
     </div>
@@ -131,8 +138,28 @@
     <div class="col">
         <div class="card">
             <div class="card-block text-center">
+                <small class="card-title">Status</small>
+                <h5 *ngIf="!job?.data?.exc_begin && !job.data.exc_end">
+                    Queued
+                </h5>
+                <h5 *ngIf="job?.data?.exc_begin && !job.data.exc_end">
+                    Execution began
+                </h5>
+                <h5 *ngIf="job?.data?.exc_begin && job?.data?.exc_end">
+                    Finished
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-block text-center">
                 <small class="card-title">Average Power</small>
-                <h5>{{ job?.data?.job_tot_avg_power | number:'1.1-2' }} W</h5>
+                <h5 *ngIf="!job?.data?.job_tot_avg_power">-- W</h5>
+                <h5 *ngIf="job?.data?.job_tot_avg_power">
+                    {{ job?.data?.job_tot_avg_power | number:'1.1-2' }} W
+                </h5>
             </div>
         </div>
     </div>
@@ -141,7 +168,10 @@
         <div class="card">
             <div class="card-block text-center">
                 <small class="card-title">Sys Utilization</small>
-                <h5>{{ job?.data?.ipmi_avg_sys_util | number:'1.1-2' }} %</h5>
+                <h5 *ngIf="!job?.data?.ipmi_avg_sys_util">-- %</h5>
+                <h5 *ngIf="job?.data?.ipmi_avg_sys_util">
+                    {{ job?.data?.ipmi_avg_sys_util | number:'1.1-2' }} %
+                </h5>
             </div>
         </div>
     </div>
@@ -150,7 +180,10 @@
         <div class="card">
             <div class="card-block text-center">
                 <small class="card-title">CPUs Utilization</small>
-                <h5>{{ job?.data?.ipmi_avg_cpu_util | number:'1.1-2'}} %</h5>
+                <h5 *ngIf="!job?.data?.ipmi_avg_cpu_util">-- %</h5>
+                <h5 *ngIf="job?.data?.ipmi_avg_cpu_util">
+                    {{ job?.data?.ipmi_avg_cpu_util | number:'1.1-2'}} %
+                </h5>
             </div>
         </div>
     </div>
@@ -159,11 +192,13 @@
         <div class="card">
             <div class="card-block text-center">
                 <small class="card-title">Average Temperature</small>
-                <h5>{{ job?.data['job_tot_avg_temp'] | number:'1.1-2'}} °C</h5>
+                <h5 *ngIf="!job?.data?.job_tot_avg_temp">-- °C</h5>
+                <h5 *ngIf="job?.data?.job_tot_avg_temp">
+                    {{ job?.data['job_tot_avg_temp'] | number:'1.1-2'}} °C
+                </h5>
             </div>
         </div>
     </div>
-
 </div>
 
 <div class="row mb-3">

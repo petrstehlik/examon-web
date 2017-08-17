@@ -60,6 +60,9 @@ export class JobInfoComponent implements OnInit, OnDestroy {
 
     public load_core_options = this.default_chart_options;
 
+    /**
+     * Process job data and if event is live start websocket
+     */
     @Input('job')
     set setJob(data) {
         if (data != undefined && data.loaded) {
@@ -79,7 +82,6 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         this.job['from'] = this.job['data']['backup_qtime'];
 
         if (this.job['data']['active']) {
-            console.log('Fetched job is active!');
             this.startSocket();
             this.fetchInt = setInterval(() => {
                 this.startFetchRaw('load_core', 'core', 'load_core', this.aggWindow());
@@ -88,25 +90,38 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         this.fetchRaw('load_core', 'core', 'load_core', this.aggWindow());
     }
 
+    /**
+     * We are ready for live stream of data, prepare websocket and add handlers
+     */
     private startSocket() {
         this.socket = io(env.ws.host + ':' + env.ws.port + '/jobs');
 
+        // Subscribe to a room with jobid
         this.socket.on('connect', () => {
-            console.debug('Socket connected');
             this.socket.emit('subscribe', {jobid : this.job['data']['job_id']});
         });
 
+        // Handle new data
         this.socket.on('data', (data) => {
-            console.debug(JSON.parse(data));
             this.job['data'] = Object.assign(this.job['data'], JSON.parse(data));
+
+            // Job finished executing, we don't need any new data and we can stop refreshing the chart
+            if ('exc_end' in this.job['data'] && this.job['data']['exc_end']) {
+                this.socket.emit('unsubscribe', {jobid : this.job['data']['job_id']});
+                clearInterval(this.fetchInt);
+            }
         });
     }
 
+    /**
+     * Fetch new data for barchart with shifting 'to' date
+     **/
     private startFetchRaw(dict_name,
         endpoint,
         metric: string|string[],
         aggregate: number = null)
     {
+        this.job['to'] = +Date.now();
         this.timeserie.fetch(this.job, dict_name, endpoint, metric, aggregate, true)
         .subscribe(data => {
             const key = Object.keys(data['points'])[0];
@@ -115,6 +130,9 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         });
     }
 
+    /**
+     * Fetch initial data for bar chart
+     */
     private fetchRaw(dict_name,
         endpoint,
         metric: string|string[],
@@ -127,12 +145,7 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         else
             this.job['to'] = this.job['data']['end_time'];
 
-        this.timeserie.fetch(this.job,
-            dict_name,
-            endpoint,
-            metric,
-            aggregate,
-            true)
+        this.timeserie.fetch(this.job, dict_name, endpoint, metric, aggregate, true)
         .subscribe(data => {
             const key = Object.keys(data['points'])[0];
 
@@ -157,6 +170,9 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Clear interval for fetching new data, unsubscribe from a room and disconnect socket
+     */
     ngOnDestroy() {
         clearInterval(this.fetchInt);
 
