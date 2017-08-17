@@ -8,6 +8,7 @@ declare const b4w;
 declare const io;
 let socket;
 let active_metric = env.active_metric;
+let active_metric_name = env.active_metric_name;
 
 window.onbeforeunload = function (e) {
     socket.emit('unsubscribe-metric', {metric : active_metric});
@@ -23,12 +24,6 @@ export class RenderComponent implements OnInit, OnDestroy {
 
     public colors = [];
     public metrics = metrics;
-
-    @HostListener('window:onunload', ['$event'])
-    beforeunloadHandler(event) {
-        socket.emit('unsubscribe-metric', {metric : active_metric});
-        socket.disconnect();
-    }
 
     constructor() { }
 
@@ -60,9 +55,6 @@ export class RenderComponent implements OnInit, OnDestroy {
 
         let node_data = {};
 
-        // Metric selection init
-        let active_metric_name = env.active_metric_name;
-
         // detect application mode
         const DEBUG = env.production;
 
@@ -71,18 +63,13 @@ export class RenderComponent implements OnInit, OnDestroy {
 
         let _selected_obj;
 
-
         socket = io(env.ws.host + ':' + env.ws.port + '/render', { reconnection: true });
         // Connect to a websocket and subscribe to the active metric
         socket.on('connect', function() {
-            console.debug('Connected');
-
-            socket.emit('subscribe-metric', {metric : active_metric});
+            console.info('Connected to WS');
         });
 
         socket.on('initial-data', function(data) {
-            console.debug('SOCKET DATA', data);
-
             // Create a deep copy of original data
             const tmp_data = Object.assign({}, node_data);
 
@@ -141,6 +128,10 @@ export class RenderComponent implements OnInit, OnDestroy {
                 return;
             }
 
+            const sel = <HTMLSelectElement>document.getElementById('select-metric');
+
+            sel.value = active_metric;
+
             m_preloader.create_preloader();
 
             // ignore right-click on the canvas element
@@ -172,6 +163,8 @@ export class RenderComponent implements OnInit, OnDestroy {
             canvas_elem.addEventListener('touchstart', canvas_click, false);
             document.getElementById('set-metric').addEventListener('click', swichMetric);
 
+            socket.emit('subscribe-metric', {metric : active_metric});
+
             // Model is initialized so we can color the nodes
             for (const key of Object.keys(node_data)) {
                 if (key === 'min' || key === 'max') {
@@ -187,7 +180,6 @@ export class RenderComponent implements OnInit, OnDestroy {
 
             // Register the data reception via websocket only when everything is loaded
             socket.on('data', function(data) {
-                // console.log(new Date(), new Date( data['data']['timestamp'] * 1000), data['node']);
                 if (!(data['node'] in node_data)) {
                     node_data[data['node']] = data;
                 }
@@ -329,7 +321,6 @@ export class RenderComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         socket.emit('unsubscribe-metric', {metric : active_metric});
-        socket.disconnect();
         b4w.require('main').reset();
     }
 
