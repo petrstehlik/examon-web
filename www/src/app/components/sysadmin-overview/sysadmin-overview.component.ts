@@ -15,12 +15,11 @@ export class SysadminOverviewComponent implements OnInit {
 
     @Input('time')
     set setData(time) {
-        console.log(time);
         if (time != undefined) {
             this.time = time;
             this.fetch('utils', 'cluster', ['Mem_Utilization', 'CPU_Utilization', 'IO_Utilization', 'Sys_Utilization'], env.window.ipmi);
             this.fetch('temp', 'cluster', 'PCH_Temp', env.window.ipmi);
-            this.fetch('power', 'node', 'Avg_Power', env.window.ipmi + 10);
+            this.fetch('power', 'cluster', 'Avg_Power', env.window.ipmi + 10);
         }
     }
 
