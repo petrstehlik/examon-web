@@ -53,7 +53,6 @@ export class JobsLookupComponent implements OnInit {
                 this.lastjob = data;
             },
             error => {
-                console.log(error);
                 this.msg.send('Cannot fetch latest job', 'danger');
             });
 
