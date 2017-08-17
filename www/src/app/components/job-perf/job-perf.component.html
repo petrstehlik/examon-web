@@ -27,7 +27,6 @@
                 topTitle="Utilization"
                 labelY="Utilization (%)">
             </ex-graph>
-
         </div>
     </div>
 </div>
@@ -81,7 +80,6 @@
 <div class="row mb-3">
     <div class="col-12">
         <div class="card text-center">
-           IPS per node/core averaged by 5 seconds (if time > 60s)
            <ex-graph
                 [data]="data['job_ips']"
                 [loading]="data['loading_ips']"
@@ -96,8 +94,6 @@
 <div class="row mb-3">
     <div class="col-12">
         <div class="card text-center">
-           C6 & C3 states with current clock per node/core averaged by 5 seconds (if time > 60s)
-
            <ex-graph
                 [data]="data['job_cstates']"
                 [loading]="data['loading_cstates']"
