@@ -54,8 +54,8 @@ export const metrics = [{
         name : 'CPU #2 Temperature',
         value : 'CPU2_Temp'
     },
-    {
-        name : 'CPU Temperature',
-        value : 'temp_pkg'
-    }
+    //{
+    //    name : 'CPU Temperature',
+    //    value : 'temp_pkg'
+    //}
 ];
