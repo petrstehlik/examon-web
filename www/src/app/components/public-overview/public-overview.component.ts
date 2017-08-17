@@ -25,6 +25,7 @@ export class PublicOverviewComponent implements OnInit {
     private time: Object;
     public data = {
         total : <Total>{},
+        active_jobs : 0,
 
         load : {},
         loading_load : true,
@@ -56,6 +57,7 @@ export class PublicOverviewComponent implements OnInit {
             this.time = time;
 
             this.fetchTotal();
+            this.getActiveJobs();
 
             this.fetch('load', 'cluster', 'load_core', 20);
             this.fetch('load_total', 'cluster', 'load_core', this.time['to'] - this.time['from'] + 10);
@@ -63,6 +65,7 @@ export class PublicOverviewComponent implements OnInit {
             this.fetch('temp_total', 'cluster',  'temp_pkg', this.time['to'] - this.time['from'] + 10);
             this.fetch('power', 'cluster', 'Avg_Power', 20);
             this.fetch('power_total', 'cluster', 'Avg_Power', this.time['to'] - this.time['from'] + 10);
+
         }
     }
 
@@ -70,6 +73,12 @@ export class PublicOverviewComponent implements OnInit {
         private timeserie: TimeserieService) { }
 
     ngOnInit() { }
+
+    private getActiveJobs() {
+        this.http.get<Total>('/api/jobs/active').subscribe(data => {
+            this.data.active_jobs = Object.keys(data).length;
+        });
+    }
 
     private fetch(dict_name, endpoint, metric: string|string[], aggregate: number = null) {
         this.data['loading_' + dict_name] = true;

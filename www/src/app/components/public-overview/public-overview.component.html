@@ -3,7 +3,7 @@
         <div class="card text-center">
             <div class="card-block text-center">
                 <small class="card-title"># of jobs</small>
-                <h4>{{ data?.total?.jobs | number:'1.0' }}</h4>
+                <h4>{{ data?.total?.jobs + data.active_jobs | number:'1.0' }}</h4>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
     </div>
 
     <div class="col-2">
-        <div class="card">
+        <div class="card mb-1">
             <div class="card-block text-center">
                 <small class="card-title">Average Load</small>
                 <h4>
@@ -77,6 +77,20 @@
                 </h4>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current Load</small>
+                <h4>
+                    <span *ngIf="!data?.loading_load">
+                        {{ data?.load?.data[data['load']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_load">--</span>
+                    %
+                </h4>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -94,7 +108,7 @@
     </div>
 
     <div class="col-2">
-        <div class="card">
+        <div class="card mb-1">
             <div class="card-block text-center">
                 <small class="card-title">Average Temperature</small>
                 <h4>
@@ -102,6 +116,19 @@
                         {{ data?.temp_total?.data[0][1] | number:'1.0-2' }}
                     </span>
                     <span *ngIf="data?.loading_temp_total">--</span>
+                    °C
+                </h4>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current Temperature</small>
+                <h4>
+                    <span *ngIf="!data?.loading_temp">
+                        {{ data?.temp?.data[data['temp']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_temp">--</span>
                     °C
                 </h4>
             </div>
@@ -124,7 +151,7 @@
 
 
     <div class="col-2">
-        <div class="card">
+        <div class="card mb-1">
             <div class="card-block text-center">
                 <small class="card-title">Average power consumption</small>
                 <h4>
@@ -136,5 +163,19 @@
                 </h4>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current power consumption</small>
+                <h4>
+                    <span *ngIf="!data?.loading_power">
+                        {{ data?.power?.data[data['power']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_power">--</span>
+                    W
+                </h4>
+            </div>
+        </div>
+
     </div>
 </div>
