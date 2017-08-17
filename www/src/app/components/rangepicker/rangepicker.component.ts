@@ -51,8 +51,6 @@ export class RangepickerComponent implements OnInit {
         }
 
         this.query[type] = prev.getTime();
-
-        console.log(this.query);
     }
 
     /**

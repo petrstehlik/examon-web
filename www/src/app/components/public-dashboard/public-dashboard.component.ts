@@ -19,7 +19,6 @@ export class PublicDashboardComponent implements OnInit {
             from : (+Date.now() - env.timeoffset),
             to : +Date.now()
         };
-        console.log(this.timewindow);
     }
 
     public onSelect(time: Object): void {
