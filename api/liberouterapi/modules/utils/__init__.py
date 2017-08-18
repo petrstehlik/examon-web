@@ -4,6 +4,8 @@ import decimal
 import copy
 from dateutil.parser import parse
 
+from liberouterapi import config
+
 def split_list(values, delim = ","):
     """
     Remove all whitespaces and split by delimiter
@@ -31,8 +33,8 @@ def time_serializer(obj):
 
         millis = int(calendar.timegm(obj.timetuple()) * 1000 + obj.microsecond / 1000)
 
-        if obj.utcoffset() is None:
-            millis += (time.altzone * 1000)
+        #if obj.utcoffset() is None:
+            #    millis += (config['cassandradb'].getint('timezone_offset', 0) * 1000)
         return millis
     if isinstance(obj, decimal.Decimal):
         return float(obj)
@@ -98,6 +100,10 @@ def transform_live_job(jobid, jobman):
     if 'variable_list ' in job:
         job['variable_list'] = copy.deepcopy(job['variable_list '])
         del job['variable_list ']
+
+    # Convert UNIX timestamps to datetime so it can be transformed correctly
+    job['ctime'] = datetime.fromtimestamp(job['ctime'])
+    job['qtime'] = datetime.fromtimestamp(job['qtime'])
 
     job['ngpus_req']  = job['ngpus']
     job['ncpus_req']  = job['req_cpus']
