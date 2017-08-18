@@ -33,8 +33,8 @@ def time_serializer(obj):
 
         millis = int(calendar.timegm(obj.timetuple()) * 1000 + obj.microsecond / 1000)
 
-        #if obj.utcoffset() is None:
-            #    millis += (config['cassandradb'].getint('timezone_offset', 0) * 1000)
+        if obj.utcoffset() is None:
+            millis -= (config['cassandradb'].getint('timezone_offset', 0) * 1000)
         return millis
     if isinstance(obj, decimal.Decimal):
         return float(obj)
