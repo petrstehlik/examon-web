@@ -3,14 +3,13 @@ from liberouterapi.error import ApiException
 from ..module import Module
 from ..utils import *
 
-
 from flask import Blueprint, request
 
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import dict_factory
 import json
-import calendar, datetime, time
+import datetime, time, calendar
 import decimal
 import logging
 import copy
@@ -75,7 +74,11 @@ def jobs_hello(jobid):
         result = info[0]
 
     result["vnode_list"] = split_list(result["vnode_list"])
-    result['ctime'] = calendar.timegm(result['ctime'].timetuple()) * 1000
+
+    # This shouldn't be needed when the correct times are stored in DB
+    result['ctime'] = calendar.timegm(result['ctime'].timetuple()) * 1000000
+    result['qtime'] = calendar.timegm(result['qtime'].timetuple()) * 1000000
+
     result['active'] = False
 
     return(json.dumps(result, default=time_serializer))
