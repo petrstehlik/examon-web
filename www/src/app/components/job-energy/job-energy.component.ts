@@ -18,7 +18,7 @@ export class JobEnergyComponent implements OnInit {
         if (job != null) {
             this.job = job;
             this.fetch('power', 'node', 'Avg_Power', 20);
-            this.fetch('temp', 'node', ['CPU1_Temp', 'CPU2_Temp'], 20);
+            this.fetch('temp', 'node', 'temp_pkg', 20);
             this.fetch('cpu_dram_power', 'cpu', ['pow_dram', 'pow_pkg'], 2);
         }
     }
