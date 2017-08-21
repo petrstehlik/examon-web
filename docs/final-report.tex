@@ -12,20 +12,21 @@
 \usepackage{booktabs} % Horizontal rules in tables
 \usepackage[small, labelfont=bf, up, textfont=up]{caption}
 \usepackage[rgb]{xcolor} % Should be CMYK if supported by the system
-\definecolor{prace-orange}{rgb}{1.0,0.42, 0.1} % 255, 107, 25
+
 % Colours by PRACE graphics guidelines
 %\definecolor{prace-darkblue}{rgb}{0.1, 0.19, 0.48} % 25, 49, 123
 %\definecolor{prace-lightblue}{rgb}{0.52, 0.81, 0.94} %132, 206, 239
 % Colours by SoHPC logo pipette measurements
+\definecolor{prace-orange}{rgb}{1.0,0.42, 0.1} % 255, 107, 25
 \definecolor{prace-darkblue}{rgb}{0.08, 0.31, 0.58} % #155195 = 21,81,149
 \definecolor{prace-lightblue}{rgb}{0.32, 0.73, 0.93} % #51bbed = 81,187,237
 \newcommand{\highlight}[1]{\textcolor{prace-orange}{#1}}
-\definecolor{link}{rgb}{0.1, 0.19, 0.48}  
+\definecolor{link}{rgb}{0.1, 0.19, 0.48}
+
 \usepackage{sectsty} % Enables custom section titles
 \allsectionsfont{\large\color{prace-orange}\usefont{OT1}{phv}{m}{n}}
 \usepackage[superscript,biblabel]{cite}
 \usepackage{calc,float,wrapfig}\restylefloat{figure}
-\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum'
 
 \usepackage[colorlinks=true, linkcolor=link, anchorcolor=link,citecolor=link,
 filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
@@ -43,6 +44,8 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
       --export-area-drawing}}\fi%
   \includegraphics[#1]{#2}%
 }
+
+\graphicspath{{img/}}
 
 % http://tex.stackexchange.com/questions/59166/span-column-in-a-multicols-environment
 %\newcounter{tempcolnum}
@@ -90,8 +93,8 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
   \maketitle
   \fontsize{14pt}{20pt}\usefont{OT1}{phv}{m}{n}\selectfont
   \raggedright
-  Energy efficiency is one of the most timely problems in managing HPC facilities which can be addressed at different scale and perspective. Using Internet of Things technologies this project focuses on visualising data collected from the Galileo supercomputer in a web application. 
-\end{minipage}\hfill
+    Energy efficiency is one of the most timely problems in managing HPC facilities which can be addressed at different scale and perspective. Using Internet of Things technologies this project focuses on visualising data collected from the Galileo supercomputer in a web application.
+  \end{minipage}\hfill
 \begin{minipage}{0.40\textwidth}
   \includegraphics[width=\linewidth]{3d-model}
   %\includegraphicsvg[width=\linewidth]{sohpc-logo}
@@ -101,27 +104,56 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
 \frenchspacing
 \begin{multicols}{3}
 
-\lettrine[lines=4,nindent=0em]{\highlight{T}}{}his template is used for
-PRACE Summer of HPC project newsletter report in popular science format that should be 2-3 pages long with graphics. The target audience is an educated adult, without scientific education in the field of the project. The report should contain a title, abstract, references and acknowledgements. 
-% http://ctan.ijs.si/tex-archive/macros/latex/contrib/wrapfig/multiple-span.txt
-\vspace{13\baselineskip} % we enforce space here for figure in right column
-The report should cover an introduction, methods, results and conclusions but does not have to contain these as section headings. Tone should be more informal than a journal article. Your enthusiasm should show.
+\lettrine[lines=4,nindent=0em]{\highlight{T}}{}he current monitoring system\cite{current} consists of several layers which allow to aggregate in a single point heterogeneous data sources which consist of computing elements, node, job scheduler and facility telemetry of the Galileo supercomputer located at CINECA, Bologna, Italy.
 
-\section{Introduction}
-\section{Methods}
+The system was named \textit{ExaMon}\footnote{Shorthand for Exascale Monitoring} and is built on top of MQTT protocol\cite{mqtt} which allows measured metrics to be send to a central broker where received data are processed and stored in KairosDB\cite{kairos} database utilizing Cassandra cluster.
+
+\begin{figure}[H]
+%\color{yellow}\rule{\linewidth}{3cm}\color{black}
+    \includegraphics[width=0.9\linewidth]{examon-architecture}
+    \caption{Examon Architecture}
+    \label{arch}
+\end{figure}
+
+This enables us to post-process data in time-oriented fashion in order to visualise them on a time-line and as a single number as well.
+
+Current implementation uses Grafana framework to visualise data stored in KairosDB. Grafana will be replaced by the project's result of creating a dedicated web application for defined use-cases with 3D model of a cluster room showing various metrics of the whole HPC system with focus on energy consumption and efficiency.
+
+\section*{Methods}
+The whole project can be separated into three phases. First phase is data anylysis where the whole dataset of available metrics was presented, how they are distributed and eventually processed on the back-end.
+
+Datasets can be divided into multiple levels of aggregation:
+\begin{itemize}
+    \item{Per-core level -- the most low-level data can be found in core's registers such as IPS, Lx-cache misses and more. It also provides info about its load and temperature.}
+    \item{Per-CPU level -- each node consists of two CPUs and each of them can provide data about its C-states, energy counters and its frequency.}
+    \item{Per-node level -- most of the information available on node-level basis are coming from IPMI\cite{ipmi}. Via this interface we can access info about node's utilization, multiple temperature sensors and average power consumption.}
+    \item{Per-cluster level -- the Galileo's cluster room was equipped with several environmental sensors. This dataset is not currently available due to technical problems.}
+    \item{Per-job level -- data gathered using the PBS scheduler's hooks. This dataset is aside from previous ones since it points to allocated and used resources of the job submitted to the queue. This data are stored directly to Cassandra cluster ommitting KairosDB.}
+\end{itemize}
+
+With each level we can aggregate the lower levels (except job-level data). This is especially useful for core-level data which are mostly too dense for any comprehensible visualisation.
+
+Second phase was to visualize data stored in KairosDB in simple yet insightful way in a lightweight web application. The application, called ExaMon Web, uses Angular framework as its base on top of which several other libraries were used. Worth mentioning are Dygraphs and Bootstrap. The former library produces powerful time-oriented charts utilizing the canvas element in web browser. The latter is a CSS framework to produce uniform user interface across the whole application.
+
+Compared to Grafana, the created web application feels more lightweight, fast and easier to use because of the prepared datasets which are being used. The balance between configurability and the ease of use must have been found. We concluded the best way to achieve this was to enable time selection on given datasets but restrict configurability of the charts themselves. This way user is not bogged down with configuration and only focuses on prepared data. If there is such desire to see other metrics the Grafana framework is still available right next to the ExaMon Web. As an additional feature, compared to Grafana, we can perform more advanced queries using the KairosDB REST API.
+
+The last phase was to utilize the live stream of MQTT messages right in the ExaMon Web. Two use-cases were defined for the MQTT messages depending on their origin.
+
+Several job info MQTT messages are send during the job's lifecycle inside the PBS and every job is assigned a unique job ID. Using the ID user can subscribe to given messages and view various information on the ExaMon Web job dashboard. The dashboard also uses Cassandra cluster in case the job is already finished and stored in the cluster. This way user can see additional data about their job.
+
+Using the job data user can view detailed info about allocated resources of the given job such as CPU load, system utilization and more as seen in \ref{pic:job-perf}.
+
+Second use-case is
+
+
 \section{Results}
 \section{Discussion \& Conclusion}
 
-You can use your blog posts as a basis for this report. 
+You can use your blog posts as a basis for this report.
 
 Graphics should be your own. Short title should be just few words. Highlight word or two to give some separation within the short title. Long name preceding short title is not necessarily the title of your project as facts about the projects, mentors and the author(s) are given at the end. Usually in magazines no two articles are the same in terms of formatting. You are free to do figure positioning and column spans. Bear in mind that with multiple columns spanning in \LaTeX is non-trivial.
-\begin{wrapfigure}[13]{l}[\columnwidth+\columnsep]{1.3\columnwidth}
-  \color{yellow}\rule{\linewidth}{3cm}\color{black}
-  %\includegraphics[width=\linewidth]{fig1}
-  \caption{Use \href{http://www.ctan.org/pkg/wrapfig}{WrapFig} only if you are wrapping a text around the figure that flows on more that one column. See \href{http://ctan.ijs.si/tex-archive/macros/latex/contrib/wrapfig/multiple-span.txt}{instructions} on how to find breaking point on each column. Note that captions are not preferred.}
-  \label{fig:myfig1}
-\end{wrapfigure}
-\noindent Example nearby shows how wrapfig can be used for spanning into two columns. Don't be afraid of large screenshots. To get an idea on the style take a look into PRACE digest, newsletter and other popular scientific texts available on Internet. Google for \highlight{writing popular scientific}. For example: \url{http://awelu.srv.lu.se/genres-and-text-types/writing-in-academic-genres/popular-science-writing/}
+
+Example nearby shows how wrapfig can be used for spanning into two columns. Don't be afraid of large screenshots. To get an idea on the style take a look into PRACE digest, newsletter and other popular scientific texts available on Internet. Google for \highlight{writing popular scientific}. For example: \url{http://awelu.srv.lu.se/genres-and-text-types/writing-in-academic-genres/popular-science-writing/}
 
 \section*{Paper format}
 We use A4 paper size with 10pt Charter or Georgia font. Text at the end and captions should be 9pt. Short title Helvetica (Arial) medium or light 45pt with 50pt spacing. Long title and Abstract 12pt. Margins should be 12mm everywhere except ob the bottom where 0.75 inch is reserved for page number. Other important dimensions: 
@@ -319,10 +351,18 @@ Please balance the size of figures and text in such way that you will have the c
 \begin{thebibliography}{9}
 \vspace*{-1ex}  % adjust this
 \scriptsize
-\bibitem[1]{Figueredo:2009dg}
-Figueredo, A.~J. and Wolf, P. S.~A. (2009).
-\newblock Assortative pairing and life history strategy - a cross-cultural
-  study.
+\bibitem[1]{current}
+Beneventi, Francesco, et al. "Continuous learning of HPC infrastructure models using big data analytics and in-memory processing tools." 2017 Design, Automation \& Test in Europe Conference \& Exhibition (DATE). IEEE, 2017.
+
+\bibitem[2]{mqtt}
+Locke, Dave. "Mq telemetry transport (mqtt) v3.1 protocol specification." IBM developerWorks Technical Library (2010).
+
+\bibitem[3]{kairos}
+Goldschmidt, Thomas, et al. "Scalability and robustness of time-series databases for cloud-native monitoring of industrial processes." Cloud Computing (CLOUD), 2014 IEEE 7th International Conference on. IEEE, 2014.
+
+\bibitem[4]{ipmi}
+Kaufman, Gerald J. "System and method for application programming interface for extended intelligent platform management." U.S. Patent No. 7,966,389. 21 Jun. 2011.
+APA
 \end{thebibliography}
 
 \vfill
