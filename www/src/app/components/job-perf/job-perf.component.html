@@ -32,48 +32,45 @@
 </div>
 
 <div class="row mb-3">
-    <div class="col row">
-
-        <div class="col-12 mb-1">
-            <div class="card text-center">
-                <ex-graph
-                    [data]="data['job_fe_bound']"
-                    [loading]="data['loading_fe_bound']"
-                    height="150"
-                    topTitle="Front-end Bound"
-                    labelY="Bounds (%)">
-                </ex-graph>
-            </div>
-        </div>
-
-        <div class="col-12">
-            <div class="card text-center">
-                <ex-graph
-                    [data]="data['job_be_bound']"
-                    [loading]="data['loading_be_bound']"
-                    height="150"
-                    topTitle="Back-end Bound"
-                    labelY="Bounds (%)">
-                </ex-graph>
-            </div>
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_fe_bound']"
+                [loading]="data['loading_fe_bound']"
+                height="150"
+                topTitle="Front-end Bound"
+                labelY="Bounds (%)">
+            </ex-graph>
         </div>
     </div>
 </div>
-<div class="row mb-3">
-    <div class="col row">
-        <div class="col-12">
-            <div class="card text-center">
-                <ex-graph
-                    [data]="data['job_febe_bound']"
-                    [loading]="data['loading_febe_bound']"
-                    height="150"
-                    stacked="true"
-                    topTitle="Front/Back-end Bound"
-                    labelY="Utilization (%)">
-                </ex-graph>
-            </div>
-        </div>
 
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_be_bound']"
+                [loading]="data['loading_be_bound']"
+                height="150"
+                topTitle="Back-end Bound"
+                labelY="Bounds (%)">
+            </ex-graph>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_febe_bound']"
+                [loading]="data['loading_febe_bound']"
+                height="150"
+                stacked="true"
+                topTitle="Front/Back-end Bound"
+                labelY="Utilization (%)">
+            </ex-graph>
+        </div>
     </div>
 </div>
 
