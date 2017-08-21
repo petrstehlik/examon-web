@@ -45,6 +45,8 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
   \includegraphics[#1]{#2}%
 }
 
+\newcommand{\itempar}[1]{\noindent\highlight{\textsf #1}\par\noindent}
+
 \graphicspath{{img/}}
 
 % http://tex.stackexchange.com/questions/59166/span-column-in-a-multicols-environment
@@ -72,7 +74,7 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
 
 \renewcommand{\maketitlehookb}{\par\noindent\flushleft%
 \fontsize{45}{50}\usefont{OT1}{phv}{m}{n}\selectfont%
-\highlight{Visualising} HPC System's Load} 
+\highlight{Visualising} HPC System's Load}
 
 \preauthor{\vskip 0.9ex \begin{flushleft}\large
     \usefont{OT1}{phv}{b}{sl} \color{prace-orange}}
@@ -119,9 +121,18 @@ This enables us to post-process data in time-oriented fashion in order to visual
 
 Current implementation uses Grafana framework to visualise data stored in KairosDB. Grafana will be replaced by the project's result of creating a dedicated web application for defined use-cases with 3D model of a cluster room showing various metrics of the whole HPC system with focus on energy consumption and efficiency.
 
+\begin{figure*}[b!]
+    \includegraphics[width=\columnwidth]{job-lookup}
+    \includegraphics[width=\columnwidth]{job-info}
+    \includegraphics[width=\columnwidth]{job-energy}
+    \caption{From left to right: intro page with jobs lookup, currently running jobs and last finished job; job's info dashboard with a finished job; job's energy dashboard.}
+    \label{fig:job}
+\end{figure*}
+
 \section*{Methods}
 The whole project can be separated into three phases. First phase is data anylysis where the whole dataset of available metrics was presented, how they are distributed and eventually processed on the back-end.
 
+\itempar{Data Analysis}
 Datasets can be divided into multiple levels of aggregation:
 \begin{itemize}
     \item{Per-core level -- the most low-level data can be found in core's registers such as IPS, Lx-cache misses and more. It also provides info about its load and temperature.}
@@ -133,217 +144,70 @@ Datasets can be divided into multiple levels of aggregation:
 
 With each level we can aggregate the lower levels (except job-level data). This is especially useful for core-level data which are mostly too dense for any comprehensible visualisation.
 
+\itempar{Visualisation}
 Second phase was to visualize data stored in KairosDB in simple yet insightful way in a lightweight web application. The application, called ExaMon Web, uses Angular framework as its base on top of which several other libraries were used. Worth mentioning are Dygraphs and Bootstrap. The former library produces powerful time-oriented charts utilizing the canvas element in web browser. The latter is a CSS framework to produce uniform user interface across the whole application.
 
-Compared to Grafana, the created web application feels more lightweight, fast and easier to use because of the prepared datasets which are being used. The balance between configurability and the ease of use must have been found. We concluded the best way to achieve this was to enable time selection on given datasets but restrict configurability of the charts themselves. This way user is not bogged down with configuration and only focuses on prepared data. If there is such desire to see other metrics the Grafana framework is still available right next to the ExaMon Web. As an additional feature, compared to Grafana, we can perform more advanced queries using the KairosDB REST API.
+Compared to Grafana, the created web application feels more lightweight, fast and easier to use because of the prepared datasets which are being used. The balance between configurability and the ease of use must have been found. We concluded the best way to achieve this was to enable time selection on given datasets but restrict configurability of the charts themselves. This way user is not bogged down with configuration and only focuses on prepared data.
 
+If there is such desire to see other metrics the Grafana framework is still available right next to the ExaMon Web. As an additional feature, compared to Grafana, we can perform more advanced queries using the KairosDB REST API.
+
+\itempar{Live Data}
 The last phase was to utilize the live stream of MQTT messages right in the ExaMon Web. Two use-cases were defined for the MQTT messages depending on their origin.
 
 Several job info MQTT messages are send during the job's lifecycle inside the PBS and every job is assigned a unique job ID. Using the ID user can subscribe to given messages and view various information on the ExaMon Web job dashboard. The dashboard also uses Cassandra cluster in case the job is already finished and stored in the cluster. This way user can see additional data about their job.
 
-Using the job data user can view detailed info about allocated resources of the given job such as CPU load, system utilization and more as seen in \ref{pic:job-perf}.
+Using the job data a user can view detailed info about allocated resources of the given job such as CPU load, system utilization and more as seen in \ref{fig:job}. With this information the user can asses some conclusions about their program. How effective it is, where are the slow parts and even perform a top-down analysis for performance issues. Also they can view how the program performed in terms of energy efficiency.
 
-Second use-case is
+Second use-case is designed for general public and partly for system administrator. The use case is separated into two different parts. First one is very similar to job dashboards where data are displayed as time-serie charts with the difference in aggregation level which is at the cluster level. This means we can easily display, for example, the cluster's CPU load.
 
+The other part is the most crucial in terms of interactive data visualisation. An accurate 3D model of the Galileo cluster was created using Blender and with the help of Blend4Web incorporated into the ExaMon Web. Even further, deeper integration was realized utilizing WebSockets (using Socket.io library) that enables us to create a reactive paradigm model instead of polling-based one. The model inside the page receives live data that has been published by the nodes and send to the broker. A subscription model was developed to accomodate large amount of visitors. The model then colours each node based on the minimum and maximum value of all received data. Weighted moving average was used in order to accomodate for sudden spikes in data using the given formula:
 
-\section{Results}
-\section{Discussion \& Conclusion}
+$v_{new} = v_{current} + v_{previous} \times (1 - \alpha)$
 
-You can use your blog posts as a basis for this report.
+\noindent where $v_{previous}$ value is set to the first available value and $\alpha = 0.75$ as a default value was chosen based on short-term evaluation.
 
-Graphics should be your own. Short title should be just few words. Highlight word or two to give some separation within the short title. Long name preceding short title is not necessarily the title of your project as facts about the projects, mentors and the author(s) are given at the end. Usually in magazines no two articles are the same in terms of formatting. You are free to do figure positioning and column spans. Bear in mind that with multiple columns spanning in \LaTeX is non-trivial.
+\section*{Results}
 
-Example nearby shows how wrapfig can be used for spanning into two columns. Don't be afraid of large screenshots. To get an idea on the style take a look into PRACE digest, newsletter and other popular scientific texts available on Internet. Google for \highlight{writing popular scientific}. For example: \url{http://awelu.srv.lu.se/genres-and-text-types/writing-in-academic-genres/popular-science-writing/}
+The web application ExaMon Web is ready for production and is already running on one of CINECA's virtual machine in staging environment. ExaMon Web can be split to two major parts: 1. Tool for overseeing job submitted to PBS queue. 2. Cluster-level visualisation and analysis.
 
-\section*{Paper format}
-We use A4 paper size with 10pt Charter or Georgia font. Text at the end and captions should be 9pt. Short title Helvetica (Arial) medium or light 45pt with 50pt spacing. Long title and Abstract 12pt. Margins should be 12mm everywhere except ob the bottom where 0.75 inch is reserved for page number. Other important dimensions: 
-\begin{description}
-  \item[column separation]  \the\columnsep
-  \item[column width] \the\columnwidth
-  \item[textwidth] \the\textwidth
-\end{description}
-For compiling \LaTeX it is recommended (if having troubles) to use latest \TeX live distribution. Use pdf\LaTeX instead of classical \LaTeX as it outputs PDF directly, wraps URLs correctly and can include PNG files directly. Do not use JPEG for screenshots! JPEG is for photos only. For sketching use \href{http://www.inkscape.org}{Inkscape}. 
+We will describe both parts of the ExaMon Web with a prepared use-case scenario which were created during development.
 
-\section*{General guidelines}
-\newcommand{\itempar}[1]{\noindent\highlight{\textsf #1}\par\noindent}
-\begin{itemize}
-  \setlength{\itemsep}{0pt plus 3pt}\setlength{\topsep}{0pt plus 4pt}
-  \setlength{\partopsep}{0pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
-\item All articles should be in English.
-\item Articles should be a maximum of 3 pages.
-\item All articles should contain at least 2 images.
-\end{itemize}
+\itempar{Job Visualiser}
 
-\itempar{Who Am I writing for?}This article should be in the style of a popular science article. This means that is should be relatively simple to understand and entertaining. 
+\itempar{Cluster Visualiser}
+
+\section*{Discussion \& Conclusion}
 
 
-\noindent The audience are not specialists in the field in questions, but rather interested laypeople. Adapt your content to the level of general knowledge of an educated adult who is not a computer scientist or scientist in your field Let your enthusiasm for your project show! Explain terms well. 
-
-\noindent Use vivid language. Use illustrations, graphics and examples.
-
-\itempar{Formatting}%
-Final formatting will consist of a three column article 2-3 pages long. Please follow the formatting in the templates. Please provide links to hi-res version of any images submitted.
-
-\itempar{Title}%
-This should succinctly describe the content of the article. Be descriptive!
+%\itempar{Introduction -- What is the project?}%
+%The introduction should describe the question/problem/research area addressed by the project and set the context for your work. It should explain why your project is interesting or important. It should introduce the techniques and approach you used to complete the project.
+%
+%\itempar{Methods -- How did I complete the project?}%
+%Briefly describe what was actually done. This should include more detail on techniques and approaches, with enough detail that an interested person could attempt to reproduce your work (You do not have to include every detail, but use citations to give the required background). 
+%
+%\itempar{Results -- What did I find out?}%
+%Focus on what worked! Outline the outcomes and results of your project
+%
+%\itempar{Discussion \& Conclusion}
+%(What does that mean?) Explain your conclusions and your interpretation of your results. How did it compare to what was to be expected or previous work? What implications does this have for other work?
 %
 
-The title should be at the top of your first page and centred.
-Do not use a title page.
-%Headings with an asterisk(*) must be included
-
-\itempar{Content}%
-The following is the suggested content of the article. You do not have to include section heading to match, but should match the general flow and content.
-
-\itempar{Author}
-Author's names and institutional affiliation at the end.
-
-\itempar{Abstract -- What did I do - in brief}  An abstract is a one-paragraph summary of the entire article. It should describe the question/problem or research topic addressed in the project and the methods used to answer or explore this area. It should highlight the important parts of the article. This is easiest to write once you have completed the rest of the article. Include a sentence summarising the introduction, methods, results and discussion section. The abstract should not contain citations. Equations should be avoided if possible. And not numbered if not referenced in text. 
-
-\itempar{Introduction -- What is the project?}%
-The introduction should describe the question/problem/research area addressed by the project and set the context for your work. It should explain why your project is interesting or important. It should introduce the techniques and approach you used to complete the project.
-
-\itempar{Methods -- How did I complete the project?}%
-Briefly describe what was actually done. This should include more detail on techniques and approaches, with enough detail that an interested person could attempt to reproduce your work (You do not have to include every detail, but use citations to give the required background). 
-
-\itempar{Results -- What did I find out?}%
-Focus on what worked! Outline the outcomes and results of your project
-
-\itempar{Discussion \& Conclusion}
-(What does that mean?) Explain your conclusions and your interpretation of your results. How did it compare to what was to be expected or previous work? What implications does this have for other work?
-
-\itempar{References} (what work did I reference?)
+\begin{figure*}[t!]
+    %\color{yellow}\rule{2\columnwidth+\columnsep}{10cm}%
+    \includegraphics[width=2\columnwidth+\columnsep]{public-3d}
+    \hspace{\columnsep}
+    \begin{minipage}[b]{\columnwidth}
+        \includegraphics[width=\linewidth]{public-overview}
+        \includegraphics[width=\linewidth]{job-lookup}
+    \end{minipage}
+    \caption*{3D model}
+    \label{fig:3d}
+\end{figure*}
 
 \itempar{Acknowledgements} (who helped me?) PRACE acknowledgement will be given together at the colophon. Site acknowledgement if required. Other acknowledgement if requested.
-%\multicolinterrupt{\textcolor{prace-darkblue}{\lipsum[16]}}
 
-\subsection*{Tables and Figures}
-%Strange why the following macro needs to be repeated due to multicolinterrupt
-%\newcommand{\itempar}[1]{\noindent\highlight{\textsf #1}\par\noindent}
-
-Week 3 plans are given separately and contain the following items:
-
-\itempar{Workplan} Please append and up-to-date workplan (Week 3 reports) outlining what you did week by week. Introduction can be used for final report too.
-
-\itempar{Appendices} (Extra information)
-Optional --- anything else you want to include, but not publish
-
-\noindent\begin{minipage}[H]{2\columnwidth+\columnsep}
- %\vspace{-15pt}
-  \begin{figure}[H]
-  \centering
-  \color{yellow}\rule{\linewidth}{3.8cm}\color{black}
-  %\includegraphics{}
-  \caption{Captions for figures should be used only if necessary and referenced in text.}
-\label{fig:my_label}
-\end{figure}
-\end{minipage}
-
-\itempar{Appendices} (Compulsory)
-
-\itempar{Award statement}%
-Please amend a section to ``Week 3 plans'' at end of the programme stating why you think you should win
-\begin{enumerate}
-  \item The HPC Ambassador Award.
-  \item The Best Visualisation Award.
-\end{enumerate}
-Information given as an update will be used to aid reviewers in evaluation of the projects and will not be publicly available.
-
-
-
-\subsection*{Tables and Figures}
-
-All tables and figures should be captioned. All tables and figures should be put into context in the text. Give your main figure instead of SoHPC logo figure nearby the title. Tables and figures should sequentially numbered. Make sure that there isn't a page break in the middle. Sometimes it is easier to add more text to get good balancing between columns.
-
-
-
-\itempar{Acronyms, technical terms}%
-Symbols, abbreviations and acronyms should be defined the first time they are used and then used consistently from there on. Note that too technical slang is not desired here.
-
-
-\begin{table}[H]
- \caption{Random table}
- \centering
- \begin{tabular}{llr}
- \toprule
- \multicolumn{2}{c}{Name} \\
- \cmidrule(r){1-2}
- First name & Last Name & Grade \\
- \midrule
- John & Doe & $7.5$ \\
- Richard & Miles & $2$ \\
- \bottomrule
- \end{tabular}
-\end{table}
-
-%\vspace*{5cm}
-
-\begin{figure*}[t]
-  \color{yellow}\rule{2\columnwidth+\columnsep}{10cm}%
-  %\includegraphics[width=2\columnwidth+\columnsep]{fig4}
-  \hspace{\columnsep}
-  \begin{minipage}[b]{1.0\columnwidth}
-    \color{yellow}\rule{\linewidth}{4.6cm}\\[\columnsep]
-    \color{prace-lightblue}\rule{\linewidth}{5cm}
-    % \includegraphics[width=\linewidth]{fig5}
-    % \includegraphics[width=\linewidth]{fig6}
-  \end{minipage}
-  \color{black}
-  \vspace{-3ex}
-  \caption*{Large figures should be placed at top and can be combination of
-    several sub-figures. With or without caption. Do not number figures if
-    they are not referenced in text. Several sentences can be used to
-    describe the figures.}
-  \label{fig:large}
-\end{figure*}
-%\noindent Answers to the questions of general interest will be published at the page \url{http://trac.lecad.fs.uni-lj.si/sohpc/wiki/template} where also all template files are available for download.
-
-\section*{Videos and final presentations}
-We recommend that videos are prepared in \href{https://support.google.com/youtube/answer/1722171}{720p HD resolution} (19:6). Screen casts can be recorded by \href{http://atomisystems.com/activepresenter/free-edition/}{Active Presenter --  free edition}.
-
-It is advisable that you prepare a text that you will be recording along with the presentation.\vspace{50mm} For quick check of how recording goes try the following:
-\begin{enumerate}
- \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
- \item Enter Full Motion Recording (FMR).
- \item Select Custom resolution (1280x720) and portion of screen you will be capturing.
-\item Disable Floating Toolbar (bottom left).
-\item Unmute microphone on the desktop.
-\end{enumerate}
-Once a capture has finished, one can:
-\begin{itemize}
-  \item Edit the capture (Cut, delete, copy, part of the captured video)
-  \item Insert text, shapes, spotlights, higlight boxes, images
-  \item Other elements possible.
-  \item Each added feature appears in the timeline and you can edit for how long it will appear, where it will appear and how it will appear/disappear through transitions
-  \item Position of these can also be altered to give a sense of ``animation''.
-  \item Export it into MP4 or AVI format.
-\end{itemize}
-There are many other ways to record a screen and edit such as \href{http://geekthis.net/blog/98/virtualbox-video-capture}{VirtualBox screen recording} and \href{https://youtu.be/WDh1CrL2344}{Windows Movie Maker}. For video encoding one can use \href{http://www.erightsoft.com/SUPER.html}{Super~\copyright} or similar software. Please visit examples of \href{https://www.youtube.com/playlist?list=PLhpKvYInDmFWy66381nifGkCJBLb6iwGf}{SoHPC 2016 videos} on Youtube.
-
-
-\section*{Section 1}
-Section names should not be too technical. No numbering should be used. Sections can be even questions for the text that follows. Section names can state the fact explained in continuation.
-
-\begin{figure}[H]
-  \color{yellow}\rule{\linewidth}{3cm}\color{black}
-  % \includegraphics[width=\linewidth]{vortex}
-  \caption{Quickly explain the content of the figure if you reference it in
-    the text.}
-  \label{fig:vortex}
-\end{figure}
-
-
-%\subsection*{Subsection 1}
-\begin{align}
- A = 
- \begin{bmatrix}
- A_{11} & A_{21} \\
- A_{21} & A_{22}
- \end{bmatrix}
- \end{align}
-Please balance the size of figures and text in such way that you will have the complete page filled. It should not be half way ended. Use citations as superscript\cite{Figueredo:2009dg} if absolutely necessary.
 \newcommand{\sohpcinfo}[1]{\par\vspace{1ex}\footnotesize
-  \textcolor{prace-lightblue}{PRACE SoHPC}%
+  \textcolor{prace-lightblue}{PRACE SoHPC }%
   \textcolor{prace-darkblue}{#1}\\[0.5ex]\scriptsize
 }
 
@@ -390,15 +254,21 @@ APA
 \vspace{-1.5ex}% any of information below is optional
 \begin{flushleft}
   \sohpcinfo{ More Information}
-  \href{http://www.virtouso.org}{www.virtouso.org}
-  \sohpcinfo{ Acknowledgement}
-  Write any requested acknowledgements or thanks here. Mentors should be
-  asked for them too.
+  \href{https://www.angular.io}{Angular} \\
+  \href{http://dygraphs.com}{Dygraphs}  \\
+  \href{http://getbootstrap.com}{Bootstrap} \\
+  \href{https://www.blender.org}{Blender} \\
+  \href{https://www.blend4web.com/en/}{Blend4Web}
 
-    \sohpcinfo{ Project ID} 1705
+\sohpcinfo{ Acknowledgement}
+Write any requested acknowledgements or thanks here. Mentors should be
+asked for them too.
+
+\sohpcinfo{ Project ID} 1705
+
 \end{flushleft}
 \end{multicols}
-\end{document} 
+\end{document}
 
 %%Local Variables:
 %%% mode: latex
