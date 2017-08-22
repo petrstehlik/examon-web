@@ -31,11 +31,6 @@
 \usepackage[colorlinks=true, linkcolor=link, anchorcolor=link,citecolor=link,
 filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
 
-%\pagestyle{empty}
-% Do not enable page numbering below as it will be inserted by the publication
-%\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}\fancyfoot[C]{\colorbox{orange}{\raisebox{0mm}[4mm][7mm]{\textcolor{white}{\usefont{OT1}{phv}{m}{n}\selectfont~\thepage~}}}}
-%To automatically convert Inkscape SVG into PDF or EPS use:
-% pdflatex -synctex=1  --enable-write1 sohpc-template.tex
 \newcommand{\includegraphicsvg}[2][]{%
   \ifnum\pdfstrcmp{\pdffilemoddate{./#2.svg}}%
   {\pdffilemoddate{../gen/#2.pdf}}>0%
@@ -48,17 +43,6 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
 \newcommand{\itempar}[1]{\noindent\highlight{\textsf #1}\par\noindent}
 
 \graphicspath{{img/}}
-
-% http://tex.stackexchange.com/questions/59166/span-column-in-a-multicols-environment
-%\newcounter{tempcolnum}
-%\makeatletter
-%\newcommand{\multicolinterrupt}[1]{% Stuff to span rows
-%\setcounter{tempcolnum}{\col@number}
-%\end{multicols}
-%#1%
-%\begin{multicols}{\value{tempcolnum}}
-%}
-%\makeatother
 
 \hyphenation{SoHPC AntiSpam} % do not hyphenate
 
@@ -108,7 +92,7 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
 
 \lettrine[lines=4,nindent=0em]{\highlight{T}}{}he current monitoring system\cite{current} consists of several layers which allow to aggregate in a single point heterogeneous data sources which consist of computing elements, node, job scheduler and facility telemetry of the Galileo supercomputer located at CINECA, Bologna, Italy.
 
-The system was named \textit{ExaMon}\footnote{Shorthand for Exascale Monitoring} and is built on top of MQTT protocol\cite{mqtt} which allows measured metrics to be send to a central broker where received data are processed and stored in KairosDB\cite{kairos} database utilizing Cassandra cluster.
+The system was named \textit{ExaMon}\footnote{Shorthand for Exascale Monitoring} and is built on top of MQTT protocol\cite{mqtt} which allows measured metrics to be send to a central broker where received data are processed and stored in KairosDB database utilizing Cassandra cluster.
 
 \begin{figure}[H]
 %\color{yellow}\rule{\linewidth}{3cm}\color{black}
@@ -130,22 +114,27 @@ Current implementation uses Grafana framework to visualise data stored in Kairos
 \end{figure*}
 
 \section*{Methods}
-The whole project can be separated into three phases. First phase is data anylysis where the whole dataset of available metrics was presented, how they are distributed and eventually processed on the back-end.
+The whole project can be separated into three phases. First phase is data analysis where the whole dataset of available metrics was presented, how they are distributed and eventually processed on the back-end. Datasets can be divided into multiple levels of aggregation:
 
-\itempar{Data Analysis}
-Datasets can be divided into multiple levels of aggregation:
-\begin{itemize}
-    \item{Per-core level -- the most low-level data can be found in core's registers such as IPS, Lx-cache misses and more. It also provides info about its load and temperature.}
-    \item{Per-CPU level -- each node consists of two CPUs and each of them can provide data about its C-states, energy counters and its frequency.}
-    \item{Per-node level -- most of the information available on node-level basis are coming from IPMI\cite{ipmi}. Via this interface we can access info about node's utilization, multiple temperature sensors and average power consumption.}
-    \item{Per-cluster level -- the Galileo's cluster room was equipped with several environmental sensors. This dataset is not currently available due to technical problems.}
-    \item{Per-job level -- data gathered using the PBS scheduler's hooks. This dataset is aside from previous ones since it points to allocated and used resources of the job submitted to the queue. This data are stored directly to Cassandra cluster ommitting KairosDB.}
-\end{itemize}
+\itempar{Per-core level}
+The most low-level data can be found in core's registers such as IPS, Lx-cache misses and more. It also provides info about its load and temperature.
+
+\itempar{Per-CPU level}
+Each node consists of two CPUs and each of them can provide data about its C-states, energy counters and its frequency.
+
+\itempar{Per-node level}
+Most of the information available on node-level basis are coming from IPMI\cite{ipmi}. Via this interface we can access info about node's utilization, multiple temperature sensors and average power consumption.
+
+\itempar{Per-cluster level}
+The Galileo's cluster room was equipped with several environmental sensors. This dataset is not currently available due to technical problems.
+
+\itempar{Per-job level}
+Data gathered using the PBS scheduler's hooks. This dataset is aside from previous ones since it points to allocated and used resources of the job submitted to the queue. This data are stored directly to Cassandra cluster omitting KairosDB.
 
 With each level we can aggregate the lower levels (except job-level data). This is especially useful for core-level data which are mostly too dense for any comprehensible visualisation.
 
 \itempar{Visualisation}
-Second phase was to visualize data stored in KairosDB in simple yet insightful way in a lightweight web application. The application, called ExaMon Web, uses Angular framework as its base on top of which several other libraries were used. Worth mentioning are Dygraphs and Bootstrap. The former library produces powerful time-oriented charts utilizing the canvas element in web browser. The latter is a CSS framework to produce uniform user interface across the whole application.
+Second phase was to visualise data stored in KairosDB in simple yet insightful way in a lightweight web application. The application, called ExaMon Web, uses Angular framework as its base on top of which several other libraries were used. Worth mentioning are Dygraphs and Bootstrap. The former library produces powerful time-oriented charts utilizing the canvas element in web browser. The latter is a CSS framework to produce uniform user interface across the whole application.
 
 Compared to Grafana, the created web application feels more lightweight, fast and easier to use because of the prepared datasets which are being used. The balance between configurability and the ease of use must have been found. We concluded the best way to achieve this was to enable time selection on given datasets but restrict configurability of the charts themselves. This way user is not bogged down with configuration and only focuses on prepared data.
 
@@ -154,57 +143,65 @@ If there is such desire to see other metrics the Grafana framework is still avai
 \itempar{Live Data}
 The last phase was to utilize the live stream of MQTT messages right in the ExaMon Web. Two use-cases were defined for the MQTT messages depending on their origin.
 
-Several job info MQTT messages are send during the job's lifecycle inside the PBS and every job is assigned a unique job ID. Using the ID user can subscribe to given messages and view various information on the ExaMon Web job dashboard. The dashboard also uses Cassandra cluster in case the job is already finished and stored in the cluster. This way user can see additional data about their job.
+\itempar{PBS Jobs}
+Each PBS job goes through a specific set of events during its lifecycle and every job is assigned a unique job ID. Using the ID user can subscribe to such MQTT messages and view various information on the ExaMon Web job dashboard. The dashboard also uses Cassandra cluster in case the job is already finished and stored in the cluster. This way user can see additional data about their job.
 
 Using the job data a user can view detailed info about allocated resources of the given job such as CPU load, system utilization and more as seen in \ref{fig:job}. With this information the user can asses some conclusions about their program. How effective it is, where are the slow parts and even perform a top-down analysis for performance issues. Also they can view how the program performed in terms of energy efficiency.
 
+\itempar{3D Model of Cluster Room}
 Second use-case is designed for general public and partly for system administrator. The use case is separated into two different parts. First one is very similar to job dashboards where data are displayed as time-serie charts with the difference in aggregation level which is at the cluster level. This means we can easily display, for example, the cluster's CPU load.
 
-The other part is the most crucial in terms of interactive data visualisation. An accurate 3D model of the Galileo cluster was created using Blender and with the help of Blend4Web incorporated into the ExaMon Web. Even further, deeper integration was realized utilizing WebSockets (using Socket.io library) that enables us to create a reactive paradigm model instead of polling-based one. The model inside the page receives live data that has been published by the nodes and send to the broker. A subscription model was developed to accomodate large amount of visitors. The model then colours each node based on the minimum and maximum value of all received data. Weighted moving average was used in order to accomodate for sudden spikes in data using the given formula:
+The other part is the most crucial in terms of interactive data visualisation. An accurate 3D model of the Galileo cluster was created using Blender and with the help of Blend4Web incorporated into the ExaMon Web. Even further, deeper integration was realized utilizing WebSockets (using Socket.io library) that enables us to create a reactive paradigm model instead of polling-based one. The model inside the page receives live data that has been published by the nodes and send to the broker. A subscription model was developed to accommodate large amount of visitors. The model then colours each node based on the minimum and maximum value of all received data. Weighted moving average was used in order to accommodate for sudden spikes in data using the given formula:
 
 $v_{new} = v_{current} + v_{previous} \times (1 - \alpha)$
 
 \noindent where $v_{previous}$ value is set to the first available value and $\alpha = 0.75$ as a default value was chosen based on short-term evaluation.
 
 \section*{Results}
-
-The web application ExaMon Web is ready for production and is already running on one of CINECA's virtual machine in staging environment. ExaMon Web can be split to two major parts: 1. Tool for overseeing job submitted to PBS queue. 2. Cluster-level visualisation and analysis.
-
-We will describe both parts of the ExaMon Web with a prepared use-case scenario which were created during development.
-
-\itempar{Job Visualiser}
-
-\itempar{Cluster Visualiser}
-
-\section*{Discussion \& Conclusion}
-
-
-%\itempar{Introduction -- What is the project?}%
-%The introduction should describe the question/problem/research area addressed by the project and set the context for your work. It should explain why your project is interesting or important. It should introduce the techniques and approach you used to complete the project.
-%
-%\itempar{Methods -- How did I complete the project?}%
-%Briefly describe what was actually done. This should include more detail on techniques and approaches, with enough detail that an interested person could attempt to reproduce your work (You do not have to include every detail, but use citations to give the required background). 
-%
-%\itempar{Results -- What did I find out?}%
-%Focus on what worked! Outline the outcomes and results of your project
-%
-%\itempar{Discussion \& Conclusion}
-%(What does that mean?) Explain your conclusions and your interpretation of your results. How did it compare to what was to be expected or previous work? What implications does this have for other work?
-%
+ExaMon Web can be split to two major parts: 1) Tool for overseeing job submitted to PBS queue and 2) Cluster-level visualisation and analysis each of them designed with a prepared use-case scenario.
 
 \begin{figure*}[t!]
     %\color{yellow}\rule{2\columnwidth+\columnsep}{10cm}%
     \includegraphics[width=2\columnwidth+\columnsep]{public-3d}
     \hspace{\columnsep}
     \begin{minipage}[b]{\columnwidth}
+        \includegraphics[width=\linewidth]{3d-open}
         \includegraphics[width=\linewidth]{public-overview}
-        \includegraphics[width=\linewidth]{job-lookup}
     \end{minipage}
-    \caption*{3D model}
+    \caption*{The public section with 3D model and its possible other possible arrangement. Also a public overview dashboard with preselected timerange of 30 minutes.}
     \label{fig:3d}
 \end{figure*}
 
-\itempar{Acknowledgements} (who helped me?) PRACE acknowledgement will be given together at the colophon. Site acknowledgement if required. Other acknowledgement if requested.
+\itempar{Job Visualiser}
+The main task of job visualiser is to inform a user about their submitted job. The job ID is then used in the ExaMon Web job lookup. UI offers to query by manual input or, for ease of access, the list of active jobs and the last finished job are shown.
+
+In order to capture and keep this lifecycle data a new tool in form of a Python class had to be developed. The \texttt{JobManager} subscribes to MQTT topics that send job-related data. This data is then stored in internal volatile database. This way it can keep track of all submitted jobs. The \texttt{JobManager} is aware of the job's state and sorts the incoming job data according to their lifecycle.
+
+The class is designed to be expandable and configurable. This means we can add callback functions to certain points of job's lifecycle. This is used when a user subscribes to a live job and with each new received messages with the same job ID the job record in the database is processed and send to the user via a WebSocket.
+
+If the job is finished the application will assess all information as for an active job and add additional info to the page as seen in \ref{fig:job}.
+
+In both cases a user can view the performance and energy usage of their job. Each of the dashboard disposes of preselected interactive time-series charts.
+
+\itempar{Cluster Visualiser}
+The cluster visualiser is very similar to job visualiser in terms of used components and the form of data. The main difference between them is that cluster visualiser is mainly designed for general public which doesn't run jobs on the cluster but is interested on how a HPC facility performs.
+
+The intro dashboard shows several charts aggregated to cluster level with averaged and last values right next to each chart. User can also select time range in which the data will be shown.
+
+The second part a precise 3D model developed in Blender and used in Blend4Web framework which is incorporated into the ExaMon Web application. The model utilizes the same class as Job Visualiser to capture incoming MQTT messages but this time for metrics published by cluster's sensors and tools. The manager computes weighted moving average which are then available for querying.
+
+Once a user opens the 3D model the application subscribes to given metrics and waits for available data. A minimum and maximum value is computed and according to these values each node is colour-coded in usual colours ranging from red to blue in a HSL colour model.
+
+The application then receives new data for each node as soon as they are made available by the manager and recolours given node.
+
+User can operate the 3D model in usual way (panning, rotation and zooming) and can see detailed info about each node by clicking it. This highlights the node and show a legend.
+
+\section*{Discussion \& Conclusion}
+The ExaMon Web application was successfully developed and plans for public deployment are already arranged. The application  is already running on one of CINECA's virtual machine in staging environment. The expected web application was delivered with several improvements and additions which will help the team at UNIBO to further develop the whole ExaMon system.
+
+The application can be further expanded with new dashboards such as \textit{System Administrator} dashboard. Such dashboard can help the system administrator of Galileo supercomputer to quickly assess valuable insight of the whole cluster which would be otherwise very complicated and time-consuming.
+
+Using this application CINECA can show general public how a supercomputer performs and what it takes to run it. The users of Galileo can comfortably and easily view detailed info about their jobs and how they behave in real-time and in real-world conditions and adjust their programs to perform better and more efficiently.
 
 \newcommand{\sohpcinfo}[1]{\par\vspace{1ex}\footnotesize
   \textcolor{prace-lightblue}{PRACE SoHPC }%
@@ -221,52 +218,48 @@ Beneventi, Francesco, et al. "Continuous learning of HPC infrastructure models u
 \bibitem[2]{mqtt}
 Locke, Dave. "Mq telemetry transport (mqtt) v3.1 protocol specification." IBM developerWorks Technical Library (2010).
 
-\bibitem[3]{kairos}
-Goldschmidt, Thomas, et al. "Scalability and robustness of time-series databases for cloud-native monitoring of industrial processes." Cloud Computing (CLOUD), 2014 IEEE 7th International Conference on. IEEE, 2014.
-
-\bibitem[4]{ipmi}
+\bibitem[3]{ipmi}
 Kaufman, Gerald J. "System and method for application programming interface for extended intelligent platform management." U.S. Patent No. 7,966,389. 21 Jun. 2011.
 APA
 \end{thebibliography}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \vfill
 \noindent\begin{minipage}[b]{0.7\linewidth}
 \begin{flushleft}
-  \usefont{OT1}{phv}{m}{n}\selectfont
-  \sohpcinfo{Project Title}
-  \href{https://summerofhpc.prace-ri.eu/web-visualization-of-energy-load-of-an-hpc-system/}{Web visualization of Energy load of an HPC system}
-  
-  \sohpcinfo{Site}
-  CINECA, Italy
-  
-  \sohpcinfo{Authors}
-  \href{mailto:xstehl14@stud.fit.vutbr.cz}{\theauthor},
-  BUT, Czech Republic
-  
-  \sohpcinfo{Mentor}
-  \href{mailto:a.bartolini@unibo.it}{Dr. Andrea Bartolini}, UNIBO, Italy
+    \usefont{OT1}{phv}{m}{n}\selectfont
+    \sohpcinfo{ Project Title}
+    \href{https://summerofhpc.prace-ri.eu/web-visualization-of-energy-load-of-an-hpc-system/}{Web visualization of Energy load of an HPC system}
+
+    \sohpcinfo{ Site}
+    CINECA, Italy
+
+    \sohpcinfo{ Authors}
+    \href{mailto:xstehl14@stud.fit.vutbr.cz}{\theauthor},
+    BUT, Czech Republic
+
+    \sohpcinfo{ Mentor}
+    \href{mailto:a.bartolini@unibo.it}{Dr. Andrea Bartolini}, UNIBO, Italy
 \end{flushleft}
 \end{minipage}\hfill%
 \begin{minipage}[b]{0.3\linewidth}
-  \color{prace-darkblue}\rule{\linewidth}{2.5cm}\par
+  \includegraphics[width=\linewidth]{profile_photo}\par
   \tiny\theauthor
 \end{minipage}%
 \vspace{-1.5ex}% any of information below is optional
 \begin{flushleft}
-  \sohpcinfo{ More Information}
-  \href{https://www.angular.io}{Angular} \\
-  \href{http://dygraphs.com}{Dygraphs}  \\
-  \href{http://getbootstrap.com}{Bootstrap} \\
-  \href{https://www.blender.org}{Blender} \\
-  \href{https://www.blend4web.com/en/}{Blend4Web}
-
-\sohpcinfo{ Acknowledgement}
-Write any requested acknowledgements or thanks here. Mentors should be
-asked for them too.
-
+  \sohpcinfo{ Software applied}
+    \href{https://www.angular.io}{Angular}, 
+    \href{http://dygraphs.com}{Dygraphs}, 
+    \href{http://getbootstrap.com}{Bootstrap}, 
+    \href{https://www.blender.org}{Blender}, 
+    \href{https://www.blend4web.com/en/}{Blend4Web}
+  \sohpcinfo{ Acknowledgement}
+  I would like to express my gratitude to all people at CINECA and UNIBO who made this project possible and to all people who helped during the development of ExaMon Web. I would like to also thank my family and close friends for all the support I received.
 \sohpcinfo{ Project ID} 1705
-
 \end{flushleft}
+
 \end{multicols}
 \end{document}
 
@@ -280,4 +273,3 @@ asked for them too.
 %%% TeX-master: t
 %%% ispell-local-dictionary: "british"
 %%% End:
-
