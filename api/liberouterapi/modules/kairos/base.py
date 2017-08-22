@@ -1,6 +1,5 @@
 from liberouterapi import config, app
 from .error import JobsError
-from .utils import check_times, generate_health_url, generate_base_url, extract_data, merge_dicts, join_data
 from .Aggregate import Aggregate
 
 from flask import request
@@ -12,6 +11,8 @@ conn = connect(server = config["kairosdb"].get("server"),
         port = config["kairosdb"].get("port"),
         user = config["kairosdb"].get("user"),
         passw = config["kairosdb"].get("password"))
+
+from .utils import check_times, generate_health_url, generate_base_url, extract_data, merge_dicts, join_data
 
 @app.route("/kairos/health")
 def health():

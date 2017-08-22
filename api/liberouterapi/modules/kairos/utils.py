@@ -1,6 +1,8 @@
 from .error import JobsError
 import time
 
+from .base import conn
+
 def check_times(args):
     """
     Check timestamps in a GET request
