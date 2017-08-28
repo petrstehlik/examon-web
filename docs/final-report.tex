@@ -90,9 +90,9 @@ filecolor=link, menucolor=link,urlcolor=prace-darkblue]{hyperref}
 \frenchspacing
 \begin{multicols}{3}
 
-\lettrine[lines=4,nindent=0em]{\highlight{T}}{}he current monitoring system\cite{current} consists of several layers which allow to aggregate in a single point heterogeneous data sources which consist of computing elements, node, job scheduler and facility telemetry of the Galileo supercomputer located at CINECA, Bologna, Italy.
+\lettrine[lines=4,nindent=0em]{\highlight{T}}{}he current monitoring system\cite{current} consists of several layers which allow to aggregate in a single point heterogeneous data sources which consist of computing elements, nodes, job scheduler and facility telemetry of the Galileo supercomputer located at CINECA, Bologna, Italy.
 
-The system was named \textit{ExaMon}\footnote{Shorthand for Exascale Monitoring} and is built on top of MQTT protocol\cite{mqtt} which allows measured metrics to be send to a central broker where received data are processed and stored in KairosDB database utilizing Cassandra cluster.
+The system was named \textit{ExaMon} (shorthand for Exascale Monitoring) and is built on top of MQTT protocol\cite{mqtt} which allows measured metrics to be send to a central broker where received data are processed and stored in KairosDB database utilizing Cassandra cluster.
 
 \begin{figure}[H]
 %\color{yellow}\rule{\linewidth}{3cm}\color{black}
@@ -158,7 +158,7 @@ $v_{new} = v_{current} + v_{previous} \times (1 - \alpha)$
 \noindent where $v_{previous}$ value is set to the first available value and $\alpha = 0.75$ as a default value was chosen based on short-term evaluation.
 
 \section*{Results}
-ExaMon Web can be split to two major parts: 1) Tool for overseeing job submitted to PBS queue and 2) Cluster-level visualisation and analysis each of them designed with a prepared use-case scenario.
+ExaMon Web can be split to two major parts: 1) Tool for overseeing jobs submitted to PBS queue and 2) Cluster-level visualisation and analysis each of them designed with a prepared use-case scenario.
 
 \begin{figure*}[t!]
     %\color{yellow}\rule{2\columnwidth+\columnsep}{10cm}%
@@ -168,7 +168,7 @@ ExaMon Web can be split to two major parts: 1) Tool for overseeing job submitted
         \includegraphics[width=\linewidth]{3d-open}
         \includegraphics[width=\linewidth]{public-overview}
     \end{minipage}
-    \caption*{The public section with 3D model and its possible other possible arrangement. Also a public overview dashboard with preselected timerange of 30 minutes.}
+    \caption*{The public section with 3D model and its possible other possible arrangement. Also a public overview dashboard with pre-selected time range of 30 minutes.}
     \label{fig:3d}
 \end{figure*}
 
@@ -181,20 +181,20 @@ The class is designed to be expandable and configurable. This means we can add c
 
 If the job is finished the application will assess all information as for an active job and add additional info to the page as seen in \ref{fig:job}.
 
-In both cases a user can view the performance and energy usage of their job. Each of the dashboard disposes of preselected interactive time-series charts.
+In both cases a user can view the performance and energy usage of their job. Each of the dashboard disposes of pre-selected interactive time-series charts.
 
 \itempar{Cluster Visualiser}
-The cluster visualiser is very similar to job visualiser in terms of used components and the form of data. The main difference between them is that cluster visualiser is mainly designed for general public which doesn't run jobs on the cluster but is interested on how a HPC facility performs.
+The cluster visualiser is very similar to the job visualiser in terms of used components and the form of data. The main difference between them is that cluster visualiser is mainly designed for general public which doesn't run jobs on the cluster but is interested on how an HPC facility performs.
 
 The intro dashboard shows several charts aggregated to cluster level with averaged and last values right next to each chart. User can also select time range in which the data will be shown.
 
 The second part a precise 3D model developed in Blender and used in Blend4Web framework which is incorporated into the ExaMon Web application. The model utilizes the same class as Job Visualiser to capture incoming MQTT messages but this time for metrics published by cluster's sensors and tools. The manager computes weighted moving average which are then available for querying.
 
-Once a user opens the 3D model the application subscribes to given metrics and waits for available data. A minimum and maximum value is computed and according to these values each node is colour-coded in usual colours ranging from red to blue in a HSL colour model.
+Once a user opens the 3D model the application subscribes to given metrics and waits for available data. A minimum and maximum value is computed and according to these values each node is colour-coded in usual colours ranging from red to blue in the HSL colour model.
 
 The application then receives new data for each node as soon as they are made available by the manager and recolours given node.
 
-User can operate the 3D model in usual way (panning, rotation and zooming) and can see detailed info about each node by clicking it. This highlights the node and show a legend.
+Users can operate the 3D model in usual way (panning, rotation and zooming) and can see detailed info about each node by clicking it. This highlights the node and show a legend.
 
 \section*{Discussion \& Conclusion}
 The ExaMon Web application was successfully developed and plans for public deployment are already arranged. The application  is already running on one of CINECA's virtual machine in staging environment. The expected web application was delivered with several improvements and additions which will help the team at UNIBO to further develop the whole ExaMon system.
