@@ -9,6 +9,7 @@ Author:
 
 import paho.mqtt.client as mqtt
 import logging, json, copy
+import time
 
 class JobManager():
 
@@ -88,6 +89,7 @@ class JobManager():
         # Process runjob event
         if topic[-1] == "jobs_runjob":
             self.process_runjob(jobid, payload)
+            return
 
         # Process exc_begin event
         # This event requires the runjob event to be already present in the DB
@@ -111,6 +113,9 @@ class JobManager():
         # We received unknown message
         else:
             self.log.warn("Received unknown topic '%s'" % msg.topic)
+            return
+
+        self.check_timeout()
 
     def process_runjob(self, jobid, payload):
         """
@@ -245,6 +250,24 @@ class JobManager():
             self.db_fail[jobid]["exc_end"].append(payload)
         else:
             self.db_fail[jobid]["exc_end"] = [payload]
+
+        self.on_fail(jobid)
+
+    def check_timeout(self):
+        """Check timeout in all active records
+        The timeout time is taken as ctime + req_time and compared to current unix timestamp
+        If current timestamp is smaller, the job is moved to failed db
+        """
+        for jobid in self.db.copy():
+            timeout = self.db[jobid]['runjob'][0]['ctime'] + self.db[jobid]['runjob'][0]['req_time']
+            now = int(time.time())
+
+            if timeout < now:
+                self.db_fail[jobid] = copy.deepcopy(self.db[jobid])
+                del self.db[jobid]
+                self.log.info("TIMEOUT: Moving job %s to fail DB" % jobid)
+
+        self.on_fail(jobid)
 
     def default_on_receive(self, jobid):
         pass
