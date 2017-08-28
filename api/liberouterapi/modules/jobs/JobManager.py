@@ -26,9 +26,7 @@ class JobManager():
     def __init__(self,
             mqtt_broker,
             mqtt_port,
-            mqtt_topics,
-            drop_job_arrays = True,
-            on_end = None):
+            mqtt_topics):
         """
         drop_job_arrays The PBS hook sends job arrays where job ID is in format xxxxxxx[xxxx].io01
         """
@@ -37,8 +35,6 @@ class JobManager():
         self.broker = mqtt_broker
         self.port = mqtt_port
         self.topics = [(str(topic), 0) for topic in mqtt_topics]
-
-        self.drop_job_arrays = drop_job_arrays
 
         self.db = dict()
         self.db_fail = dict()
@@ -52,6 +48,7 @@ class JobManager():
         self.on_receive = self.default_on_receive
 
         self.on_end = self.default_on_end
+        self.on_fail = self.default_on_fail
 
         self.client.connect(mqtt_broker, self.port, 60)
 
@@ -233,6 +230,8 @@ class JobManager():
         else:
             self.db_fail[jobid]["exc_begin"] = [payload]
 
+        self.on_fail(jobid)
+
     def process_exc_end_fail(self, jobid, payload):
         if not jobid in self.db_fail:
             self.db_fail[jobid] = dict()
@@ -251,6 +250,9 @@ class JobManager():
         pass
 
     def default_on_end(self, jobid):
+        pass
+
+    def default_on_fail(self, jobid):
         pass
 
 
