@@ -266,8 +266,7 @@ class JobManager():
                 self.db_fail[jobid] = copy.deepcopy(self.db[jobid])
                 del self.db[jobid]
                 self.log.info("TIMEOUT: Moving job %s to fail DB" % jobid)
-
-        self.on_fail(jobid)
+                self.on_fail(jobid)
 
     def default_on_receive(self, jobid):
         pass
