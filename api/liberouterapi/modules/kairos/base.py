@@ -7,10 +7,10 @@ from pyKairosDB import connect, metadata, reader
 import json
 import requests
 
-conn = connect(server = config["kairosdb"].get("server"),
-        port = config["kairosdb"].get("port"),
-        user = config["kairosdb"].get("user"),
-        passw = config["kairosdb"].get("password"))
+conn = connect(server = config["kairosdb"].get("server", "localhost"),
+        port = config["kairosdb"].get("port", 8000),
+        user = config["kairosdb"].get("user", ""),
+        passw = config["kairosdb"].get("password", ""))
 
 from .utils import check_times, generate_health_url, generate_base_url, extract_data, merge_dicts, join_data
 
@@ -196,13 +196,13 @@ def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags
 
     if tags == None:
         tags_parsed = {
-                    "org" : ["cineca"],
-                    "cluster" : ["galileo"]
+                    "org" : config["kairosdb"].get("org", "cineca"),
+                    "cluster" : config["kairosdb"].get("cluster", "galileo")
                 }
     else:
         tags_parsed = merge_dicts({
-                "org" : ["cineca"],
-                "cluster" : ["galileo"]
+                "org" : config["kairosdb"].get("org", "cineca"),
+                "cluster" : config["kairosdb"].get("cluster", "galileo")
             }, tags)
 
     res = reader.read(conn,
