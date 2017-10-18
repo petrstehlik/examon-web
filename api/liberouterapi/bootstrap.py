@@ -1,18 +1,17 @@
 from __future__ import print_function
+
 import sys
 import pkgutil
 from getpass import getpass
-from flask import request, Blueprint
+from flask import request
 from bson import json_util
+import os
 
-from liberouterapi import app
-from .configurator import Config
-from .modules.module import Module
+from liberouterapi import app, config
+from liberouterapi.Module import Module
 from .error import ApiException
 from .dbConnector import dbConnector
 from .Auth import Auth
-
-config = Config()
 
 def routes():
     """
@@ -20,30 +19,37 @@ def routes():
     """
     routes = []
     for rule in app.url_map.iter_rules():
-        print(rule)
         routes.append({
             "name": rule.rule,
             "method": rule.methods,
             "desc" : rule.endpoint
-            })
+        })
 
-        return(routes)
+    return(routes)
 
 def import_modules():
     """
     Import all modules' Blueprints to register them as Routes
     """
-    modules = pkgutil.iter_modules([config['api']['module_path']])
+    modules = pkgutil.iter_modules([
+        config['api']['module_path'],
+        os.path.join(os.path.dirname(__file__), 'modules')]
+        )
+
+    print(os.path.join(os.path.dirname(__file__), 'modules'))
+    print(config['api']['module_path'])
+
+    sys.path.append(config['api']['module_path'])
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
     for importer, mod_name, _ in modules:
         if mod_name not in sys.modules:
-            loaded_mod = __import__("liberouterapi." +
-                    config['api']['modules'].split('/')[-1] + "." +  mod_name,
+            loaded_mod = __import__(mod_name,
                     fromlist=[str(mod_name)])
+            print("   > Imported module \"" + mod_name + "\"")
 
             for obj in vars(loaded_mod).values():
-                if isinstance(obj, Blueprint):
-                    print("   > Imported module \"" + mod_name + "\"")
+                if isinstance(obj, Module):
                     app.register_blueprint(obj)
 
 def ask_for_username():
@@ -75,7 +81,7 @@ def check_users():
     If there is no user set API to setup state
     """
     db = dbConnector()
-    if db.users.count() == 0:
+    if db.count("users") == 0:
         print("\033[1m" + "# Warning: * No users found *" + "\033[0m")
         app.add_url_rule('/setup', view_func = setup, methods=['POST'])
         config.setup = True
@@ -93,7 +99,7 @@ def handle_invalid_usage(error):
     response = error.to_dict()
     return response, error.status_code
 
-#@app.after_request
+@app.after_request
 def setup_mode(response):
     if config.setup:
         response.headers['Warning'] = 'setup-required'
@@ -108,23 +114,26 @@ def setup():
     if config.setup == False:
         raise ApiException("API is already setup")
     settings = request.get_json()
+
     db = dbConnector()
 
     if len(settings['username']) == 0:
-        raise ApiException("Missing username")
+        raise ApiException("Missing username", status_code = 400)
 
-    if len(settings['password']) == 0:
-        raise ApiException("Missing password")
+    if len(settings['password']) == 0 or len(settings['password2']) == 0:
+        raise ApiException("Missing password", status_code = 400)
+
+    if settings['password'] != settings['password2']:
+        raise ApiException("Mismatching password fields")
 
     try:
         # Insert user to database via user module
         from .modules.users import unprotected_add_user
-        user_data = {
-                "username" : settings['username'],
-                "password" : settings['password'],
-                "role" : 0
-                }
-        res = unprotected_add_user(user_data)
+        from .user import User
+        from .role import Role
+
+        user = User(settings['username'], password=settings['password'], role = Role.admin)
+        res = unprotected_add_user(user)
 
         config.setup = False
         return(json_util.dumps({ "user_id" : res}))
