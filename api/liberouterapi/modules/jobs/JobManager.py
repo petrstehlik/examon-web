@@ -9,6 +9,7 @@ Author:
 
 import paho.mqtt.client as mqtt
 import logging, json, copy
+import time
 
 class JobManager():
 
@@ -26,9 +27,7 @@ class JobManager():
     def __init__(self,
             mqtt_broker,
             mqtt_port,
-            mqtt_topics,
-            drop_job_arrays = True,
-            on_end = None):
+            mqtt_topics):
         """
         drop_job_arrays The PBS hook sends job arrays where job ID is in format xxxxxxx[xxxx].io01
         """
@@ -37,8 +36,6 @@ class JobManager():
         self.broker = mqtt_broker
         self.port = mqtt_port
         self.topics = [(str(topic), 0) for topic in mqtt_topics]
-
-        self.drop_job_arrays = drop_job_arrays
 
         self.db = dict()
         self.db_fail = dict()
@@ -52,6 +49,7 @@ class JobManager():
         self.on_receive = self.default_on_receive
 
         self.on_end = self.default_on_end
+        self.on_fail = self.default_on_fail
 
         self.client.connect(mqtt_broker, self.port, 60)
 
@@ -91,6 +89,7 @@ class JobManager():
         # Process runjob event
         if topic[-1] == "jobs_runjob":
             self.process_runjob(jobid, payload)
+            return
 
         # Process exc_begin event
         # This event requires the runjob event to be already present in the DB
@@ -114,6 +113,9 @@ class JobManager():
         # We received unknown message
         else:
             self.log.warn("Received unknown topic '%s'" % msg.topic)
+            return
+
+        self.check_timeout()
 
     def process_runjob(self, jobid, payload):
         """
@@ -233,6 +235,8 @@ class JobManager():
         else:
             self.db_fail[jobid]["exc_begin"] = [payload]
 
+        self.on_fail(jobid)
+
     def process_exc_end_fail(self, jobid, payload):
         if not jobid in self.db_fail:
             self.db_fail[jobid] = dict()
@@ -247,10 +251,30 @@ class JobManager():
         else:
             self.db_fail[jobid]["exc_end"] = [payload]
 
+        self.on_fail(jobid)
+
+    def check_timeout(self):
+        """Check timeout in all active records
+        The timeout time is taken as ctime + req_time and compared to current unix timestamp
+        If current timestamp is smaller, the job is moved to failed db
+        """
+        for jobid in self.db.copy():
+            timeout = self.db[jobid]['runjob'][0]['ctime'] + self.db[jobid]['runjob'][0]['req_time']
+            now = int(time.time())
+
+            if timeout < now:
+                self.db_fail[jobid] = copy.deepcopy(self.db[jobid])
+                del self.db[jobid]
+                self.log.info("TIMEOUT: Moving job %s to fail DB" % jobid)
+                self.on_fail(jobid)
+
     def default_on_receive(self, jobid):
         pass
 
     def default_on_end(self, jobid):
+        pass
+
+    def default_on_fail(self, jobid):
         pass
 
 

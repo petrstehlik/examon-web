@@ -96,6 +96,7 @@ def transform_live_job(jobid, jobman):
     if "exc_end" in job_raw:
         job['exc_end'] = True
         job = merge_dicts(job, job_raw['exc_end'][0])
+        job['end_time'] = parse(job['end_time'])
 
     if 'variable_list ' in job:
         job['variable_list'] = copy.deepcopy(job['variable_list '])

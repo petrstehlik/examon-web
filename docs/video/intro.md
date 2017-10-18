@@ -1,0 +1,75 @@
+This is the Galileo supercomputer located in CINECA, Bologna, Italy.
+
+It has 516 nodes in its disposal each having two eight-core CPUs.
+
+That results in more than eight thousand available cores.
+
+Each core is equipped with 8 GB of RAM which adds up to more than 46 terabytes of RAM in total.
+
+Staying with memory -- Galileo has 2 petabytes scratch disk.
+
+All this hardware makes up the total power of 1 100 teraflops.
+
+As of today, Galileo is the 281st fastest computer in the world.
+
+And as you can imagine all this performance takes up a lot of power. 2 825 kW when Galileo is in its full chat.
+
+This lays ground to one of the most timely problems in managing HPC facilities all around the world. Using the Internet of Things technologies a monitoring system was build by the good guys from UNIBO, codename ExaMon.
+
+ExaMon measures more than 50 metrics every 2 to 30 seconds. You can get data ranging from CPU's cores load, through the system utilization to the cluster temperature.
+
+But there was something missing. Something to visualise all this data in a meaningful way.
+
+This is where I come into play. I was tasked with building a web application which will take all the data we gather from Galileo and visualise it.
+~~ dramatic pause ~~~
+And therefore ExaMon Web was born. It's an application built on top of Angular framework with Python backend which connects to multiple data sources, combines them and visualises them.
+
+A picture is worth a thousand words so let's do a quick walkthrough of the Examon web.
+
+~~~ Screen ~~~
+
+## Job Visualisation
+We start of on the job lookup page.
+
+A job is a routine which allocates a selected portion of the cluster and then runs your code on it. Each job has its unique ID.
+
+We can use this ID here to go directly to our job or we can pick an active job from the list. It is also possible to view a finished job with even more data about it.
+
+So I have a job running so let's take a look at it.
+
+We can get some basic info about the job itself such as the user or queue it is running in.
+
+Next we have some times there. Each job goes through a specific lifecycle but let's skip it now. Some cooler stuff awaits.
+
+Next we have allocated resources such as CPUs, RAM or MPI processes. We also know exactly which cores and nodes were allocated and for this job the scheduler assigned us nodexxx and all cores from it.
+
+The last part on this dashboard is average core load for all allocated cores. This way we can quickly say if it works well and effectively.
+
+Let's move to the performance dashboard. This shows us how our code performs in much more detailed way.
+
+We have a lot of info there such as core's load, IPS, cache misses and so on. All in nice interactive graphs.
+
+Next is the energy dashboard. Here we can see the power consumption, temperatures and CPU and DRAM power. This reminds us that running our code requires quite a lot of energy.
+
+## Intermediate
+
+Now we have all the info we need about a job such as system load, temperatures, effectiveness and so on but what if we want to see data about the whole cluster? For this we move to the public dashboard.
+
+## Public dashboard
+First of all on the top we can specify in what time range we want to see the data. We will stay with the last 30 minutes now.
+
+We can see some basic numbers about the cluster and the jobs that has been run there.
+
+Below that are another charts showing us the cluster's load, temperature and power consumption per node. Personally I love the cluster’s load chart.
+
+Now let's move to the coolest part of the app. The 3D model. Once the model is loaded we can see a 3D model of the Galileo cluster itself.
+
+You see can that the nodes are color coded in some way. Right now it basically says what temperature is flowing into each node. Blue is around 14 degrees to red topping around 25 degrees.
+
+We can walk through the model, pan..., zoom... or rotate it. The Blender master at CINECA has provided us even with cool transformation of the model itself. We can open the cluster to see everything perfectly in one view or look from the top at the cluster.
+
+Next if we are bored enough with the ambient temperature we can switch to other metrics such as Memory load. Did I mention that everything happening in the model is real-time? No? Well, it is. Using MQTT all the needed data is delivered straight to us and rendered. With the memory load we can the changes on certain nodes.
+
+And that is all folks! Thanks for watching and I hope you enjoyed the walkthrough.
+
+
