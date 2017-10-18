@@ -15,23 +15,23 @@ The basic steps:
 	* Enable CORS if requested
 	* import all modules and its Blueprints
 """
-
-from .Router import Router
 from flask_socketio import SocketIO
-
+from .Router import Router
 print("# Setting up the application")
 app = Router(__name__)
 
+from .configurator import Config
 """
 Load user config specified by an argument or in default path.
 """
-from .configurator import Config
+
+
 try:
 	config = Config()
 except KeyError as e:
 	import sys
 	print("Missing item in config %s" % e)
-	sys.exit()
+	sys.exit(1)
 
 from .dbConnector import dbConnector
 from .session import SessionManager
@@ -43,26 +43,23 @@ from .role import Role
 import ssl
 from bson import json_util
 
-if config["ssl"].getboolean("enabled"):
+if config["api"].getboolean("ssl", False):
 	context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 	context.load_cert_chain(config['ssl']['certificate'], config['ssl']['key'])
 
-if (config["auth"].getboolean("enabled")):
-    print("# Connecting to MongoDB")
-    db = dbConnector()
+print("# Connecting to a database")
+db = dbConnector()
 
 print("# Session manager setting up")
 session_manager = SessionManager.from_object(config)
 
-if (config["auth"].getboolean("enabled")):
-    print("# Authorization module setting up")
-    auth = Auth(db, session_manager, config['api']['secret_key'])
+print("# Authorization module setting up")
+auth = Auth(db, session_manager)
 
-    check_users()
+check_users()
 
 print("# Configuring server app")
 app.config.from_object(config)
-socketio = SocketIO(app)
 
 if config['api'].getboolean('cors', False):
 	print("# CORS enabled")
@@ -72,6 +69,8 @@ if config['api'].getboolean('cors', False):
 	except:
 		print("# ERROR: failed to initialize CORS. Is it installed?")
 		exit(1)
+
+socketio = SocketIO(app)
 
 """
 Import all modules from module path
