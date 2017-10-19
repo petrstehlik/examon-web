@@ -1,4 +1,4 @@
-from liberouterapi import config, app
+from muapi import config, app
 from .error import JobsError
 from .Aggregate import Aggregate
 

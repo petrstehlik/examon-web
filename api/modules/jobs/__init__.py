@@ -1,5 +1,5 @@
-from liberouterapi import app, config
-from liberouterapi.error import ApiException
+from muapi import app, config
+from muapi.error import ApiException
 #from ..module import Module
 from modules.utils import *
 

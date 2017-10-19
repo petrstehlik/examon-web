@@ -1,7 +1,8 @@
-from liberouterapi import socketio, config
+from muapi import socketio, config
 from flask_socketio import send, emit, join_room, leave_room
-from ..jobs import jobman
-from ..utils import *
+
+from jobs import jobman
+from utils import *
 import json
 
 import logging

@@ -4,7 +4,7 @@ import decimal
 import copy
 from dateutil.parser import parse
 
-from liberouterapi import config
+from muapi import config
 
 def split_list(values, delim = ","):
     """

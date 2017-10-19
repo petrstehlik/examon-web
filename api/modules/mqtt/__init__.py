@@ -1,7 +1,7 @@
-from liberouterapi import app, socketio, config
-from liberouterapi.error import ApiException
-from ..module import Module
-from ..utils import split_list, merge_dicts
+from muapi import app, socketio, config
+from muapi.error import ApiException
+from muapi.Module import Module
+from utils import split_list, merge_dicts
 from Holder import Holder
 
 from flask import Blueprint, request
@@ -12,7 +12,7 @@ import logging
 class MqttError(ApiException):
     status_code = 500
 
-mqtt = Blueprint('mqtt', __name__, url_prefix = '/mqtt')
+mqtt = Module('mqtt', __name__, url_prefix = '/mqtt', no_version=True)
 
 log = logging.getLogger(__name__)
 

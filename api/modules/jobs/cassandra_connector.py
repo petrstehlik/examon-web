@@ -3,7 +3,7 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import dict_factory
 import logging
 
-from liberouterapi.configurator import Config
+from muapi.configurator import Config
 
 def connect():
     """
@@ -27,7 +27,7 @@ def connect():
     cluster = Cluster(
             contact_points=([conf["cassandradb"].get("server")]),
             auth_provider = auth,
-            connect_timeout = 30.0,
+            connect_timeout = 10.0,
             control_connection_timeout = 10.0)
     session = cluster.connect(conf["cassandradb"].get("cluster"))
 
