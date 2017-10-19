@@ -9,4 +9,4 @@ with open(activate_this) as file_:
 import sys
 print(sys.version)
 
-from liberouterapi import app as application
+from muapi import app as application
