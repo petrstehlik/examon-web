@@ -26,8 +26,17 @@ export const environment = {
     active_metric : 'Ambient_Temp',
     active_metric_name : 'Ambient Temperature',
     ws : {
-        host : window.location.hostname,
+        //host : window.location.hostname,
+        host : 'localhost',
         port : 5555
     },
-    interval : 5000    // Interval in miliseconds to resfresh data in job info
+    interval : 5000,    // Interval in miliseconds to resfresh data in job info,
+    /**
+     * Path to configuration file
+     */
+    configPath : 'assets/config-sample.json',
+    /**
+     * Used only when fetching config.json failed
+     */
+    apiUrl : '',
 };

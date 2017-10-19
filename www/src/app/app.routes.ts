@@ -2,7 +2,8 @@ import { JobInfoComponent,
     JobsLookupComponent,
     JobDashboardComponent,
     PublicDashboardComponent,
-    SysadminDashboardComponent
+    SysadminDashboardComponent,
+    SetupComponent
 } from './components';
 import { NullComponent } from './components';
 
@@ -23,7 +24,10 @@ export const appRoutes = [
         path : 'public',
         component : PublicDashboardComponent
     },
-
+    {
+        path : 'setup',
+        component :  SetupComponent
+    },
     {
         path : '**',
         component : NullComponent

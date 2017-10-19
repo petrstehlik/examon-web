@@ -16,9 +16,13 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { GraphComponent } from './components/graph/graph.component';
 
 import { JobService } from 'app/services/job.service';
+import { AuthService } from 'app/services/auth.service';
+
 import { MessageService } from 'app/services';
 
 import { MapToIterable, ObjectSize } from 'app/utils/keyIterable';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { SessionInterceptor } from 'app/utils/http.interceptor';
 
 import {
     NullComponent,
@@ -32,38 +36,48 @@ import {
     SysadminDashboardComponent,
     SysadminOverviewComponent,
     RangepickerComponent,
-    RenderComponent } from 'app/components';
-
-@NgModule({
-  declarations: [
-    AppComponent,
-    NullComponent,
-    JobInfoComponent,
-    JobsLookupComponent,
-    NavbarComponent,
-    GraphComponent,
-    GeneralPublicViewComponent,
-    JobDashboardComponent,
-    JobPerfComponent,
-    JobEnergyComponent,
-    SysadminDashboardComponent,
-    PublicDashboardComponent,
-    PublicOverviewComponent,
-    SysadminOverviewComponent,
-    RangepickerComponent,
     RenderComponent,
-    MapToIterable,
-    ObjectSize
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    ChartsModule,
-    NgbModule.forRoot(),
-    RouterModule.forRoot(appRoutes)
-  ],
-  providers: [JobService, MessageService],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+    SetupComponent } from 'app/components';
+
+    @NgModule({
+        declarations: [
+            AppComponent,
+            NullComponent,
+            JobInfoComponent,
+            JobsLookupComponent,
+            NavbarComponent,
+            GraphComponent,
+            GeneralPublicViewComponent,
+            JobDashboardComponent,
+            JobPerfComponent,
+            JobEnergyComponent,
+            SysadminDashboardComponent,
+            PublicDashboardComponent,
+            PublicOverviewComponent,
+            SysadminOverviewComponent,
+            RangepickerComponent,
+            RenderComponent,
+            MapToIterable,
+            ObjectSize,
+            SetupComponent
+        ],
+        imports: [
+            BrowserModule,
+            FormsModule,
+            HttpClientModule,
+            ChartsModule,
+            NgbModule.forRoot(),
+            RouterModule.forRoot(appRoutes)
+        ],
+        providers: [
+            JobService,
+            MessageService,
+            {
+                provide: HTTP_INTERCEPTORS,
+                useClass: SessionInterceptor,
+                multi: true
+            }
+        ],
+        bootstrap: [AppComponent]
+    })
+    export class AppModule { }
