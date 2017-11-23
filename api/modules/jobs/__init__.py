@@ -3,7 +3,8 @@ from muapi.error import ApiException
 #from ..module import Module
 from modules.utils import *
 
-from flask import Blueprint, request
+from flask import request
+from muapi.Module import Module
 
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
@@ -14,7 +15,7 @@ import decimal
 import logging
 import copy
 
-from cassandra_connector import connect, prepare_statements
+from .cassandra_connector import connect, prepare_statements
 
 from .JobManager import JobManager
 
@@ -38,7 +39,7 @@ except Exception as e:
     log.error("Failed to connect to Cassandra: %s" % str(e))
 
 
-jobs = Blueprint('jobs', __name__, url_prefix = '/jobs')
+jobs = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
 
 @jobs.route('/<string:jobid>', methods=['GET'])
 def jobs_hello(jobid):
@@ -65,13 +66,16 @@ def jobs_hello(jobid):
         info[0]["variable_list"][item[0]] = item[1]
 
     # Try to fetch measurements from DB
-    measures = session.execute(prepared["measures"], (jobid,))
+    #measures = session.execute(prepared["measures"], (jobid,))
 
-    if len(measures.current_rows) > 0:
-        result = merge_dicts(info[0], measures[0])
-        result["asoc_power"] = asoc_node_core(result["job_node_avg_powerlist"], result["vnode_list"])
-    else:
-        result = info[0]
+    try:
+        if len(measures.current_rows) > 0:
+            result = merge_dicts(info[0], measures[0])
+            result["asoc_power"] = asoc_node_core(result["job_node_avg_powerlist"], result["vnode_list"])
+        else:
+            result = info[0]
+    except:
+        result=info[0]
 
     result["vnode_list"] = split_list(result["vnode_list"])
 
@@ -89,7 +93,7 @@ def jobs_latest():
         Fetch all jobs that finished in last 30 minutes,
         sort them by start_time and return the last one.
     """
-    tstamp = (int(time.time()) - 1800) * 1000
+    tstamp = (int(time.time()) - 1800000) * 1000
     qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
             WHERE token(user_id) > token('') and start_time >= " \
             + str(tstamp) + " ALLOW FILTERING")
