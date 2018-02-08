@@ -51,12 +51,12 @@ def jobs_hello(jobid):
 
     info = session.execute(prepared["sel_by_job_id"], (int(jobid),))
     if len(info.current_rows) == 0:
-        return('', 404)
+        return '', 404
 
     try:
         info[0]["asoc_nodes"] = asoc_node_core(info[0]["used_cores"], info[0]["vnode_list"])
     except Exception as e:
-        log.error(str(info[0]))
+        log.error("Can't associate nodes and cores with job: %s" % info[0]['job_id'])
         info[0]["asoc_nodes"] = dict()
 
     variables = [item.split("->") for item in split_list(info[0]["var_list"])]
