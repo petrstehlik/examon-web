@@ -49,7 +49,7 @@ def jobs_hello(jobid):
         # The job is currently running, we can fetch the info we need
         return json.dumps(transform_live_job(jobid, jobman), default=Job.time_serializer)
 
-    info = session.execute(prepared["sel_by_job_id"], (jobid,))
+    info = session.execute(prepared["sel_by_job_id"], (int(jobid),))
     if len(info.current_rows) == 0:
         return('', 404)
 
@@ -67,7 +67,7 @@ def jobs_hello(jobid):
         info[0]["variable_list"][item[0]] = item[1]
 
     # Try to fetch measurements from DB
-    #measures = session.execute(prepared["measures"], (jobid,))
+    measures = session.execute(prepared["measures"], (int(jobid),))
 
     try:
         if len(measures.current_rows) > 0:
