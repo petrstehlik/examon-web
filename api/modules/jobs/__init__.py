@@ -91,16 +91,17 @@ def jobs_latest():
         Fetch all jobs that finished in last 30 minutes,
         sort them by start_time and return the last one.
     """
-    tstamp = (int(time.time()) - 1800000) * 1000
-    qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
-            WHERE token(user_id) > token('') and start_time >= " \
-            + str(tstamp) + " ALLOW FILTERING")
+
+    # Get last job ID
+    last_job = session.execute("select max(job_id) as job_id from davide_jobs_simplekey")
+    qres = session.execute("SELECT * FROM davide_jobs_simplekey \
+            WHERE job_id = {}".format(last_job[0]['job_id']))
 
     if len(qres.current_rows) == 0:
         # No jobs finished in last 30 minutes, try 12 hours
         tstamp = (int(time.time()) - 43200) * 1000
-        qres = session.execute("SELECT * FROM galileo_jobs_complexkey \
-            WHERE token(user_id) > token('') and start_time >= " \
+        qres = session.execute("SELECT * FROM davide_jobs_simplekey \
+            WHERE  start_time >= " \
             + str(tstamp) + " ALLOW FILTERING")
 
     results = [item for item in qres]
@@ -133,7 +134,7 @@ def jobs_total():
         raise JobsError("'from' time cannot precede 'to' time")
 
     qres = session.execute("SELECT job_id, nnodes_req, ncpus_req, ngpus_req, nmics_req, start_time, end_time \
-        FROM galileo_jobs_complexkey \
+        FROM davide_jobs_simplekey \
         WHERE token(user_id) > token('') AND \
             start_time >= " + str(args["from"]) + " AND \
             start_time <= " + str(args["to"]) + " ALLOW FILTERING")
