@@ -6,11 +6,13 @@ from dateutil.parser import parse
 
 from muapi import config
 
+
 def split_list(values, delim = ","):
     """
     Remove all whitespaces and split by delimiter
     """
     return values.replace(" ", "").split(delim)
+
 
 def merge_dicts(x, y):
     """Given two dicts, merge them into a new dict as a shallow copy."""
@@ -18,16 +20,17 @@ def merge_dicts(x, y):
     z.update(y)
     return z
 
+
 def get_duration(start, end):
     """
     Get duration in seconds from two datetimes
     """
     return (end - start).total_seconds()
 
+
 def time_serializer(obj):
     """Default JSON serializer."""
     if isinstance(obj, datetime):
-        millis = 0
         if obj.utcoffset() is not None:
             obj = obj - obj.utcoffset()
 
@@ -40,6 +43,7 @@ def time_serializer(obj):
         return float(obj)
 
     raise TypeError('Not sure how to serialize %s' % (obj,))
+
 
 def asoc_node_core(cores, nodes):
     """
@@ -63,11 +67,12 @@ def asoc_node_core(cores, nodes):
 
     for i in range(0, len(nodes_list)):
         asoc_nodes.append({
-                "node" : nodes_list[i],
-                "cores" : split_list(cores_list[i])
+                "node": nodes_list[i],
+                "cores": split_list(cores_list[i])
             })
 
     return asoc_nodes
+
 
 def transform_live_job(jobid, jobman):
     job_raw = jobman.db[jobid]
@@ -86,8 +91,8 @@ def transform_live_job(jobid, jobman):
 
         for item in job_raw['exc_begin']:
             job['asoc_nodes'].append({
-                "node" : item['node_id'],
-                "cores" : item['job_cores']
+                "node": item['node_id'],
+                "cores": item['job_cores']
                 })
 
         job = merge_dicts(job, job_raw['exc_begin'][0])
@@ -106,12 +111,11 @@ def transform_live_job(jobid, jobman):
     job['ctime'] = datetime.fromtimestamp(job['ctime'])
     job['qtime'] = datetime.fromtimestamp(job['qtime'])
 
-    job['ngpus_req']  = job['ngpus']
-    job['ncpus_req']  = job['req_cpus']
-    job['nmics_req']  = job['nmics']
+    job['ngpus_req'] = job['ngpus']
+    job['ncpus_req'] = job['req_cpus']
+    job['nmics_req'] = job['nmics']
     job['nnodes_req'] = len(job['vnode_list'])
-    job['mem_req']    = job['req_mem']
-    job['user_id']    = job['job_owner']
+    job['mem_req'] = job['req_mem']
+    job['user_id'] = job['job_owner']
 
-    return(job)
-
+    return job
