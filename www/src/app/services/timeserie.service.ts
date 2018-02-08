@@ -21,7 +21,7 @@ export class TimeserieService {
         aggregate: number = null,
         raw: boolean = false) {
         return new Observable(observer =>
-            this.http.get('/api/kairos/' + endpoint, {
+            this.http.get('/kairos/' + endpoint, {
               params : this.prepareParams(job, metric, aggregate)
             }).subscribe(data => {
                 if (raw)
