@@ -5,6 +5,7 @@ import logging
 
 from muapi.configurator import Config
 
+
 def connect():
     """
     Connect to a Cassandra cluster specified in config
@@ -22,19 +23,21 @@ def connect():
     logger.info("Connecting to Cassandra cluster")
 
     auth = PlainTextAuthProvider(
-            username = conf["cassandradb"].get("user"),
-            password = conf["cassandradb"].get("password"))
+            username=conf["cassandradb"].get("user"),
+            password=conf["cassandradb"].get("password"))
     cluster = Cluster(
-            contact_points=([conf["cassandradb"].get("server")]),
-            auth_provider = auth,
-            connect_timeout = 10.0,
-            control_connection_timeout = 10.0)
+            contact_points=[conf["cassandradb"].get("server")],
+            port=conf['cassandradb'].getint("port", 9042),
+            auth_provider=auth,
+            connect_timeout=10.0,
+            control_connection_timeout=10.0)
     session = cluster.connect(conf["cassandradb"].get("cluster"))
 
     logger.info("Successfully connected to Cassanda cluster")
     session.row_factory = dict_factory
 
     return session
+
 
 def prepare_statements(session):
     """
