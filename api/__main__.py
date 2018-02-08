@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+import logging
 
-from muapi import app, config
+logging.basicConfig()
+
+from muapi import socketio, config, app
 
 if __name__ == '__main__':
-    app.run(port = app.config["PORT"],
-            host = app.config["HOST"])
+    socketio.run(app, debug=True, port=5555)
+            #port = app.config["PORT"],
+            #host = app.config["HOST"])
