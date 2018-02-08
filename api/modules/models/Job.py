@@ -6,8 +6,6 @@ import json
 
 from muapi import config
 
-import pdb
-
 
 class Job:
     """
