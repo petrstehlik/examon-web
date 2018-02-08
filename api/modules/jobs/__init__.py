@@ -59,12 +59,13 @@ def jobs_hello(jobid):
         log.error("Can't associate nodes and cores with job: %s" % info[0]['job_id'])
         info[0]["asoc_nodes"] = dict()
 
-    variables = [item.split("->") for item in split_list(info[0]["var_list"])]
+    #variables = [item.split("->") for item in split_list(info[0].get("var_list", ""))]
 
     # Create variable list which is actually a dict
-    info[0]["variable_list"] = dict()
-    for item in variables:
-        info[0]["variable_list"][item[0]] = item[1]
+    #info[0]["variable_list"] = dict()
+    #print(variables)
+    #for item in variables:
+    #    info[0]["variable_list"][item[0]] = item[1]
 
     # Try to fetch measurements from DB
     measures = session.execute(prepared["measures"], (int(jobid),))
@@ -76,17 +77,13 @@ def jobs_hello(jobid):
         else:
             result = info[0]
     except:
-        result=info[0]
-
-    result["vnode_list"] = split_list(result["vnode_list"])
-
-    # This shouldn't be needed when the correct times are stored in DB
-    result['ctime'] = calendar.timegm(result['ctime'].timetuple()) * 1000000
-    result['qtime'] = calendar.timegm(result['qtime'].timetuple()) * 1000000
+        result = info[0]
 
     result['active'] = False
 
-    return(json.dumps(result, default=time_serializer))
+    job = Job.from_dict(result)
+
+    return job.json()
 
 @jobs.route('/latest')
 def jobs_latest():
