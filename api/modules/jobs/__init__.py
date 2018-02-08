@@ -1,7 +1,6 @@
-from muapi import app, config
+from muapi import config
 from muapi.error import ApiException
-#from ..module import Module
-from modules.utils import *
+from modules.utils import transform_live_job, time_serializer, split_list
 
 from flask import request
 from muapi.Module import Module
@@ -18,6 +17,8 @@ import copy
 from .cassandra_connector import connect, prepare_statements
 
 from .JobManager import JobManager
+
+from modules.models.Job import Job
 
 jobman = JobManager(config['jobs']['server'],
         1883,
