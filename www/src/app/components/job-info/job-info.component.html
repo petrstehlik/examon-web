@@ -38,7 +38,7 @@
 
                 <p>
                     <small>Queue time: </small>
-                    {{ job.data.backup_qtime | date:'HH:mm:ss dd/MM/yy' }}
+                    {{ job.data.queue_time | date:'HH:mm:ss dd/MM/yy' }}
                 </p>
                 <p>
                     <small>Start time:</small>
@@ -97,7 +97,7 @@
                     (click)="modal.open(nodes, { windowClass: 'nodes-modal' })">
                     <div class="card-block text-center">
                         <small class="card-title">Nodes &rarr;</small>
-                        <h5>{{ job?.data?.nnodes_req | number }}</h5>
+                        <h5>{{ job?.data?.nodes | number }}</h5>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                     (click)="modal.open(nodes, { windowClass: 'nodes-modal' })">
                     <div class="card-block text-center">
                         <small class="card-title">Cores &rarr;</small>
-                        <h5>{{ job?.data?.ncpus_req | number }}</h5>
+                        <h5>{{ job?.data?.cpus | number }}</h5>
                     </div>
                 </div>
             </div>
