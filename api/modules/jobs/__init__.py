@@ -39,15 +39,15 @@ try:
 except Exception as e:
     log.error("Failed to connect to Cassandra: %s" % str(e))
 
-
 jobs = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
+
 
 @jobs.route('/<string:jobid>', methods=['GET'])
 def jobs_hello(jobid):
 
     if jobid in jobman.db:
         # The job is currently running, we can fetch the info we need
-        return(json.dumps(transform_live_job(jobid, jobman), default=time_serializer))
+        return json.dumps(transform_live_job(jobid, jobman), default=Job.time_serializer)
 
     info = session.execute(prepared["sel_by_job_id"], (jobid,))
     if len(info.current_rows) == 0:
