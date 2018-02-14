@@ -157,6 +157,37 @@ class Job:
 
         raise TypeError('Not sure how to serialize %s' % (obj,))
 
+    def associate_cores_nodes(self):
+        """Associate nodes with their cores.
+
+        Expected format of cores: `core1, core2#core1#core1` where each core is separated
+        by a comma and each node's core by a hash tag.
+
+        Expected format of nodes: comma-separated list with the number of items as in cores
+        list for nodes.
+        """
+
+        if len(self.node_list) != (len(self.core_list) - 1):
+            # Both lists must have the same length
+            raise Exception("Cores' and nodes' list lengths doesn't match!")
+
+        for i in range(0, len(self.node_list)):
+            self.asoc_nodes.append({
+                "node": self.node_list[i],
+                "cores": self.split_list(self.core_list[i])
+            })
+
+    @staticmethod
+    def average(data):
+        data = [float(x) for x in data]
+        return sum(data)/float(len(data))
+
+    def add_measures(self, data):
+        self.power = self.average(self.split_list(data['power_mean'], delim='#')[:-1])
+        self.gpu_power = self.average(self.split_list(data['gpu_power'], delim='#')[:-1])
+        self.cpu_util = self.average(self.split_list(data['cpu_util'], delim='#')[:-1])
+        self.avg_temp = self.average(self.split_list(data['ambient_temp_mean'], delim='#')[:-1])
+
     def json(self):
         return json.dumps({
             'job_id': self.job_id,
