@@ -19,7 +19,7 @@ class Job:
         * ngpus_req in PBS
         * nmics_req in PBS
         * nnodes_req in PBS, min_nodes, max_nodes, req_nodes, sched_nodes in SLURM -> nodes
-        * project in PBS
+        * project in PBS, SLURM part
         * qlist in PBS
         * core_list in SLURM, node_list in PBS -> node_list
 
@@ -46,6 +46,13 @@ class Job:
                  node_list=None,
                  exit_code=-1,
                  active=False,
+                 time=-1,
+                 variables=[],
+                 gpus=-1,
+                 mpi_procs=-1,
+                 mics=-1,
+                 memory=-1,
+                 project='',
                  ):
         self.log = logging.getLogger(__name__)
 
@@ -71,22 +78,40 @@ class Job:
         self.node_list = node_list
         self.exit_code = exit_code
         self.active = active
+        self.asoc_nodes = list()
+        self.time = time
+        self.variables = variables
+        self.mpi_procs = mpi_procs
+        self.mics = mics
+        self.gpus = gpus
+        self.memory = memory
+        self.power = 0
+        self.avg_temp = 0
+        self.gpu_power = 0
+        self.cpu_util = 0
+        self.project = project
+
+        try:
+            self.associate_cores_nodes()
+        except Exception as e:
+            self.log.error(e)
 
     @classmethod
     def from_dict(cls, data):
-        if 'ncpus_req' in data:
+        if 'ncpus_req' in data or 'nnodes_req' in data:
             # PBS Pro data
             cpus = data['ncpus_req']
+            nodes = data['nnodes_req']
+            time = data['req_time']
+            memory = data['req_mem']
+            project = data['project_name']
         else:
             # SLURM data
             cpus = data['min_cpus']
-
-        if 'nnodes_req' in data:
-            # PBS Pro data
-            nodes = data['nnodes_req']
-        else:
-            # SLURM data
             nodes = data['min_nodes']
+            time = data['time_limit']
+            memory = data['pn_min_memory']
+            project = data['part']
 
         return Job(job_id=data.get('job_id'),
                    user_id=data['user_id'],
@@ -101,6 +126,10 @@ class Job:
                    nodes=nodes,
                    node_list=Job.split_list(data['node_list']),
                    exit_code=data.get('exit_code', -1),
+                   time=time,
+                   variables=data.get('var_list', []),
+                   memory=memory,
+                   project=project,
                    )
 
     def parse_node_list(self):
@@ -133,7 +162,7 @@ class Job:
             'job_id': self.job_id,
             'user_id': self.user_id,
             'account_name': self.account_name,
-            'job_name': self.account_name,
+            'job_name': self.job_name,
             'start_time': self.start_time,
             'queue_time': self.queue_time,
             'end_time': self.end_time,
@@ -143,4 +172,15 @@ class Job:
             'node_list': self.node_list,
             'exit_code': self.exit_code,
             'active': self.active,
+            'asoc_nodes': self.asoc_nodes,
+            'time': self.time,
+            'variables': self.variables,
+            'gpus': self.gpus,
+            'mics': self.mics,
+            'mpi_procs': self.mpi_procs,
+            'power': self.power,
+            'temp': self.avg_temp,
+            'cpu_util': self.cpu_util,
+            'gpu_power': self.gpu_power,
+            'project': self.project,
         }, default=Job.time_serializer)
