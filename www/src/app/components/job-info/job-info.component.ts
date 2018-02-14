@@ -84,10 +84,10 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         if (this.job['data']['active']) {
             this.startSocket();
             this.fetchInt = setInterval(() => {
-                this.startFetchRaw('load_core', 'core', 'load_core', this.aggWindow());
+                this.startFetchRaw('load_core', 'node', 'power', this.aggWindow());
             }, env.interval);
         }
-        this.fetchRaw('load_core', 'core', 'load_core', this.aggWindow());
+        this.fetchRaw('load_core', 'node', 'power', this.aggWindow());
     }
 
     /**

@@ -4,7 +4,7 @@
             <ex-graph
                 [data]="data['job_load_core']"
                 [loading]="data['loading_load_core']"
-                topTitle="Allocated Cores' Load"
+                topTitle="Allocated Nodes' Load"
                 labelY="Load (%)">
             </ex-graph>
              <ex-graph
@@ -80,9 +80,9 @@
            <ex-graph
                 [data]="data['job_ips']"
                 [loading]="data['loading_ips']"
-                topTitle="IPS"
+                topTitle="MIPS"
                 range="null"
-                labelY="IPS">
+                labelY="MIPS">
             </ex-graph>
         </div>
     </div>
@@ -101,3 +101,16 @@
     </div>
 </div>
 
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card text-center">
+           <ex-graph
+                [data]="data['job_freq']"
+                [loading]="data['loading_freq']"
+                topTitle="Frequency"
+                range="null"
+                labelY="MHz">
+            </ex-graph>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,4 @@
 <section class="job-info" *ngIf="job?.loaded">
-
 <div class="row mb-3">
     <div class="col-md-12">
         <div class="card">
@@ -67,7 +66,7 @@
                 <div class="card">
                     <div class="card-block text-center">
                         <small class="card-title">Time</small>
-                        <h5>{{ job?.data?.req_time | number }} s</h5>
+                        <h5>{{ job?.data?.time | number }} s</h5>
                     </div>
                 </div>
             </div>
@@ -76,7 +75,7 @@
                 <div class="card">
                     <div class="card-block text-center">
                         <small class="card-title">GPUs</small>
-                        <h5>{{ job?.data?.ngpus_req | number }}</h5>
+                        <h5>{{ job?.data?.gpus | number }}</h5>
                     </div>
                 </div>
             </div>
@@ -85,7 +84,7 @@
                 <div class="card">
                     <div class="card-block text-center">
                         <small class="card-title">MICs</small>
-                        <h5>{{ job?.data?.nmics_req | number }}</h5>
+                        <h5>{{ job?.data?.mics | number }}</h5>
                     </div>
                 </div>
             </div>
@@ -126,7 +125,7 @@
                 <div class="card">
                     <div class="card-block text-center">
                         <small class="card-title">MPI Processes</small>
-                        <h5>{{ job?.data?.mpiprocs | number }}</h5>
+                        <h5>{{ job?.data?.mpi_procs | number }}</h5>
                     </div>
                 </div>
             </div>
@@ -160,9 +159,9 @@
         <div class="card">
             <div class="card-block text-center">
                 <small class="card-title">Average Power</small>
-                <h5 *ngIf="!job?.data?.job_tot_avg_power">-- W</h5>
-                <h5 *ngIf="job?.data?.job_tot_avg_power">
-                    {{ job?.data?.job_tot_avg_power | number:'1.1-2' }} W
+                <h5 *ngIf="!job?.data?.power">-- W</h5>
+                <h5 *ngIf="job?.data?.power">
+                    {{ job?.data?.power | number:'1.1-2' }} W
                 </h5>
             </div>
         </div>
@@ -171,10 +170,10 @@
     <div class="col">
         <div class="card">
             <div class="card-block text-center">
-                <small class="card-title">Sys Utilization</small>
-                <h5 *ngIf="!job?.data?.ipmi_avg_sys_util">-- %</h5>
-                <h5 *ngIf="job?.data?.ipmi_avg_sys_util">
-                    {{ job?.data?.ipmi_avg_sys_util | number:'1.1-2' }} %
+                <small class="card-title">GPU Power</small>
+                <h5 *ngIf="!job?.data?.gpu_power">-- %</h5>
+                <h5 *ngIf="job?.data?.gpu_power">
+                    {{ job?.data?.gpu_power | number:'1.1-2' }} W
                 </h5>
             </div>
         </div>
@@ -184,9 +183,9 @@
         <div class="card">
             <div class="card-block text-center">
                 <small class="card-title">CPUs Utilization</small>
-                <h5 *ngIf="!job?.data?.ipmi_avg_cpu_util">-- %</h5>
-                <h5 *ngIf="job?.data?.ipmi_avg_cpu_util">
-                    {{ job?.data?.ipmi_avg_cpu_util | number:'1.1-2'}} %
+                <h5 *ngIf="!job?.data?.cpu_util">-- %</h5>
+                <h5 *ngIf="job?.data?.cpu_util">
+                    {{ job?.data?.cpu_util * 100 | number:'1.1-2'}} %
                 </h5>
             </div>
         </div>
@@ -196,9 +195,9 @@
         <div class="card">
             <div class="card-block text-center">
                 <small class="card-title">Average Temperature</small>
-                <h5 *ngIf="!job?.data?.job_tot_avg_temp">-- °C</h5>
-                <h5 *ngIf="job?.data?.job_tot_avg_temp">
-                    {{ job?.data['job_tot_avg_temp'] | number:'1.1-2'}} °C
+                <h5 *ngIf="!job?.data?.temp">-- °C</h5>
+                <h5 *ngIf="job?.data?.temp">
+                    {{ job?.data['temp'] | number:'1.1-2'}} °C
                 </h5>
             </div>
         </div>
