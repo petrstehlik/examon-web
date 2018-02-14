@@ -47,35 +47,13 @@ def jobs_hello(jobid):
     if len(info.current_rows) == 0:
         return '', 404
 
-    try:
-        info[0]["asoc_nodes"] = asoc_node_core(info[0]["used_cores"], info[0]["vnode_list"])
-    except Exception as e:
-        log.error("Can't associate nodes and cores with job: %s" % info[0]['job_id'])
-        info[0]["asoc_nodes"] = dict()
-
-    #variables = [item.split("->") for item in split_list(info[0].get("var_list", ""))]
-
-    # Create variable list which is actually a dict
-    #info[0]["variable_list"] = dict()
-    #print(variables)
-    #for item in variables:
-    #    info[0]["variable_list"][item[0]] = item[1]
+    job = Job.from_dict(info[0])
 
     # Try to fetch measurements from DB
     measures = session.execute(prepared["measures"], (int(jobid),))
 
-    try:
-        if len(measures.current_rows) > 0:
-            result = merge_dicts(info[0], measures[0])
-            result["asoc_power"] = asoc_node_core(result["job_node_avg_powerlist"], result["vnode_list"])
-        else:
-            result = info[0]
-    except:
-        result = info[0]
-
-    result['active'] = False
-
-    job = Job.from_dict(result)
+    if len(measures.current_rows) > 0:
+        job.add_measures(measures[0])
 
     return job.json()
 
