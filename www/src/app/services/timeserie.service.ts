@@ -19,7 +19,9 @@ export class TimeserieService {
         endpoint,
         metric: string|string[],
         aggregate: number = null,
-        raw: boolean = false) {
+        raw: boolean = false,
+        factor: number = 1.0,
+    ) {
         return new Observable(observer =>
             this.http.get('/kairos/' + endpoint, {
               params : this.prepareParams(job, metric, aggregate)
@@ -27,7 +29,7 @@ export class TimeserieService {
                 if (raw)
                     observer.next(data);
                 else
-                    observer.next(this.parseData(data));
+                    observer.next(this.parseData(data, factor));
             }, error => {
                 if (error.status === 404) {
                     this.msg.send('No data for \'' + dict_name + '\'.', 'danger');
@@ -43,7 +45,7 @@ export class TimeserieService {
         if ('data' in job) {
             //for (let key of job["data"]["asoc_nodes"]) {
             for (const key of job['data']['node_list']) {
-                params = params.append('node', key);
+                params = params.append('node', 'davide' + String(key));
             }
         }
 
@@ -65,18 +67,19 @@ export class TimeserieService {
         return params;
     }
 
-    private parseData(data: Object): Object {
+    private parseData(data: Object, factor = 1.0): Object {
         const tmp_data = [];
 
         for (const key of Object.keys(data['points'])) {
-            tmp_data.push([new Date(+key * 1000), ...data['points'][key]]);
+            tmp_data.push([
+                new Date(+key * 1000),
+                ...data['points'][key].map(x => {return x * factor})
+            ]);
         }
 
-        const tmp = {
+        return {
             'labels' : ['Date', ...data['labels']],
             'data' : tmp_data
         };
-
-        return tmp;
     }
 }
