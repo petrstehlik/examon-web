@@ -51,11 +51,10 @@ def prepare_statements(session):
 
     prepared["measures"] = session.prepare(
         """SELECT
-            power_list,
             power_mean,
-            system_power_mean,
             ambient_temp_mean,
-            gpu_power_mean
+            gpu_power_mean as gpu_power,
+            util_p0_1_mean AS cpu_util
         FROM jobs_measures_aggregate
         WHERE job_id = ?""")
 
