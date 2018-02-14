@@ -1,28 +1,19 @@
 from muapi import config
 from muapi.error import ApiException
 from modules.utils import transform_live_job, time_serializer, split_list
+from modules.models.Job import Job
 
 from flask import request
 from muapi.Module import Module
-
-from cassandra.cluster import Cluster
-from cassandra.auth import PlainTextAuthProvider
-from cassandra.query import dict_factory
-import json
-import datetime, time, calendar
-import decimal
-import logging
-import copy
-
-from .cassandra_connector import connect, prepare_statements
-
 from .JobManager import JobManager
 
-from modules.models.Job import Job
+from .cassandra_connector import connect, prepare_statements
+import json
+import datetime, time, calendar
+import logging
 
-jobman = JobManager(config['jobs']['server'],
-        1883,
-        json.loads(config['jobs']['topics']))
+
+jobman = JobManager(config['jobs']['server'], 1883, json.loads(config['jobs']['topics']))
 
 from .sockets import *
 
@@ -30,8 +21,10 @@ jobman.on_receive = emit_data
 
 log = logging.getLogger(__name__)
 
+
 class JobsError(ApiException):
     status_code = 500
+
 
 try:
     session = connect()
@@ -44,6 +37,7 @@ jobs = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
 
 @jobs.route('/<string:jobid>', methods=['GET'])
 def jobs_hello(jobid):
+    log.info("Query for job ID", jobid)
 
     if jobid in jobman.db:
         # The job is currently running, we can fetch the info we need
@@ -107,7 +101,8 @@ def jobs_latest():
     results = [item for item in qres]
 
     ordered = sorted(results, key = lambda k : k['end_time'])
-    return(json.dumps(ordered[-1], default=time_serializer))
+    return json.dumps(ordered[-1], default=time_serializer)
+
 
 @jobs.route('/stats/total', methods=['GET'])
 def jobs_total():
