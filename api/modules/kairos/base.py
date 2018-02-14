@@ -3,26 +3,30 @@ from .error import JobsError
 from .Aggregate import Aggregate
 
 from flask import request
-from pyKairosDB import connect, metadata, reader
+from pyKairosDB import connect, reader
 import json
 import requests
 
-conn = connect(server = config["kairosdb"].get("server", "localhost"),
-        port = config["kairosdb"].get("port", 8000),
-        user = config["kairosdb"].get("user", ""),
-        passw = config["kairosdb"].get("password", ""))
+
+conn = connect(server=config["kairosdb"].get("server", "localhost"),
+               port=config["kairosdb"].get("port", 8000),
+               user=config["kairosdb"].get("user", ""),
+               passw=config["kairosdb"].get("password", "")
+               )
 
 from .utils import check_times, generate_health_url, generate_base_url, extract_data, merge_dicts, join_data
 
 @app.route("/kairos/health")
 def health():
     res = requests.get(generate_health_url() + "/check", auth=(conn.user, conn.passw))
-    return('', res.status_code)
+    return '', res.status_code
+
 
 @app.route("/kairos/status")
 def status():
-	res = requests.get(generate_health_url() + "/status", auth=(conn.user, conn.passw))
-	return(str(res.content))
+    res = requests.get(generate_health_url() + "/status", auth=(conn.user, conn.passw))
+    return str(res.content)
+
 
 @app.route("/kairos/metrics")
 def list_metrics():
@@ -30,7 +34,8 @@ def list_metrics():
     List all available metrics
     """
     res = requests.get(generate_base_url() + "/metricnames", auth=(conn.user, conn.passw))
-    return(str(res.content))
+    return str(res.content)
+
 
 @app.route("/kairos/tags")
 def list_tags():
@@ -38,12 +43,12 @@ def list_tags():
     List all available metrics
     """
     res = requests.get(generate_base_url() + "/tagnames", auth=(conn.user, conn.passw))
-    return(str(res.content))
+    return str(res.content)
+
 
 @app.route("/kairos/core")
 def core_level():
-    """
-    Load data on per-core level in dygraphs-friendly format
+    """Load data on per-core level in dygraphs-friendly format
     Designed for association with job info where you pick the nodes (at least!)
 
     Params:
@@ -69,11 +74,11 @@ def core_level():
 
     for item in metrics:
         args["metric"] = [item]
-        res.append(query(args, 2, ['node', 'core'], tags = {
-                "node" : args["node"]
+        res.append(query(args, 2, ['node', 'core'], tags={
+            "node": args["node"]
             }))
 
-    return(json.dumps(join_data(res)))
+    return json.dumps(join_data(res))
 
 @app.route("/kairos/cpu")
 def cpu_level():
@@ -110,6 +115,7 @@ def cpu_level():
 
     return(json.dumps(join_data(res)))
 
+
 @app.route("/kairos/node")
 def load_base():
     """
@@ -136,12 +142,12 @@ def load_base():
                 "node" : args["node"]
             }))
 
-        return(json.dumps(join_data(res_list)))
+        return json.dumps(join_data(res_list))
     else:
         args["metric"] = [args["metric"]]
         res_list.append(query(args, 5, ['node']))
 
-    return(json.dumps(join_data(res_list)))
+    return json.dumps(join_data(res_list))
 
 
 @app.route("/kairos/cluster")
@@ -175,6 +181,7 @@ def cluster_level():
 
     return(json.dumps(join_data(res_list)))
 
+
 def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags = None):
     check_times(args)
 
@@ -194,15 +201,15 @@ def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags
     else:
         mod_func = modifying_func
 
-    if tags == None:
+    if not tags:
         tags_parsed = {
-                    "org" : config["kairosdb"].get("org", "cineca"),
-                    "cluster" : config["kairosdb"].get("cluster", "galileo")
+                    "org" : config["kairosdb"].get("org", "e4"),
+                    "cluster" : config["kairosdb"].get("cluster", "davide")
                 }
     else:
         tags_parsed = merge_dicts({
-                "org" : config["kairosdb"].get("org", "cineca"),
-                "cluster" : config["kairosdb"].get("cluster", "galileo")
+                "org" : config["kairosdb"].get("org", "e4"),
+                "cluster" : config["kairosdb"].get("cluster", "davide")
             }, tags)
 
     res = reader.read(conn,
@@ -214,7 +221,7 @@ def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags
             )
 
     if "raw" in args:
-        return(res)
+        return res
 
     if res["queries"][0]["sample_size"] == 0:
         raise JobsError("No data found", status_code=404)

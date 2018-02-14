@@ -7,6 +7,7 @@ class Aggregate():
     def __init__(self, default_window):
         self.default_window = default_window
         self.window = default_window
+        self.tags = None
 
     def set_window(self, window):
         if window != self.default_window:
