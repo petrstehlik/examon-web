@@ -1,0 +1,12 @@
+img {
+    width: 100%;
+    height: 100%;
+}
+
+ngb-alert {
+    position: absolute;
+    bottom: 25px;
+    left: 15px;
+    width: calc(100% - 30px);
+    z-index: 9999;
+}
