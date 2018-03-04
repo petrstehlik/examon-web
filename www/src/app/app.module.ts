@@ -1,83 +1,94 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { HttpModule, Http, Request, XHRBackend, RequestOptions} from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule, Routes, Router } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { ChartsModule } from 'ng2-charts/ng2-charts';
-
-import { appRoutes } from './app.routes';
-
 import { AppComponent } from './app.component';
-import { JobsLookupComponent } from './components/jobs-lookup/jobs-lookup.component';
-import { NavbarComponent } from './components/navbar/navbar.component';
-import { GraphComponent } from './components/graph/graph.component';
+import { HomeComponent } from './components/';
+import { LoginComponent } from './components/';
+import { LogoutComponent } from './components/';
+import { SetupComponent } from './components/';
+import { NullComponent } from './components/';
 
-import { JobService } from 'app/services/job.service';
-import { AuthService } from 'app/services/auth.service';
-
-import { MessageService } from 'app/services';
-
-import { MapToIterable, ObjectSize } from 'app/utils/keyIterable';
+import { AuthGuard } from './utils/auth.guard';
+import { ApiInterceptor } from './utils/http.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { SessionInterceptor } from 'app/utils/http.interceptor';
+import { SafePipe, SafePipeModule } from './utils/safe.pipe';
 
-import {
+import { AppConfigService } from 'app/services/app-config.service';
+
+import { modules } from './modules';
+
+/**
+  * Basic routes of the application
+  */
+const appRoutes: Routes = [
+    {
+        path : 'login',
+        component : LoginComponent
+    },
+    {
+        path : 'logout',
+        component : LogoutComponent,
+        canActivate : [AuthGuard]
+    },
+    {
+        path : 'setup',
+        component : SetupComponent
+    },
+    {
+        path: '',
+        component: HomeComponent,
+        canActivate : [AuthGuard]
+    },
+    {
+        path: '**',
+        component: NullComponent
+    }
+];
+
+export function httpFactory(router: Router,
+                            appconfig: AppConfigService): ApiInterceptor {
+    return new ApiInterceptor(router);
+}
+
+/**
+  * Initialization class for the whole application
+  */
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    LoginComponent,
+    LogoutComponent,
+    SetupComponent,
     NullComponent,
-    JobDashboardComponent,
-    JobInfoComponent,
-    JobPerfComponent,
-    JobEnergyComponent,
-    PublicDashboardComponent,
-    PublicOverviewComponent,
-    GeneralPublicViewComponent,
-    SysadminDashboardComponent,
-    SysadminOverviewComponent,
-    RangepickerComponent,
-    RenderComponent,
-    SetupComponent } from 'app/components';
-
-    @NgModule({
-        declarations: [
-            AppComponent,
-            NullComponent,
-            JobInfoComponent,
-            JobsLookupComponent,
-            NavbarComponent,
-            GraphComponent,
-            GeneralPublicViewComponent,
-            JobDashboardComponent,
-            JobPerfComponent,
-            JobEnergyComponent,
-            SysadminDashboardComponent,
-            PublicDashboardComponent,
-            PublicOverviewComponent,
-            SysadminOverviewComponent,
-            RangepickerComponent,
-            RenderComponent,
-            MapToIterable,
-            ObjectSize,
-            SetupComponent
-        ],
-        imports: [
-            BrowserModule,
-            FormsModule,
-            HttpClientModule,
-            ChartsModule,
-            NgbModule.forRoot(),
-            RouterModule.forRoot(appRoutes)
-        ],
-        providers: [
-            JobService,
-            MessageService,
-            {
-                provide: HTTP_INTERCEPTORS,
-                useClass: SessionInterceptor,
-                multi: true
-            }
-        ],
-        bootstrap: [AppComponent]
-    })
-    export class AppModule { }
+  ],
+  imports: [
+      modules,
+      SafePipeModule,
+      BrowserModule,
+      FormsModule,
+      HttpClientModule,
+      HttpModule,
+      NgbModule.forRoot(),
+      RouterModule.forRoot(appRoutes)
+  ],
+  providers: [
+    AuthGuard,
+    SafePipe,
+    AppConfigService,
+    {
+        provide : HTTP_INTERCEPTORS,
+        useFactory: (httpFactory),
+        deps: [Router, AppConfigService],
+        multi: true,
+    }
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }

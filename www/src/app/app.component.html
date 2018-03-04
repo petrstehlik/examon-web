@@ -2,7 +2,70 @@
     {{ message }}
 </ngb-alert>
 
-<section class="container-fluid">
-    <router-outlet></router-outlet>
-</section>
+<section class="main container-fluid">
+    <div class="row">
+	    <div class="sidebar col" *ngIf="!isLoginPage" [ngClass]="{'hidden' : !isOpen}" >
+            <div class="row">
+                <div class="col-2">
+                    <img *ngIf="logo?.src" [src]="logo?.src" [alt]="logo?.alt" class="logo">
+                </div>
+                <div class="menu col">
+                    <ul class="row">
+                        <!-- Home button -->
+                        <li>
+                            <div
+                                class="col"
+                                routerLink="/"
+                                routerLinkActive="active-link"
+                                [routerLinkActiveOptions]="{exact:true}">
+                                <i class="fa fa-home" aria-hidden="true"></i>
+                                <span class="flex-item">Home</span>
+                            </div>
+                        </li>
+
+                        <!-- All modules buttons -->
+                        <li *ngFor="let module of modules">
+                            <div
+                                *ngIf="enabledModules[module.path]?.enabled && user['role'] <= module['role']"
+                                class="col"
+                                routerLink="{{module.path}}"
+                                routerLinkActive="active-link">
+                                    <i class="fa" aria-hidden="true" *ngIf="module.icon != ''" [ngClass]="module.icon"></i>
+                                    <span class="flex-item">{{ module.name }}</span>
+                            </div>
+                        </li>
+
+                        <li class="col"></li>
+
+                        <!-- Logout button -->
+                        <li>
+                            <div
+                                class="flex-container"
+                                routerLink="/logout">
+                                <small>
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                    <span class="flex-item">Logout</span>
+                                </small>
+                            </div>
+                        </li>
+                    </ul>
+        </div> <!-- /menu -->
+            </div>
+
+
+
+      <!--div class="arrow" (click)="toggleSidebar()">
+          <i class="fa fa-angle-double-{{ isOpen ? 'left' : 'right' }}" aria-hidden="true"></i>
+      </div-->
+    </div> <!-- /sidebar -->
+    </div>
+
+    <div class="row">
+
+	<div class="content" [ngClass]="{'no-sidebar' : isLoginPage, 'hidden-sidebar' : !isOpen}">
+		<router-outlet></router-outlet>
+	</div>
+    </div>
+
+</section> <!-- container-fluid -->
 
