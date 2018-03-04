@@ -107,11 +107,15 @@ class Job:
             project = data['project_name']
         else:
             # SLURM data
-            cpus = data['min_cpus']
-            nodes = data['min_nodes']
+            cpus = data['cpu_cnt']
+            nodes = len(Job.split_list(data['node_list']))
             time = data['time_limit']
             memory = data['pn_min_memory']
             project = data['part']
+            try:
+                gpus = Job.split_list(data.get('gres_req'), delim=':')[1]
+            except IndexError:
+                gpus = -1
 
         return Job(job_id=data.get('job_id'),
                    user_id=data['user_id'],
@@ -130,6 +134,7 @@ class Job:
                    variables=data.get('var_list', []),
                    memory=memory,
                    project=project,
+                   gpus=gpus,
                    )
 
     def parse_node_list(self):
