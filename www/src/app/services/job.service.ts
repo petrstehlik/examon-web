@@ -25,7 +25,7 @@ export class JobService {
 
     fetch(jobid: string) {
         return new Observable(
-            observer => this.http.get('/api/jobs/' + jobid).subscribe(
+            observer => this.http.get('/jobs/' + jobid).subscribe(
                 data => {
                     console.log(data);
                     this.job.load(data);

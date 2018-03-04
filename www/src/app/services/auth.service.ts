@@ -1,57 +1,35 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Response, RequestOptions } from '@angular/http';
+import { HttpClient} from "@angular/common/http";
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/map';
+import { Subject} from "rxjs/Subject";
 
 @Injectable()
 export class AuthService {
+    subject = new Subject();
 
     constructor(private http: HttpClient) { }
 
     login(username: string, password: string) {
-        return this.http.post('/authorization',
-            JSON.stringify({ username: username, password: password })
-            )
-            .map((response: Response) => {
-                // login successful
-                const resp = response.json();
-
-                if (resp && resp['error']) {
-                    console.error(resp['error']);
-                    return;
-                }
-
-                if (resp) {
-                    // store user details and token in local storage to keep user logged in between page refreshes
-                    localStorage.setItem('session', resp['session_id']);
-                    localStorage.setItem('user', JSON.stringify(resp['user']));
-                }
-            })
-            .catch(this.handleError);
+        console.log("logging in")
+        return this.http.post('/authorization',{ username: username, password: password });
     }
 
     logout() {
         // remove user from local storage to log user out
         const user = JSON.parse(localStorage.getItem('user'));
         console.log(user);
-        return this.http.delete('/authorization')
-            .map((response: Response) => {});
+        return this.http.delete('/authorization');
 
     }
 
-    checkSession() {
-        return this.http.get('/authorization').map(
-            (response: Response) => {})
-            .catch(this.handleError);
+    public checkSession() {
+        console.log(localStorage.getItem('session'));
+        return this.http.get('/authorization');
     }
 
     admin(user: Object) {
-        return this.http.post('/setup'
-            , JSON.stringify(user))
-            .map(
-            (resp: Response) => {})
-            .catch(this.handleError);
+        return this.http.post('/setup', JSON.stringify(user));
     }
 
     private handleError(err: Response | any) {
