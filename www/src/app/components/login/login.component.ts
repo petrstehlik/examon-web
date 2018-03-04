@@ -1,0 +1,115 @@
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { AuthService } from 'app/services';
+import { AppConfigService } from 'app/services/app-config.service';
+
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
+  providers : [AuthService]
+})
+export class LoginComponent implements OnInit {
+
+    loading = false;
+    loginBtn = 'Login';
+    user = {
+        id : '',
+        username : '',
+        password : '',
+        email : ''
+    };
+    formError = false;
+    formErrorMsg = '';
+    returnUrl: String;
+    logo;
+
+    constructor(
+        private route: ActivatedRoute,
+        private router: Router,
+        private authService: AuthService,
+        private appConfig : AppConfigService) {}
+
+    ngOnInit() {
+        this.appConfig.get().subscribe(data => {
+            this.logo = {
+                src : data['logo'],
+                alt : data['name']
+            }
+        });
+        // fetch the return URL and use it if set
+        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+
+        // check if the user is logged in and if so redirect them to HP
+        const session = localStorage.getItem('session');
+
+        this.authService.checkSession().subscribe(
+            data => { this.router.navigate([this.returnUrl]) },
+            error => { console.error('Invalid session') }
+        )
+    }
+
+    setError(msg: string) {
+        this.formError = true;
+        this.formErrorMsg = msg;
+        this.loading = false;
+        this.loginBtn = 'Login';
+    }
+
+    unsetError() {
+        this.formError = false;
+        this.formErrorMsg = '';
+        this.loading = false;
+        this.loginBtn = 'Login';
+    }
+
+    login() {
+        // Authenticate the user and redirect them
+        this.loading = true;
+        this.loginBtn = 'Loading...';
+
+        console.log("login")
+
+        if (this.user.username === '' || this.user.password === '') {
+            this.setError('Missing username or password');
+            return;
+        }
+
+        this.authService.login(this.user.username, this.user.password)
+            .subscribe(
+                data => {
+                    const resp = data;
+
+                    console.log(resp);
+
+                    if (resp && resp['error']) {
+                        console.error(resp['error']);
+                        return;
+                    }
+
+                    if (resp) {
+                        // Store user details and token in local storage
+                        localStorage.setItem('session', resp['session_id']);
+                        localStorage.setItem('user', JSON.stringify(resp['user']));
+                    }
+
+                    this.unsetError();
+                    this.router.navigate([this.returnUrl]);
+                },
+                error => {
+                    console.log(error)
+                    if (error.status > 499) {
+                        this.setError('Can\'t connect to server.');
+                        return;
+                    }
+                    try {
+                        const body = JSON.parse(error['_body']);
+                        this.setError(body['message']);
+                    } catch (err) {
+                        this.setError('Error logging in.');
+                    }
+                }
+            );
+    }
+}

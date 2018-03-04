@@ -1,0 +1,16 @@
+.home {
+	.card {
+		position: relative;
+		padding-bottom: 1.5em;
+		height: 100%;
+
+		&:hover {
+			background-color: darken(#FFF, 1%);
+		}
+
+		.goto {
+	        position: absolute;
+            bottom: 10px;
+		}
+	}
+}
