@@ -38,5 +38,5 @@ export const environment = {
     /**
      * Used only when fetching config.json failed
      */
-    apiUrl : '',
+    apiUrl : 'api',
 };
