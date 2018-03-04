@@ -7,9 +7,12 @@ Author:
     Petr Stehlik <xstehl14@stud.fit.vutbr.cz> @ 2017/07
 """
 
+from __future__ import print_function
 import paho.mqtt.client as mqtt
 import logging, json, copy
 import time
+
+from muapi import config
 
 class JobManager():
 
@@ -24,10 +27,7 @@ class JobManager():
 
     finished = dict()
 
-    def __init__(self,
-            mqtt_broker,
-            mqtt_port,
-            mqtt_topics):
+    def __init__(self, mqtt_broker, mqtt_port, mqtt_topics):
         """
         drop_job_arrays The PBS hook sends job arrays where job ID is in format xxxxxxx[xxxx].io01
         """
@@ -44,13 +44,15 @@ class JobManager():
 
         # Register methods for connection and message receiving
         self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
+        self.client.on_message = self.process
 
         self.on_receive = self.default_on_receive
 
         self.on_end = self.default_on_end
         self.on_fail = self.default_on_fail
 
+        self.system_nnodes = config['SINFO'].getint('system_nnodes')
+        self.system_cores_per_node = config['SINFO'].getint('system_cores_per_node')
         self.client.connect(mqtt_broker, self.port, 60)
 
         self.client.loop_start()
@@ -102,9 +104,11 @@ class JobManager():
 
         # Process end event of job exec
         elif topic[-1] == "jobs_exc_end":
-            if jobid in self.db and \
-                "exc_begin" in self.db[jobid] and \
-                len(self.db[jobid]["exc_begin"]) == len(payload["vnode_list"]):
+            if (
+                    jobid in self.db and
+                    "exc_begin" in self.db[jobid] and
+                    len(self.db[jobid]["exc_begin"]) == len(payload["vnode_list"])
+            ):
                 self.process_exc_end(jobid, payload)
             else:
                 self.log.warn("Job '%s' - missing exc_begin or runjob event" % jobid)
@@ -277,4 +281,145 @@ class JobManager():
     def default_on_fail(self, jobid):
         pass
 
+    def process(self, client, user_data, msg):
+        """Process MQTT message from SLURM-based system."""
 
+        job_info = msg.payload.split(';')
+
+        # as alternative solution: count with normal indexes up to the var list
+        # (0-16); then, the remaining fields are computed as
+        # len(job_info) - 1 - alternative_index
+
+        data = dict(
+            job_id=int(job_info[0].strip()),
+            part=job_info[1].strip(),
+            user_id=int(job_info[2].strip()) or "None",
+            job_name=job_info[3].strip(),
+            account_name=job_info[4].strip(),
+            nodes=job_info[5].strip(),
+            exc_nodes=job_info[6].strip(),
+            sched_nodes=job_info[7].strip(),
+            req_nodes=job_info[8].strip(),
+            node_count=int(job_info[11].strip()),
+            time_limit=int(job_info[12].strip()),
+            gres_req=job_info[13].strip(),
+            cpu_cnt=int(job_info[14].strip()),
+            exit_code=int(job_info[15].strip()),
+            elapsed_time=float(job_info[16].strip()),
+            wait_time=float(job_info[17].strip()),
+            num_task=int(job_info[18].strip()),
+            num_task_perNode=int(job_info[19].strip()),
+            cpus_perTask=int(job_info[20].strip()),
+            contiguous=int(job_info[21].strip()),
+            licence=job_info[22].strip(),
+            dependency=job_info[23].strip(),
+            features=job_info[24].strip(),
+            overcommit=int(job_info[25].strip()),
+            pn_min_memory=int(job_info[26].strip()),
+            pn_min_tmp_disk=int(job_info[27].strip()),
+            share_res=int(job_info[28].strip()),
+            task_dist=int(job_info[29].strip()),
+            max_nodes=int(job_info[30].strip()),
+            min_nodes=int(job_info[31].strip()),
+            max_cpus=int(job_info[32].strip()),
+            min_cpus=int(job_info[33].strip()),
+            begin_time=job_info[34].strip(),
+            submit_time=job_info[35].strip(),
+            start_time=job_info[36].strip(),
+            end_time=job_info[37].strip(),
+        )
+
+        if(job_info[9].strip() == "None" or
+                job_info[9].strip() == "(null)"):
+            logging.warning("Problem with node bitmap")
+            # if there was a problem with node_bitmap we can try to
+            # retrieve used nodes from other fields (but it's actually
+            # not needed since all other script just use 'nodes' field
+            node_bitmap = "None"
+            node_list = "-1"
+        else:
+            node_bitmap = job_info[9].strip()
+            node_list = ""
+            node_bitmap_split = node_bitmap.split(',')
+            if len(node_bitmap_split) <= 1:
+                node_first = int(node_bitmap.split('-')[0])
+                if len(node_bitmap.split('-')) > 1:
+                    node_last = int(node_bitmap.split('-')[1])
+                else:
+                    node_last = node_first
+                for i in range(node_first, node_last+1):
+                    node_list += str(node_first + i) + ','
+            else:
+                for nb in node_bitmap_split:
+                    node_first = int(nb.split('-')[0])
+                    if len(nb.split('-')) > 1:
+                        node_last = int(nb.split('-')[1])
+                    else:
+                        node_last = node_first
+                    for i in range(node_first, node_last+1):
+                        node_list += str(node_first + i) + ','
+            data['node_list'] = node_list[:-1]
+            data['node_bitmap'] = node_bitmap
+
+        if(job_info[10].strip() == "None" or
+                job_info[10].strip() == "(null)"):
+            print("Problem with core bitmap")
+            logging.warning("Problem with core bitmap")
+            # if there was a problem with core_bitmap we cannot retrieve
+            # used cores in another way
+            core_bitmap = "None"
+            core_list = "-1"
+        else:
+            core_bitmap = job_info[10].strip()
+            core_list = ""
+            core_bitmap_split = core_bitmap.split(',')
+            if len(core_bitmap_split) <= 1:
+                core_first = int(core_bitmap.split('-')[0])
+                if len(core_bitmap.split('-')) > 1:
+                    core_last = int(core_bitmap.split('-')[1])
+                else:
+                    core_last = core_first
+                cores_on_node = {}
+                for i in range(core_first, core_last+1):
+                    index = (core_first + i) // self.system_nnodes
+                    if index in cores_on_node:
+                        cores_on_node[index].append(
+                                        (core_first + i) %
+                                        self.system_cores_per_node)
+                    else:
+                        cores_on_node[index] = [
+                                        (core_first + i) %
+                                        self.system_cores_per_node]
+                for key, vals in cores_on_node.iteritems():
+                    core_list += str(vals)[1:-1] + '# '
+            else:
+                for cb in core_bitmap_split:
+                    core_first = int(cb.split('-')[0])
+                    if len(cb.split('-')) > 1:
+                        core_last = int(cb.split('-')[1])
+                    else:
+                        core_last = core_first
+                    cores_on_node = {}
+                    for i in range(core_first, core_last+1):
+                        index = (core_first + i) // self.system_nnodes
+                        if index in cores_on_node:
+                            cores_on_node[index].append(
+                                            (core_first + i) %
+                                            self.system_cores_per_node)
+                        else:
+                            cores_on_node[index] = [
+                                            (core_first + i) %
+                                            self.system_cores_per_node]
+                    for key, vals in cores_on_node.iteritems():
+                        core_list += str(vals)[1:-1] + '# '
+        data['core_list'] = core_list
+        data['node_bitmap'] = node_bitmap
+        data['core_bitmap'] = core_bitmap
+        data['node_list'] = node_list
+
+        for key in data.keys():
+            # Clear null values
+            if data[key] == '(null)':
+                data[key] = None
+
+        self.db[data['job_id']] = data
