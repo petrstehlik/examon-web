@@ -9,80 +9,62 @@
   */
 
 import { Injectable } from '@angular/core';
-import { Request,
-    RequestOptions,
-    RequestOptionsArgs,
-    RequestMethod,
-    URLSearchParams,
-    Response,
-    Http,
-    Headers } from '@angular/http';
-import {HttpEvent, HttpInterceptor, HttpHandler, HttpRequest} from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
+import { Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
 import { environment } from 'environments/environment';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
 
 @Injectable()
-export class SessionInterceptor implements HttpInterceptor {
+export class ApiInterceptor implements HttpInterceptor {
     private currentUser: Object;
-    private configPath: string = environment.configPath;
     private prefixUrl: string;
     private api: Object = {};
-    private promise;
 
-    constructor(private router: Router) {
-        this.fetchConfig().then((data : string) => {
-            console.info("Initializing application");
+    constructor(private router : Router) {}
 
-            let conf;
+    /**
+      * For each request add:
+      *     - Authorization header if session is present
+      *     - API URL prefix
+      */
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-            try {
-                conf = JSON.parse(data);
-                this.api = conf['api'];
-            } catch (e) {
-                console.log("Error");
-                console.log(e);
-                let el = document.getElementById("error");
-                el.innerText = "Failed to parse configuration file for front-end";
-                return;
-            }
-        });
-    }
-
-    intercept(request : HttpRequest<any>, next : HttpHandler) : Observable<HttpEvent<any>> {
         // Prefix the URL with environment prefix if set
-        let req = request.clone({
-            url : this.buildUrl(request.url)
-        });
+        const apiReq = req.clone({
+            url: this.buildUrl(req.url),
+            setHeaders: {
+                'Authorization': localStorage.getItem('session') || '',
+            }
+        })
 
-        const session = localStorage.getItem('session');
-
-        // Set Authorization header
-        if (session !== null) {
-            req.headers.set('Authorization', session);
-        }
+        console.log(apiReq)
 
         // Set specific content type if "specific-content-type" header is set
-        if (req.headers.has('specific-content-type')) {
-            req.headers.delete('specific-content-type')
+        if (apiReq.headers.has('specific-content-type')) {
+            apiReq.headers.delete('specific-content-type')
         } else {
-            req.headers.set('Content-Type', 'application/json')
+            apiReq.headers.set('Content-Type', 'application/json')
         }
 
-        return next.handle(req).catch((error : any, _) => {
-            if (error.status === 401) {
+        // Call the original Http
+        return next.handle(apiReq).catch(this.catchErrors());
+    }
+
+    private catchErrors() {
+        return (res: Response) => {
+            if (res.status === 401) {
+                console.warn('Unauthorized access, remove session and user and redirect to /login');
                 localStorage.removeItem('user');
                 localStorage.removeItem('session');
                 this.router.navigate(['/login']);
-            } else if (error.status === 442) {
+            } else if (res.status === 442) {
                 // SETUP is required
                 // Maybe you ask why 442. Well, 42 is answer to everything, right?
                 this.router.navigate(['/setup']);
             }
-            return Observable.throw(error);
-        });
+            return Observable.throw(res);
+        };
     }
 
     /**
@@ -98,24 +80,4 @@ export class SessionInterceptor implements HttpInterceptor {
         return urlString + url;
     }
 
-    /**
-      * Retrieve config.json from a path specified in environment
-      *
-      * This cannot use the Angular HTTP module, therefore uses good old XMLHttpRequest
-      */
-    private fetchConfig() {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', environment.configPath);
-            xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve(xhr.response);
-                } else {
-                    reject(xhr.statusText);
-                }
-            };
-            xhr.onerror = () => reject(xhr.statusText);
-            xhr.send();
-        });
-    }
 }
