@@ -1,0 +1,174 @@
+$fa-font-path: "../../node_modules/font-awesome/fonts";
+@import "../../node_modules/font-awesome/scss/font-awesome.scss";
+
+@import "variables";
+@import "typography";
+//@import "mixins";
+//@import "login";
+//@import "forms";
+
+html, body {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+
+	font-size: $font-size;
+	font-family: $font-family;
+	background-color: darken(#FFF, 2%);
+}
+
+.preloader {
+	text-align: center;
+	color: #369;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 250%;
+	margin-top: 25%;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.username {
+	font-size: 0.85em;
+}
+
+section.box {
+	background: $white;
+	padding: 1em;
+	margin: 0.5em;
+	border: 1px solid darken($white, 5%);
+}
+
+section.main {
+	height: 100%;
+	width: 100%;
+
+	.content {
+		padding: 0.5em 1em;
+		float: left;
+	    width: 100%;
+	    height: 100%;
+		background-color: darken(#FFF, 2%);
+
+		&.no-sidebar {
+			margin: 0;
+			width: 100%;
+			padding: 0;
+		}
+		&.hidden-sidebar {
+		    margin: 0;
+		    width: 100%;
+		}
+	}
+
+	.sidebar {
+		box-shadow: none;
+		background: $dark-menu;
+		color: $light-gray;
+		overflow: visible;
+		display: block;
+
+        img.logo {
+            width: auto;
+            height: auto;
+            max-height: 40px;
+            display: block;
+            padding: 0.5em 0;
+        }
+
+		.menu {
+			ul {
+				list-style-type: none;
+				padding: 0!important;
+                margin: 0;
+
+				li div {
+					padding: 1em;
+					text-align: left;
+					cursor: pointer;
+                    margin-top: 3px;
+
+					&:hover {
+						background: $dark-menu-active;
+					}
+
+					i.fa {
+						font-size: 1.25em;
+						padding-right: 5px;
+					}
+				}
+
+				.active-link {
+					border-top: 3px solid $blue;
+					background: $dark-menu-active;
+                    margin-top: 0px;
+				}
+			}
+		}
+
+		.user-area {
+			a.user {
+				color: $light-gray;
+				border-color: $light-gray;
+				cursor: pointer;
+				text-align: center;
+			}
+
+            img {
+                height: 100%;
+                width: 100px;
+            }
+		}
+
+		.arrow {
+		    position: absolute;
+            right: -14px;
+            z-index: 9999;
+            color: $light-gray;
+            background: $dark-menu;
+            top: calc(50% - 16px);
+            padding: 5px 3px 7px 4px;
+            cursor: pointer;
+		}
+	}
+}
+
+[md-menu-item]{
+	font-size: $font-size!important;
+}
+
+nemea-events .modal-dialog {
+	//max-width: 65%!important;
+}
+
+.idea-event {
+	em {
+        font-weight: bold;
+        font-style: normal;
+    }
+    .sub {
+        padding-left: 1em;
+    }
+
+    span {
+        font-family: 'Consolas', 'Courier', monospace;
+        font-size: 1.2em;
+    }
+}
+
+.row-space {
+	margin: 1em;
+}
+
+
+.CodeMirror {
+  border: 1px solid #eee;
+  height: calc(90vh - 2em)!important;
+}
+
+.grid-placeholder {
+	border: 2px dashed $gray!important;
+	background: rgba(0,0,0,0.05)!important;
+}
