@@ -1,0 +1,26 @@
+<div class="alert alert-danger" *ngIf="error.status">
+    {{ error.message }}
+</div>
+
+<ngb-tabset type="pills" class="mb-3">
+    <ngb-tab>
+        <ng-template ngbTabTitle>Job Info</ng-template>
+        <ng-template ngbTabContent>
+            <ex-job-info [job]="job"></ex-job-info>
+        </ng-template>
+    </ngb-tab>
+
+    <ngb-tab>
+        <ng-template ngbTabTitle>Performance</ng-template>
+        <ng-template ngbTabContent>
+            <ex-job-perf [job]="job"></ex-job-perf>
+        </ng-template>
+    </ngb-tab>
+
+    <ngb-tab>
+        <ng-template ngbTabTitle>Energy</ng-template>
+        <ng-template ngbTabContent>
+            <ex-job-energy [job]="job"></ex-job-energy>
+        </ng-template>
+    </ngb-tab>
+</ngb-tabset>

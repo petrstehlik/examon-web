@@ -1,0 +1,10 @@
+<div class="chart-wrapper">
+    <h4>{{ topTitle }}</h4>
+    <img class="spinner" *ngIf="loading" src="assets/spinner.gif" alt="Loading data">
+    <div #chart class="chart" [style.height.px]="height">
+        Loading data
+    </div>
+
+    <!-- Labels div holder, this element MUST be the last in DOM tree -->
+    <div #chartLabels class="labels" id="label"></div>
+</div>

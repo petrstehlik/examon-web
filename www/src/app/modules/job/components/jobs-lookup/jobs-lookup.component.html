@@ -1,0 +1,52 @@
+<div class="container-fluid" style="height: 100vh">
+    <div class="row justify-content-md-center align-items-center" style="height: 100vh">
+        <div class="wrapper">
+            <h2 class="text-center mb-4">
+                <img src="assets/examon_logo.png" alt="Examon" height="70"/>
+            </h2>
+            <form novalidate style="min-width: 350px;">
+                <div class="input-group">
+                    <input type="text"
+                        [(ngModel)]="jobid"
+                        name="jobid"
+                        class="form-control"
+                        placeholder="Enter a job ID obtained by PBS">
+                    <span class="input-group-btn">
+                        <button type="button"
+                            class="btn btn-primary"
+                            (click)="lookup()">
+                            Search
+                        </button>
+                    </span>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a class="btn btn-secondary text-center"
+                        [routerLink]="['public']">
+                        Public Dashboard
+                    </a>
+                </div>
+            </form>
+
+            <br />
+
+            <div style="max-width: 600px">
+                <h4>Active jobs</h4>
+                <span *ngFor="let job of active_jobs_id "
+                    class="btn btn-secondary btn-sm mr-2 mb-2">
+                    <a [routerLink]="[job]" >{{ job }}</a>
+                </span>
+
+                <span *ngIf="active_jobs_id.length == 0">
+                    <small>No active jobs :(</small>
+                </span>
+            </div>
+
+            <small *ngIf="lastjob">
+                Last job finished: <a [routerLink]="[lastjob?.job_id]" >{{  lastjob?.job_id }}</a>
+            </small>
+
+        </div>
+    </div>
+</div>
+

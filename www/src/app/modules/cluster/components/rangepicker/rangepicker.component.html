@@ -1,0 +1,82 @@
+<div ngbDropdown #dropdown="ngbDropdown" class="d-inline-block rangepicker" [autoClose]="false">
+    <button class="btn btn-outline-primary" ngbDropdownToggle>
+        Pick range <small>({{ query?.from  | date : 'HH:mm dd/MM' }} – {{ query?.to | date : 'HH:mm dd/MM' }})</small>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <div class="range-container row" (click)="null">
+            <div class="col precise">
+                <div class="from">
+                <h5>From:</h5>
+                <ngb-timepicker [(ngModel)]="from_time"
+                    (ngModelChange)="selectDate($event, 'from')"
+                    name="timeFrom"
+                    class="timepicker"
+                    [spinners]="false">
+                </ngb-timepicker>
+
+                <div class="input-group datepicker">
+                    <input class="form-control"
+                        name="dp"
+                        ngbDatepicker
+                        [(ngModel)]="from_date"
+                        (ngModelChange)="selectDate($event, 'from')"
+                        #d="ngbDatepicker">
+                    <div class="input-group-addon" (click)="d.toggle()">
+                        <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                    </div>
+                </div>
+                </div>
+
+                <div class="to">
+                    <h5>To:</h5>
+                    <ngb-timepicker [(ngModel)]="to_time"
+                        (ngModelChange)="selectDate($event, 'to')"
+                        name="timeTo"
+                        class="timepicker"
+                        [spinners]="false">
+                    </ngb-timepicker>
+
+                    <div class="input-group datepicker">
+                        <input class="form-control"
+                            name="dp"
+                            ngbDatepicker
+                            [(ngModel)]="to_date"
+                            (ngModelChange)="selectDate($event, 'to')"
+                            #dto="ngbDatepicker">
+                        <div class="input-group-addon" (click)="dto.toggle()">
+                            <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <button class="btn btn-primary"
+                            type="button" (click)="apply()">
+                            Apply
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col quick-ranges">
+                <h5>Quick Ranges</h5>
+                <div class="row">
+                    <div class="col">
+                        <div *ngFor="let int of intervals_minutes"
+                            (click)="selectInterval(int)"
+                            class="interval">
+                            {{ int }} minute<span *ngIf="int > 1">s</span>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div *ngFor="let int of intervals_hours"
+                            (click)="selectInterval(int * 60)"
+                            class="interval">
+                            {{ int }} hour<span *ngIf="int > 1">s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

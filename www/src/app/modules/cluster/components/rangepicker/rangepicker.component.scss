@@ -1,0 +1,58 @@
+@import "node_modules/bootstrap/scss/variables";
+
+.rangepicker {
+    float: right;
+    position: absolute;
+    right: 15px;
+    top: 80px;
+
+    .range-container {
+        padding: 0.5rem calc(0.5rem + 15px);
+        min-width: 300px; //750
+
+        .precise {
+            display: none;
+        }
+
+        .quick-ranges {
+            //border-left: 1px solid darken(#FFF, 10%);
+
+            .interval {
+                color: $link-color;
+                text-decoration: $link-decoration;
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: $link-hover-decoration;
+                    color: $link-hover-color;
+                }
+            }
+        }
+    }
+}
+
+/deep/ {
+    .ngb-tp {
+        input {
+            font-size: 0.9rem;
+            padding: 0.6rem 0.5rem;
+        }
+
+        .ngb-tp-spacer {
+            width: 0.5rem!important;
+        }
+    }
+
+    .timepicker {
+        float: left;
+    }
+
+    .datepicker {
+        width: 65%;
+        float: left;
+    }
+
+    .to {
+        clear: both;
+    }
+}
