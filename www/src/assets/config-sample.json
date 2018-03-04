@@ -4,5 +4,24 @@
 		"host" : null,
 		"port" : null,
 		"proto" : null
-	}
+	},
+    "logo" : "assets/examon_logo.png",
+    "name" : "Examon Web",
+    "modules": {
+        "users": {
+            "enabled": true
+        },
+        "examon": {
+            "enabled": true
+        },
+        "jobs": {
+            "enabled": true
+        },
+        "system": {
+            "enabled": true
+        },
+        "cluster": {
+            "enabled": true
+        }
+    }
 }
