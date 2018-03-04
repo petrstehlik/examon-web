@@ -5,11 +5,16 @@ from modules.models.Job import Job
 
 from flask import request
 from muapi.Module import Module
+from muapi import auth
+from muapi import config
+from muapi import db
+from muapi.role import Role
 from .JobManager import JobManager
 
 from .cassandra_connector import connect, prepare_statements
 import json
 import datetime, time, calendar
+from datetime import timedelta
 import logging
 
 
@@ -36,7 +41,7 @@ jobs = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
 
 
 @jobs.route('/<string:jobid>', methods=['GET'])
-def jobs_hello(jobid):
+def get_job(jobid):
     log.info("Query for job ID", jobid)
 
     if jobid in jobman.db:
@@ -46,6 +51,8 @@ def jobs_hello(jobid):
     info = session.execute(prepared["sel_by_job_id"], (int(jobid),))
     if len(info.current_rows) == 0:
         return '', 404
+
+    print(info[0])
 
     job = Job.from_dict(info[0])
 
@@ -57,28 +64,41 @@ def jobs_hello(jobid):
 
     return job.json()
 
+
 @jobs.route('/latest')
+@auth.required()
 def jobs_latest():
+    """Fetch all jobs that finished in last 30 minutes, sort them by start_time and return the last one.
+
+    If no jobs were found, try looking further in steps of 12 hours until found.
     """
-        Fetch all jobs that finished in last 30 minutes,
-        sort them by start_time and return the last one.
-    """
+
+    def query(start_time, user_id=None):
+        """Query the jobs in given time span."""
+        if user_id:
+            statement = "SELECT * FROM {} WHERE user_id = {} AND start_time >= {} ALLOW FILTERING"\
+                .format(config['tables']['jobs'], user_id, start_time)
+        else:
+            statement = "SELECT * FROM {} WHERE start_time >= {} ALLOW FILTERING".format(config['tables']['jobs'], start_time)
+        return session.execute(statement)
+
+    # TODO: this will be useful when the LDAP will be connected
+    user_session = auth.lookup(request.headers.get('Authorization', None))
+    user = db.get('users', 'username', user_session['user'].username)
+
+    user_id = user['id'] if user['role'] > Role.admin else None
 
     # Get last job ID
-    last_job = session.execute("select max(job_id) as job_id from davide_jobs_simplekey")
-    qres = session.execute("SELECT * FROM davide_jobs_simplekey \
-            WHERE job_id = {}".format(last_job[0]['job_id']))
+    tstamp = (int(time.time()) - 1800) * 1000
+    qres = query(tstamp, user_id=user_id)
 
-    if len(qres.current_rows) == 0:
-        # No jobs finished in last 30 minutes, try 12 hours
-        tstamp = (int(time.time()) - 43200) * 1000
-        qres = session.execute("SELECT * FROM davide_jobs_simplekey \
-            WHERE  start_time >= " \
-            + str(tstamp) + " ALLOW FILTERING")
+    while len(qres.current_rows) == 0:
+        tstamp = tstamp - 43200000
+        qres = query(tstamp, user_id=user_id)
 
     results = [item for item in qres]
 
-    ordered = sorted(results, key = lambda k : k['end_time'])
+    ordered = sorted(results, key=lambda k : k['end_time'])
     return json.dumps(ordered[-1], default=time_serializer)
 
 
@@ -107,7 +127,7 @@ def jobs_total():
         raise JobsError("'from' time cannot precede 'to' time")
 
     qres = session.execute("SELECT job_id, nnodes_req, ncpus_req, ngpus_req, nmics_req, start_time, end_time \
-        FROM davide_jobs_simplekey \
+        FROM davide_jobs_complexkey \
         WHERE token(user_id) > token('') AND \
             start_time >= " + str(args["from"]) + " AND \
             start_time <= " + str(args["to"]) + " ALLOW FILTERING")
