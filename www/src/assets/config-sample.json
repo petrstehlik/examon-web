@@ -23,5 +23,31 @@
         "cluster": {
             "enabled": true
         }
+    },
+    "metrics": {
+        "core_load": {
+            "name": "Core's Load",
+            "metric": "load_core",
+            "level": "core",
+            "factor": 1,
+            "unit": "%",
+            "range": [0, 100]
+        },
+        "node_load": {
+            "name": "Node's Load",
+            "metric": "load_node",
+            "level": "node",
+            "factor": 1,
+            "unit": "%",
+            "range": [0, 100]
+        },
+        "cluster_load": {
+            "name": "Cluster's Load",
+            "metric": "load_cluster",
+            "level": "cluster",
+            "factor": 1,
+            "unit": "%",
+            "range": [0, 100]
+        }
     }
 }
