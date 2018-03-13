@@ -48,16 +48,19 @@ def get_job(jobid):
         # The job is currently running, we can fetch the info we need
         return json.dumps(transform_live_job(jobid, jobman), default=Job.time_serializer)
 
-    info = session.execute(prepared["sel_by_job_id"], (int(jobid),))
+    try:
+        jobid = int(jobid)
+    except ValueError:
+        pass
+
+    info = session.execute(prepared["sel_by_job_id"], (jobid,))
     if len(info.current_rows) == 0:
         return '', 404
-
-    print(info[0])
 
     job = Job.from_dict(info[0])
 
     # Try to fetch measurements from DB
-    measures = session.execute(prepared["measures"], (int(jobid),))
+    measures = session.execute(prepared["measures"], (jobid,))
 
     if len(measures.current_rows) > 0:
         job.add_measures(measures[0])
@@ -96,10 +99,10 @@ def jobs_latest():
         tstamp = tstamp - 43200000
         qres = query(tstamp, user_id=user_id)
 
-    results = [item for item in qres]
+    results = [Job.from_dict(item) for item in qres]
 
-    ordered = sorted(results, key=lambda k : k['end_time'])
-    return json.dumps(ordered[-1], default=time_serializer)
+    ordered = sorted(results, key=lambda k: k.end_time)
+    return json.dumps([job.dict() for job in reversed(ordered[-100:])], default=Job.time_serializer)
 
 
 @jobs.route('/stats/total', methods=['GET'])

@@ -44,19 +44,14 @@ def prepare_statements(session):
     Prepare CQL statements for querying data
     """
     prepared = dict()
+    config = Config()
 
     # Select one row by job ID
     prepared["sel_by_job_id"] = session.prepare(
-            "SELECT * FROM davide_jobs_simplekey WHERE job_id = ? LIMIT 1")
+            "SELECT * FROM {} WHERE job_id = ? LIMIT 1".format(config['tables']['jobs_simple']))
 
     prepared["measures"] = session.prepare(
-        """SELECT
-            power_mean,
-            ambient_temp_mean,
-            gpu_power_mean as gpu_power,
-            util_p0_1_mean AS cpu_util
-        FROM jobs_measures_aggregate
-        WHERE job_id = ?""")
+        """SELECT * FROM jobs_measures_aggregate WHERE job_id = ?""")
 
     #prepared["latest_job"] = session.prepare(
     #    """SELECT *
