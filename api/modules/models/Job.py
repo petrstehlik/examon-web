@@ -98,13 +98,18 @@ class Job:
 
     @classmethod
     def from_dict(cls, data):
+        gpus = -1
         if 'ncpus_req' in data or 'nnodes_req' in data:
             # PBS Pro data
             cpus = data['ncpus_req']
             nodes = data['nnodes_req']
-            time = data['req_time']
-            memory = data['req_mem']
-            project = data['project_name']
+            gpus = data['ngpus_req']
+            time = data.get('req_time')
+            memory = data.get('req_mem')
+            project = data.get('project_name')
+            data['core_list'] = data['used_cores']
+            data['node_list'] = data['used_nodes']
+            data['queue_time'] = data['qtime']
         else:
             # SLURM data
             cpus = data['cpu_cnt']
@@ -115,7 +120,7 @@ class Job:
             try:
                 gpus = Job.split_list(data.get('gres_req'), delim=':')[1]
             except IndexError:
-                gpus = -1
+                pass
 
         return Job(job_id=data.get('job_id'),
                    user_id=data['user_id'],
@@ -135,6 +140,7 @@ class Job:
                    memory=memory,
                    project=project,
                    gpus=gpus,
+                   mics=data.get('nmics_req', -1),
                    )
 
     def parse_node_list(self):
@@ -188,13 +194,13 @@ class Job:
         return sum(data)/float(len(data))
 
     def add_measures(self, data):
-        self.power = self.average(self.split_list(data['power_mean'], delim='#')[:-1])
-        self.gpu_power = self.average(self.split_list(data['gpu_power'], delim='#')[:-1])
-        self.cpu_util = self.average(self.split_list(data['cpu_util'], delim='#')[:-1])
-        self.avg_temp = self.average(self.split_list(data['ambient_temp_mean'], delim='#')[:-1])
+        self.power = self.average(self.split_list(data.get('power_mean'), delim='#')[:-1])
+        self.gpu_power = self.average(self.split_list(data.get('gpu_power_mean'), delim='#')[:-1])
+        self.cpu_util = self.average(self.split_list(data.get('util_p0_0_mean'), delim='#')[:-1])
+        self.avg_temp = self.average(self.split_list(data.get('ambient_temp_mean'), delim='#')[:-1])
 
-    def json(self):
-        return json.dumps({
+    def dict(self):
+        return {
             'job_id': self.job_id,
             'user_id': self.user_id,
             'account_name': self.account_name,
@@ -219,4 +225,7 @@ class Job:
             'cpu_util': self.cpu_util,
             'gpu_power': self.gpu_power,
             'project': self.project,
-        }, default=Job.time_serializer)
+        }
+
+    def json(self):
+        return json.dumps(self.dict(), default=Job.time_serializer)
