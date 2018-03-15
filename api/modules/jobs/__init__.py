@@ -10,6 +10,7 @@ from muapi import config
 from muapi import db
 from muapi.role import Role
 from .JobManager import JobManager
+from modules.remote_pam.ssh import RemotePAM
 
 from .cassandra_connector import connect, prepare_statements
 import json
@@ -38,6 +39,7 @@ except Exception as e:
     log.error("Failed to connect to Cassandra: %s" % str(e))
 
 jobs = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
+pam = RemotePAM()
 
 
 @jobs.route('/<string:jobid>', methods=['GET'])
@@ -89,7 +91,11 @@ def jobs_latest():
     user_session = auth.lookup(request.headers.get('Authorization', None))
     user = db.get('users', 'username', user_session['user'].username)
 
-    user_id = user['id'] if user['role'] > Role.admin else None
+    if user['role'] > Role.admin:
+        user_id = pam.get_uid(user['username'])
+
+    else:
+        user_id = None
 
     # Get last job ID
     tstamp = (int(time.time()) - 1800) * 1000
