@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         // Inspect all available routes and find all modules
         this.appConfig.get().subscribe(data => {
+            console.log(data)
             this.enabledModules = data['modules'];
             for (const route of this.router.config ) {
                 if (route.data && route.data['name']) {

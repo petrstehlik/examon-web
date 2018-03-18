@@ -1,7 +1,7 @@
 <section class="home row">
     <div *ngFor="let module of modules; let i = index"
         class="col-md-12 col-lg col"
-        [ngStyle]="{'display' : enabledModules[module?.path]?.enabled ? 'block' : 'none'}">
+        [ngStyle]="{'display': 'block'}">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
