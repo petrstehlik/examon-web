@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Rx';
 import { environment } from 'environments/environment';
 
@@ -9,7 +9,7 @@ export class ConfigService {
     private config: Object = null;
     private baseUrl = '/configuration';
 
-    constructor(private http: Http) {}
+    constructor(private http: HttpClient) {}
 
     /**
      * Load configuration of modules from the database.
@@ -21,7 +21,7 @@ export class ConfigService {
     public load() {
         return new Promise((resolve, reject) => {
             this.http.get(this.baseUrl)
-                .map( res => res.json() )
+                .map( res => res)
                 .catch((error: any): any => {
                     console.log(`Configuration could not be read`);
                     reject(true);
@@ -37,32 +37,32 @@ export class ConfigService {
 
     public getModule(name: string) {
         return this.http.get(this.baseUrl + '/' + name)
-            .map( res => res.json())
+            .map( res => res)
             .catch(this.handleError);
     }
 
     public get() {
         return this.http.get(this.baseUrl)
-            .map( res => res.json())
+            .map( res => res)
             .catch(this.handleError);
     }
 
     public update(name: string, data: Object) {
         console.log(data);
         return this.http.put(this.baseUrl + '/' + name, data)
-            .map( res => res.json())
+            .map( res => res)
             .catch(this.handleError);
     }
 
     public add(data: Object) {
         return this.http.post(this.baseUrl, data)
-            .map( res => res.json())
+            .map( res => res)
             .catch(this.handleError);
     }
 
     public remove(name: string) {
         return this.http.delete(this.baseUrl + '/' + name)
-            .map( res => res.json())
+            .map( res => res)
             .catch(this.handleError);
     }
 

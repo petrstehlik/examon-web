@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'environments/environment';
+import {environment} from 'environments/environment';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/fromPromise';
@@ -18,6 +18,7 @@ export class AppConfigService {
     public obs;
 
     constructor() {
+        this.config = environment.config;
         this.obs = this.fetch().subscribe((data: string) => {
             try {
                 this.config = data;

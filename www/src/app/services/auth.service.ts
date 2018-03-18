@@ -29,7 +29,7 @@ export class AuthService {
     }
 
     admin(user: Object) {
-        return this.http.post('/setup', JSON.stringify(user));
+        return this.http.post('/setup', user);
     }
 
     private handleError(err: Response | any) {
