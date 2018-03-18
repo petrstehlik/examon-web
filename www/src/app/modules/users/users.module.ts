@@ -22,7 +22,6 @@ const usersRoutes: Routes = [
             name : 'Users',
             description : 'Manage users, update profiles and passwords.',
             icon : 'fa-user-circle',
-            role : 0
         },
         children : [
             {
@@ -47,7 +46,7 @@ const usersRoutes: Routes = [
                 component : UsersEditComponent,
                 canActivate : [AuthGuard],
                 data : {
-                    role : 0,
+                    role : 10,
                     name : 'Edit User'
                 }
             }
