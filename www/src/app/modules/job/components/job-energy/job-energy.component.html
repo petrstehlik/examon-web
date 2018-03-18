@@ -2,10 +2,10 @@
     <div class="col">
         <div class="card text-center">
             <ex-graph
-                [data]="data['job_power']"
-                [loading]="data['loading_power']"
+                [data]="data['job_cpu']"
+                [loading]="data['loading_cpu']"
                 [range]="null"
-                topTitle="Power consumption"
+                topTitle="CPU Power Consumption"
                 labelY="Consumption (W)">
             </ex-graph>
         </div>
@@ -19,8 +19,22 @@
                 [data]="data['job_temp']"
                 [loading]="data['loading_temp']"
                 [range]="null"
-                topTitle="CPU Temperature"
+                topTitle="Ambient Temperature"
                 labelY="Temp (°C)">
+            </ex-graph>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_cpu_temp']"
+                [loading]="data['loading_cpu_temp']"
+                [range]="null"
+                topTitle="CPU Power"
+                labelY="Power (W)">
             </ex-graph>
         </div>
     </div>
@@ -50,10 +64,52 @@
     <div class="col">
         <div class="card text-center">
             <ex-graph
-                [data]="data['job_cpu_dram_power']"
-                [loading]="data['loading_cpu_dram_power']"
+                [data]="data['job_gpu']"
+                [loading]="data['loading_gpu']"
                 [range]="null"
-                topTitle="CPU and DRAM Power"
+                topTitle="GPU Power"
+                labelY="Power (W)">
+            </ex-graph>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_fan']"
+                [loading]="data['loading_fan']"
+                [range]="null"
+                topTitle="Fan Power"
+                labelY="Power (W)">
+            </ex-graph>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_pci']"
+                [loading]="data['loading_pci']"
+                [range]="null"
+                topTitle="PCI-Express Power"
+                labelY="Power (W)">
+            </ex-graph>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_mem']"
+                [loading]="data['loading_mem']"
+                [range]="null"
+                topTitle="Memory Power"
                 labelY="Power (W)">
             </ex-graph>
         </div>
