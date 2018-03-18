@@ -1,4 +1,4 @@
-<div class="row mb-3">
+<!--div class="row mb-3">
     <div class="col">
         <div class="card text-center">
             <div class="card-block text-center">
@@ -52,7 +52,7 @@
             </div>
         </div>
     </div>
-</div>
+</div-->
 
 <div class="row mb-3">
     <div class="col-10">
@@ -143,7 +143,7 @@
                 [data]="data?.power"
                 [loading]="data?.loading_power"
                 [range]="null"
-                topTitle="Average Power Consumption Per Node"
+                topTitle="Average CPU Power Consumption Per Node"
                 labelY="Power (W)">
             </ex-graph>
         </div>
@@ -172,6 +172,94 @@
                         {{ data?.power?.data[data['power']['data'].length - 1][1] | number:'1.0-2' }}
                     </span>
                     <span *ngIf="data?.loading_power">--</span>
+                    W
+                </h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-10">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data?.gpu"
+                [loading]="data?.loading_gpu"
+                [range]="null"
+                topTitle="Average GPU Power Consumption Per Node"
+                labelY="Power (W)">
+            </ex-graph>
+        </div>
+    </div>
+
+
+    <div class="col-2">
+        <div class="card mb-1">
+            <div class="card-block text-center">
+                <small class="card-title">Average power consumption</small>
+                <h4>
+                    <span *ngIf="!data?.loading_gpu_total">
+                        {{ data?.gpu_total?.data[0][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_gpu_total">--</span>
+                    W
+                </h4>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current power consumption</small>
+                <h4>
+                    <span *ngIf="!data?.loading_gpu">
+                        {{ data?.gpu?.data[data['gpu']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_gpu">--</span>
+                    W
+                </h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-10">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data?.fan"
+                [loading]="data?.loading_fan"
+                [range]="null"
+                topTitle="Average Fan Power Consumption Per Node"
+                labelY="Power (W)">
+            </ex-graph>
+        </div>
+    </div>
+
+
+    <div class="col-2">
+        <div class="card mb-1">
+            <div class="card-block text-center">
+                <small class="card-title">Average power consumption</small>
+                <h4>
+                    <span *ngIf="!data?.loading_fan_total">
+                        {{ data?.fan_total?.data[0][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_fan_total">--</span>
+                    W
+                </h4>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-block text-center">
+                <small class="card-title">Current power consumption</small>
+                <h4>
+                    <span *ngIf="!data?.loading_fan">
+                        {{ data?.fan?.data[data['fan']['data'].length - 1][1] | number:'1.0-2' }}
+                    </span>
+                    <span *ngIf="data?.loading_fan">--</span>
                     W
                 </h4>
             </div>
