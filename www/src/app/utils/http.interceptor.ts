@@ -21,7 +21,9 @@ export class ApiInterceptor implements HttpInterceptor {
     private prefixUrl: string;
     private api: Object = {};
 
-    constructor(private router : Router) {}
+    constructor(private router : Router) {
+        this.api = environment.config.api;
+    }
 
     /**
       * For each request add:
@@ -36,9 +38,7 @@ export class ApiInterceptor implements HttpInterceptor {
             setHeaders: {
                 'Authorization': localStorage.getItem('session') || '',
             }
-        })
-
-        console.log(apiReq)
+        });
 
         // Set specific content type if "specific-content-type" header is set
         if (apiReq.headers.has('specific-content-type')) {
