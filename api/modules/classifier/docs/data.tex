@@ -1,0 +1,35 @@
+\section{Data}
+\label{sec:data}
+
+As previously stated in \ref{sec:examon} data are gathered via Examon framework and stored in Cassandra database. We can split the data into two categories. Job data and metric data.
+
+The job data come from PBS Pro\cite{PBSProAdminGuide14} hooks which report various info about the job, mainly the allocated nodes, cores and other computational resources. The timestamps and events which are triggered by PBS Pro during the lifecycle of the job. We use this data for determining the runtime of a job, its resource allocations and location of the job in a cluster (node names and core numbers). The job data are sent via MQTT and stored directly to a Cassandra cluster.
+
+Using the job data one can query metric data. These are measured independently of job data and are monitored on per-core, per-CPU or per-node basis categorized into metrics. Each measured value is then sent via MQTT to KairosDB where it is stored according to its cluster location and metric. There are over 30 metrics monitored including but not limited to core load; C6 and C3 CPU state shares; system, CPU, IO and memory utilization or various temperatures gathered from various places inside a node.
+
+For the project, twelve major metrics were chosen for the best reflection of job performance. A short summary of the chosen metrics is shown in table \ref{tab:metrics}.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{lllll}
+Metric name             & Metric tag          & unit & sampling rate & base \\ \hline
+core's load             & load\_core          & \%  & 2s  & per-core \\ \hline
+C6 states               & C6res               & \%  & 2s  & per-core \\ \hline
+C3 states               & C3res               & \%  & 2s  & per-core \\ \hline
+instructions per second & ips                 & IPS & 2s  & per-core \\ \hline
+system utilization      & Sys\_Utilization    & \%  & 20s & per-node \\ \hline
+CPU utilization         & CPU\_Utilization    & \%  & 20s & per-node \\ \hline
+IO utilization          & IO\_Utilization     & \%  & 20s & per-node \\ \hline
+memory utilization      & Memory\_Utilization & \%  & 20s & per-node \\ \hline
+L1 and L2 bounds        & L1L2\_Bound         & \%  & 2s  & per-core \\ \hline
+L3 bounds               & L3\_Bound           & \%  & 2s  & per-core \\ \hline
+front-end bounds        & front\_end\_bound   & \%  & 2s  & per-core \\ \hline
+back-end bounds         & back\_end\_bound    & \%  & 2s  & per-core \\ \hline
+\end{tabular}
+\caption{Overview of measured metrics}
+\label{tab:metrics}
+\end{table}
+
+KairosDB provides us with a REST API for querying metric data in various ways. The queries are formed using JSON objects and results are also returned as JSON objects. The KairosDB limits all stored data to 21 days
+
+For complete data acquisition, we combined the job data and metric data together and queried only jobs which fit several conditions described in \ref{sec:data-filter}.

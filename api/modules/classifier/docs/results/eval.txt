@@ -1,0 +1,84 @@
+-- job_C6res
+Expected: [0], Got: 0.03
+Expected: [0], Got: 0.03
+Expected: [0], Got: 0.03
+Expected: [1], Got: 0.99
+Expected: [1], Got: 0.99
+-- job_C3res
+Expected: [0], Got: 0.05
+Expected: [0], Got: 0.05
+Expected: [0], Got: 0.05
+Expected: [0], Got: 0.05
+Expected: [0], Got: 0.05
+-- job_load_core
+Expected: [0], Got: 0.72
+Expected: [0], Got: 0.72
+Expected: [0], Got: 0.72
+Expected: [1], Got: 1.00
+Expected: [1], Got: 0.72
+-- job_ips
+Expected: [1], Got: 0.78
+Expected: [1], Got: 0.87
+Expected: [1], Got: 0.88
+Expected: [1], Got: 1.00
+Expected: [1], Got: 0.97
+-- job_Sys_Utilization
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.00
+Expected: [1], Got: 1.00
+Expected: [1], Got: 0.97
+-- job_IO_Utilization
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.05
+Expected: [0], Got: 0.05
+Expected: [0], Got: 0.05
+Expected: [0], Got: 0.00
+-- job_Mem_Utilization
+Expected: [1], Got: 1.00
+Expected: [1], Got: 1.00
+Expected: [0], Got: 0.18
+Expected: [0], Got: 0.18
+Expected: [1], Got: 1.00
+-- job_CPU_Utilization
+Expected: [0], Got: 0.63
+Expected: [0], Got: 0.63
+Expected: [0], Got: 0.63
+Expected: [0], Got: 0.52
+Expected: [1], Got: 0.63
+-- job_L1L2_Bound
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.48
+Expected: [0], Got: 0.00
+-- job_L3_Bound
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.01
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.23
+Expected: [1], Got: 1.00
+-- job_front_end_bound
+Expected: [0], Got: 0.09
+Expected: [0], Got: 0.09
+Expected: [0], Got: 0.09
+Expected: [1], Got: 1.00
+Expected: [0], Got: 0.09
+-- job_back_end_bound
+Expected: [0], Got: 0.25
+Expected: [0], Got: 0.25
+Expected: [0], Got: 0.25
+Expected: [1], Got: 1.00
+Expected: [1], Got: 0.25
+-- jobber
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.00
+Expected: [0], Got: 0.00
+Expected: [1], Got: 1.00
+Expected: [1], Got: 1.00
+Complex Job Evaluating
+Expected: 0, Got: 0.04
+Expected: 0, Got: 0.05
+Expected: 0, Got: 0.58
+Expected: 1, Got: 1.00
+Expected: 1, Got: 0.96

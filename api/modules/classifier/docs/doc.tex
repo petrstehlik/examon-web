@@ -1,0 +1,123 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[left=2cm,text={17cm,25cm},top=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+
+\graphicspath{ {figs/} }
+
+\begin{document}
+
+\begin{center}
+	\LARGE{Soft Computing}\\
+	\Large{Job Performance Evaluation Using Back-propagation Network}
+	\vspace{0.5cm}
+
+    \begin{centering}
+    \small{
+        Bc. Petr Stehlík <xstehl14@stud.fit.vutbr.cz>
+        }
+    \end{centering}
+
+	\vspace{0.2cm}
+
+\end{center}
+
+\section{Introduction}
+Every user of a supercomputer needs to know whether their submitted job finished successfully and performed well. So far these tedious tasks are usually performed manually using only the output of their program and over-simplified metrics such as job runtime and total utilized resources.
+
+The aim of this project is to create a back-propagation neural network which can classify whether a job ran well or if it is in some way suspicious of unwanted behaviours such as poor performance or execution failure.
+
+The network itself is supplied with fine-granular metric data acquired via Examon framework\cite{examon} which was run on Galileo supercomputer located in CINECA, Bologna, Italy. Where all job and metric data were gathered.
+
+The structure of this document is as follows: in section \ref{sec:theory} the theoretical background needed for this project is presented together with the description of Examon framework. In the following section \ref{sec:data} the data supplied to the network are described as well as the final format of the data. Afterwards, in section \ref{sec:implementation} the implementation of the network and its structure are laid out and in the last two sections \ref{sec:res} and \ref{sec:sum} the achieved results, summary and further work are discussed.
+
+\input{theory}
+
+\input{data}
+
+\input{implementation}
+
+\section{Achieved Results}
+\label{sec:res}
+
+The sum error was calculated using equation \ref{eq:err}. Each metric had its sum error as presented in table \ref{tab:errors}. As one can see the sum error varies through the dataset but sum errors below $1.0$ can be considered as acceptable. The largest error comes from core's load and CPU utilization since these two metrics are very similar.
+
+\begin{table}[ht]
+    \parbox{.48\linewidth}{
+        \centering
+        \begin{tabular}{lll}
+        Name                    & Epochs & Sum Error \\
+        core's load             & 49999  & 5.81947   \\
+        C6 states               & 1506   & 0.07591   \\
+        C3 states               & 4      & 0.09447   \\
+        instructions per second & 49999  & 3.18977   \\
+        system utilization      & 17988  & 0.09695   \\
+        CPU utilization         & 49999  & 7.65817   \\
+        IO utilization          & 49999  & 0.94946   \\
+        memory utilization      & 49999  & 0.82774   \\
+        L1 and L2 bounds        & 49999  & 0.52690   \\
+        L3 bounds               & 49999  & 0.77589   \\
+        front-end bounds        & 49999  & 2.72293   \\
+        back-end bounds         & 49999  & 4.63103   \\
+        job classifier          & 49999  & 0.73037
+        \end{tabular}
+        \caption{Overview of sum errors for all networks}
+        \label{tab:errors}
+    }
+    \hfill
+    \parbox{.48\linewidth}{
+        \centering
+        \begin{tabular}{lll}
+        Job \# & Expected & Result \\
+        1   & 0 & 0.04   \\
+        2   & 0 & 0.05   \\
+        3   & 0 & 0.58   \\
+        4   & 1 & 1.0    \\
+        5   & 1 & 0.96
+        \end{tabular}
+        \caption{Sum error for job evaluation dataset}
+        \label{tab:joberr}
+    }
+
+\end{table}
+
+Even with these sum errors the job classifier labelled the evaluation dataset correctly with minor errors as seen in table \ref{tab:joberr}
+
+\section{Summary}
+\label{sec:sum}
+
+As a proof of concept for classifying jobs on HPC cluster, it was verified that such classification can be made using a set of backpropagation networks. With rather a small dataset to train and evaluate the networks the error rate wasn't minimal and can be further reduced using a larger labelled dataset and users' feedback.
+
+The dataset itself cannot be randomly generated because of too complex dependencies between all metrics. Having randomly generated data we even couldn't determine whether such artificial job would be really suspicious or not.
+
+Using the intermediate input from metric networks it can be used for intelligent dashboards in Examon Web where only suspicious metrics can be shown in combination with several fixed ones.
+
+This work is the base for my master thesis and will be further expanded to provide complex insights on users' jobs suggesting the possible cause of the suspicious behaviour.
+
+\section{Program Manual}
+
+The Python code can be run using command \texttt{python jobclassifier} from the root folder of the project. The program makes available following arguments:
+\begin{itemize}
+       % \setlength\itemsep{0em}
+    \item \texttt{-h, -{}-help} show help
+    \item \texttt{-{}-train} train the networks using \texttt{data.json} dataset
+    \item \texttt{-{}-dir CONFIG\_DIR} where to store configurations for trained networks
+    \item \texttt{-{}-max-epochs EPOCHS} train the network using \texttt{data.json} dataset (default: 10 000)
+    \item \texttt{-{}-eval CONFIG\_EVAL} maximum number of epochs
+\end{itemize}
+
+An example command for training the networks: \texttt{python jobclassifier -{}-train -{}-dir example} and example command for evaluating the dataset using networks trained from previous example: \texttt{python jobclassifier -{}-eval example}.
+
+
+\subsection*{Acknowledgements}
+This work was done using the Examon framework created by F. Beneventi, A. Bartolini, A. Borghesi and collective at UNIBO, Italy. Examon Web was created by P. Stehlík during the PRACE Summer of HPC stay at CINECA, Bologna, Italy. Data used in this project were collected using the CINECA infrastructure and Galileo supercomputer and anonymized before any use in this project.
+
+\bibliography{doc}{}
+\bibliographystyle{abbrv}
+
+\end{document}
