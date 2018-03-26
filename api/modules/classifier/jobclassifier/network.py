@@ -6,7 +6,8 @@ import sys
 
 from neuron import Neuron
 
-class Network():
+
+class Network:
     def __init__(self, *args):
         """
         inputs: number on input neurons
@@ -82,7 +83,7 @@ class Network():
                 # Update weights in the whole layer
                 neuron.update_weights(lrate, inputs)
 
-    def train(self, dataset, lrate, epochs = sys.maxsize, epsilon = 0.0001 ):
+    def train(self, dataset, lrate, epochs=sys.maxsize, epsilon=0.0001):
         self.log.info("Max epochs = {}, epsilon = {}, learning rate = {}".format(epochs, epsilon, lrate))
 
         total_epochs = 0
@@ -101,14 +102,12 @@ class Network():
 
             if sum_error < epsilon:
                 self.log.info("epoch={0}, lrate={1}, error={2:.5f}".format(epoch, lrate, sum_error))
-                #sys.stdout.flush()
                 break
 
             if epoch % 100 == 0:
                 self.log.info("epoch = {0}, error = {1:.5f}".format(epoch, sum_error))
                 sys.stdout.flush()
 
-        #print(" "*100, end="\r")
         self.log.info("epochs = {0}, error = {1:.5f}".format(epoch, sum_error))
 
     def predict(self, data):
@@ -121,17 +120,17 @@ class Network():
             export_layers.append([neuron.export() for neuron in layer])
 
         return({
-            "layers" : export_layers,
-            "configuration" : self.layers_list,
-            "name" : self.name
+            "layers": export_layers,
+            "configuration": self.layers_list,
+            "name": self.name
             })
 
     @classmethod
-    def load(self, settings):
+    def load(cls, settings):
         network = Network(settings['configuration'], settings['name'])
         network.layers = []
 
         for layer in settings['layers']:
             network.layers.append([Neuron.load(neuron) for neuron in layer])
-        return(network)
+        return network
 

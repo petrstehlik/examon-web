@@ -23,7 +23,8 @@ metrics = [
     "job_CPU2_Temp"
         ]
 
-def stretch(data, size = 120):
+
+def stretch(data, size=120):
     """
     Take datapoints and stretch them to (60*60*24)/30 = 2880 values using interpolation
     """
@@ -31,9 +32,8 @@ def stretch(data, size = 120):
     interp_points = interp.interp1d(np.arange(points.size), points)
     stretched = interp_points(np.linspace(0, points.size - 1, size))
 
-    #log.debug(points)
-    #log.debug(stretched)
-    return(stretched)
+    return stretched
+
 
 def stats(data):
     """
@@ -55,6 +55,7 @@ def stats(data):
     log.info("{}/{} jobs suspicious".format(susp, len(data)))
     log.info("{}/{} job metrics suspicious".format(metr, len(data) * len(metrics)))
     log.info("{} datapoints".format(datapoints))
+
 
 if __name__ == "__main__":
     with open('../data.json') as fp:

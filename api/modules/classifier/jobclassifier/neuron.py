@@ -1,12 +1,15 @@
 from random import random
 from math import exp
 import logging
+
+
 logging.basicConfig(level=logging.INFO)
+
 
 class Neuron:
     def __init__(self, inputs):
         """
-        Initiliaze neurons weights
+        Initialize neurons weights
 
         Weight for each input and one for the bias
         """
@@ -17,7 +20,7 @@ class Neuron:
         self._activation = 0.0
 
         # Add bias as the last weight
-        self._weights = [random() for i in range(inputs+1)]
+        self._weights = [random() for _ in range(inputs+1)]
 
         self.log.debug("CREATE: Weights {0}".format(self._weights))
 
@@ -28,6 +31,7 @@ class Neuron:
         self._activation = self._weights[-1]
         for i in range(len(self._weights[:-1])):
             self._activation += self._weights[i] * inputs[i]
+
     def transfer(self):
         """
         Sigmoid transfer function
@@ -58,36 +62,32 @@ class Neuron:
             self._weights[j] += lrate * self._delta * inputs[j]
 
         self._weights[-1] += lrate * self._delta
-    #
+
     # Getters
-    #
     def output(self):
         return self._output
-
-    def derivative(self):
-        return self._derivative
 
     def delta(self):
         return self._delta
 
     def export(self):
         return({
-            "delta" : self._delta,
-            "inputs" : self._inputs,
-            "output" : self._output,
-            "weights" : self._weights,
-            "activation" : self._activation
+            "delta": self._delta,
+            "inputs": self._inputs,
+            "output": self._output,
+            "weights": self._weights,
+            "activation": self._activation
             })
 
     @classmethod
-    def load(self, settings):
+    def load(cls, settings):
         neuron = Neuron(settings['inputs'])
         neuron._delta = settings['delta']
         neuron._inputs = settings['inputs']
         neuron._output = settings['output']
         neuron._weights = settings['weights']
         neuron._activation = settings['activation']
-        return(neuron)
+        return neuron
 
     def __repr__(self):
-        return("<neuron.Neuron weights: {}, bias: {}, output: {}".format(self._weights[:-1], self._weights[-1], self._output))
+        return "<neuron.Neuron weights: {}, bias: {}, output: {}".format(self._weights[:-1], self._weights[-1], self._output)
