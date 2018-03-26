@@ -86,15 +86,15 @@ export class SystemComponent implements OnInit {
 
         //this.fetchTotal();
 
-        this.fetch('load', 'cluster', 'UTIL_P0', 20);
+        this.fetch('load', 'cluster', 'UTIL_P0', 10);
         this.fetch('load_total', 'cluster', 'UTIL_P0', this.time['to'] - this.time['from'] + 10);
-        this.fetch('temp', 'cluster', 'TEMP_P0', 20);
+        this.fetch('temp', 'cluster', 'TEMP_P0', 30);
         this.fetch('temp_total', 'cluster',  'TEMP_P0', this.time['to'] - this.time['from'] + 10);
-        this.fetch('power', 'cluster', 'PWR_null', 20);
+        this.fetch('power', 'cluster', 'PWR_null', 30, 45.0);
         this.fetch('power_total', 'cluster', 'PWR_null', this.time['to'] - this.time['from'] + 10);
-        this.fetch('gpu', 'cluster', 'GPU_Power', 20);
+        this.fetch('gpu', 'cluster', 'GPU_Power', 30, 45.0);
         this.fetch('gpu_total', 'cluster', 'GPU_Power', this.time['to'] - this.time['from'] + 10);
-        this.fetch('fan', 'cluster', 'Fan_Power', 20);
+        this.fetch('fan', 'cluster', 'Fan_Power', 30, 45.0);
         this.fetch('fan_total', 'cluster', 'Fan_Power', this.time['to'] - this.time['from'] + 10);
     }
 
@@ -104,10 +104,10 @@ export class SystemComponent implements OnInit {
         });
     }
 
-    private fetch(dict_name, endpoint, metric: string|string[], aggregate: number = null) {
+    private fetch(dict_name, endpoint, metric: string|string[], aggregate: number = null, factor: number = 1.0) {
         this.data['loading_' + dict_name] = true;
 
-        this.timeserie.fetch(this.time, dict_name, endpoint, metric, aggregate, false, 1.0).subscribe(data => {
+        this.timeserie.fetch(this.time, dict_name, endpoint, metric, aggregate, false, factor).subscribe(data => {
             this.data[dict_name] = data;
             this.data['loading_' + dict_name] = false;
         });
