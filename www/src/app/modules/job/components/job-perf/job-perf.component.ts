@@ -20,7 +20,7 @@ export class JobPerfComponent implements OnInit {
     set setJob(job: Job) {
         if (job != null) {
             this.job = job;
-            this.fetch('utilization', 'core', 'UTIL_P0', null,1.0);
+            this.fetch('utilization', 'core', 'UTIL_P0', 20,1.0);
             this.fetch('ips', 'node', ['IPS_P0']); // MIPS
             this.fetch('freq', 'node', ['FREQA_P0'], );
             //this.fetch('load_core_cluster',  'cluster', 'UTIL_P0', env.window.pmu, 1.0);
