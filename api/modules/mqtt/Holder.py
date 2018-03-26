@@ -9,7 +9,8 @@ import paho.mqtt.client as mqtt
 import logging
 import json
 
-class Holder():
+
+class Holder:
 
     # Callback function on what to do with the message before storing it in database
     on_receive = None
@@ -22,11 +23,14 @@ class Holder():
 
     nodes = list()
 
+    # Prefix used for all MQTT topics
+    prefix = 'org/e4/cluster/davide/node/+/plugin/'
+
     def __init__(self,
             mqtt_broker,
-            mqtt_port = 1883,
-            mqtt_topics = ["#"],
-            alfa = 0.75):
+            mqtt_port=1883,
+            mqtt_topics=['/'],
+            alfa=0.75):
         self.log = logging.getLogger(__name__)
 
         self.log.debug("Initializing MQTT Holder")
@@ -62,6 +66,22 @@ class Holder():
             self.log.info("Successfully subscribed to all topics")
         else:
             self.log.error("Failed to subscribe to topics")
+
+    def subscribe(self, topic):
+        result, _ = self.client.subscribe(self.prefix + topic, 0)
+
+        if result == mqtt.MQTT_ERR_SUCCESS:
+            self.log.info("Successfully subscribed to topic '{}'".format(topic))
+        else:
+            self.log.error("Failed to subscribe to topics")
+
+    def unsubscribe(self, topic):
+        result, _ = self.client.unsubscribe(self.prefix + topic)
+
+        if result == mqtt.MQTT_ERR_SUCCESS:
+            self.log.info("Successfully unsubscribed from topic '{}'".format(topic))
+        else:
+            self.log.error("Failed to unsubscribe from topic '{}'".format(topic))
 
     def on_message(self, client, userdata, msg):
         """
@@ -101,19 +121,19 @@ class Holder():
                     value = float(data[0])
 
                 self.db[topic[-1]][nodeID] = {
-                        "value" : value,
-                        "timestamp" : data[1]
+                        "value": value,
+                        "timestamp": data[1]
                     }
 
             else:
                 self.log.debug("New metric found: %s" % topic[-1])
                 self.db[topic[-1]] = {
-                        nodeID : {
-                                "value" : float(data[0]),
-                                "timestamp" : data[1]
+                        nodeID: {
+                                "value": float(data[0]),
+                                "timestamp": data[1]
                             },
-                        "max" : float(data[0]),
-                        "min" : float(data[0])
+                        "max": float(data[0]),
+                        "min": float(data[0])
                         }
 
             value = self.db[topic[-1]][nodeID]["value"]
@@ -132,8 +152,8 @@ class Holder():
 
     def minmax(self, metric):
         return({
-                'min' : self.db[metric]['min'],
-                'max' : self.db[metric]['max']
+                'min': self.db[metric]['min'],
+                'max': self.db[metric]['max']
             })
 
     def default_on_store(self, nodeID, metric, payload):
