@@ -26,7 +26,7 @@
                         <!-- All modules buttons -->
                         <li *ngFor="let module of modules">
                             <div
-                                *ngIf="enabledModules[module.path]?.enabled && user['role'] <= module['role']"
+                                *ngIf="user['role'] <= module['role']"
                                 class="col"
                                 routerLink="{{module.path}}"
                                 routerLinkActive="active-link">
@@ -39,9 +39,12 @@
 
                         <!-- Logout button -->
                         <li>
-                            <div
-                                class="flex-container"
-                                routerLink="/logout">
+                                <div routerLink="/users/{{ user['id']}}">
+                                    {{ user['username'] }}
+                                </div>
+                        </li>
+                        <li>
+                            <div routerLink="/logout">
                                 <small>
                                     <i class="fa fa-sign-out" aria-hidden="true"></i>
                                     <span class="flex-item">Logout</span>

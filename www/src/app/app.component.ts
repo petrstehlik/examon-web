@@ -35,6 +35,7 @@ export class AppComponent implements OnInit {
                 private msg: MessageService) {}
 
     ngOnInit() {
+        this.getModules();
         this.getIsOpen();
         this.user = JSON.parse(localStorage.getItem('user'));
         this.session_id = localStorage.getItem('session');
@@ -61,8 +62,6 @@ export class AppComponent implements OnInit {
             }
         });
 
-        this.getModules();
-
         this.subscription = this.msg.get().subscribe(
             message => {
                 if (message != undefined) {
@@ -81,6 +80,7 @@ export class AppComponent implements OnInit {
     }
 
     getModules() {
+        console.log('calling getmodules')
         console.log(this.router.config)
         for (const route of this.router.config ) {
             if (route.data && route.data['name']) {
