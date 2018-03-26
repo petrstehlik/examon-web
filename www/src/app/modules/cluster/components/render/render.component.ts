@@ -4,16 +4,9 @@ import { environment as env } from 'environments/environment';
 import { HSVtoRGB, calcOffset, getOffset } from 'app/utils/colors';
 import { metrics } from './metrics';
 
-declare const b4w;
 declare const io;
-let socket;
 let active_metric = env.active_metric;
 let active_metric_name = env.active_metric_name;
-
-window.onbeforeunload = function (e) {
-    socket.emit('unsubscribe-metric', {metric : active_metric});
-    socket.disconnect();
-};
 
 @Component({
   selector: 'ex-render',
@@ -24,304 +17,301 @@ export class RenderComponent implements OnInit, OnDestroy {
 
     public colors = [];
     public metrics = metrics;
+    private socket;
+    public data = {};
+    public range = {}
+
+    public cluster = [
+        ['davide0', 'davide1', 'davide2', 'davide3', 'davide4', 'davide5', 'davide6', 'davide7', 'davide8', 'davide9','davide10', 'davide11', 'davide12', 'davide13', 'davide14'],
+        ['davide15', 'davide16', 'davide17', 'davide18', 'davide19', 'davide20', 'davide21', 'davide22', 'davide23', 'davide24','davide25', 'davide26', 'davide27', 'davide28', 'davide29'],
+        ['davide30', 'davide31', 'davide32', 'davide33', 'davide34', 'davide35', 'davide36', 'davide37', 'davide38', 'davide39','davide40', 'davide41', 'davide42', 'davide43', 'davide44'],
+        ];
 
     constructor() { }
 
     ngOnInit() {
-        b4w.require('main').reset();
+        this.connect();
+        this.subscribe();
+        this.initialData();
+        this.receiveData();
+    }
 
-        this.register();
+    /**
+     * Connect to a websocket and register callback for errors
+      */
+    private connect() {
+        this.socket = io(env.ws.host + ':' + env.ws.port + '/render', { reconnection: true });
 
-        // import the app module and start the app by calling the init method
-        b4w.require('Galileo_main').init();
+        this.socket.on('connect', function() {
+            console.info('connected to WebSocket server');
+        });
+
+        this.socket.on('error', function(data) {
+            console.error('Error occured', data);
+        });
+    }
+
+    /**
+     * subscribe to a selected metric
+     *
+     * @param {string} metric
+     */
+    public subscribe(metric = active_metric) {
+        this.socket.emit('subscribe-metric', {metric : metric});
+    }
+
+    private initialData() {
+        this.socket.on('initial-data', (data) => {
+            console.log(data);
+            this.data = data;
+            this.range = {
+                min: data['min'],
+                max: data['max'],
+            };
+
+            for (let node in data) {
+                if (node != 'min' && node != 'max') {
+                    this.color_node(node, data[node]['value'])
+                }
+            }
+        });
+    }
+
+    private receiveData() {
+        this.socket.on('data', (data) => {
+            this.data[data['node']] = data['data'];
+            this.range = data['range']
+            this.color_node(data['node'], data['data']['value'])
+        })
     }
 
     /**
      * This is a callback hell, so everything must be in this function
      */
-    register() {
-        // register the application module
-    b4w.register('Galileo_main', function(exports, require) {
+    //    let node_data = {};
 
-        // import modules used by the app
-        const m_app       = require('app');
-        const m_cfg       = require('config');
-        const m_data      = require('data');
-        const m_preloader = require('preloader');
-        const m_cont      = require('container');
-        const m_mouse     = require('mouse');
-        const m_scenes    = require('scenes');
-        const m_mat       = require('material');
+    //    let _selected_obj;
 
-        let node_data = {};
+    //
 
-        // detect application mode
-        const DEBUG = env.production;
+    //    socket.on('initial-data', function(data) {
+    //        // Create a deep copy of original data
+    //        const tmp_data = Object.assign({}, node_data);
 
-        // automatically detect assets path
-        const APP_ASSETS_PATH = m_cfg.get_assets_path('Galileo');
+    //        node_data = data;
 
-        let _selected_obj;
+    //        // We must clear the model
+    //        if (Object.keys(tmp_data).length > 0) {
+    //            for (const key of Object.keys(tmp_data)) {
+    //                if (key === 'max' || key === 'min') {
+    //                    continue;
+    //                }
 
-        socket = io(env.ws.host + ':' + env.ws.port + '/render', { reconnection: true });
-        // Connect to a websocket and subscribe to the active metric
-        socket.on('connect', function() {
-            console.info('Connected to WS');
-        });
+    //                const obj = m_scenes.get_object_by_name(key);
+    //                m_mat.set_diffuse_color(obj, 'node', [1, 1, 1]);
+    //            }
 
-        socket.on('initial-data', function(data) {
-            // Create a deep copy of original data
-            const tmp_data = Object.assign({}, node_data);
+    //            for (const key of Object.keys(node_data)) {
+    //                if (key === 'min' || key === 'max') {
+    //                    continue;
+    //                }
 
-            node_data = data;
+    //                color_node(key, {
+    //                    value : node_data[key]['value'],
+    //                    min : node_data['min'],
+    //                    max : node_data['max']
+    //                });
+    //            }
+    //        }
+    //    });
 
-            // We must clear the model
-            if (Object.keys(tmp_data).length > 0) {
-                for (const key of Object.keys(tmp_data)) {
-                    if (key === 'max' || key === 'min') {
-                        continue;
-                    }
+    //        const sel = <HTMLSelectElement>document.getElementById('select-metric');
 
-                    const obj = m_scenes.get_object_by_name(key);
-                    m_mat.set_diffuse_color(obj, 'node', [1, 1, 1]);
-                }
+    //        sel.value = active_metric;
 
-                for (const key of Object.keys(node_data)) {
-                    if (key === 'min' || key === 'max') {
-                        continue;
-                    }
+    //        document.getElementById('set-metric').addEventListener('click', swichMetric);
 
-                    color_node(key, {
-                        value : node_data[key]['value'],
-                        min : node_data['min'],
-                        max : node_data['max']
-                    });
-                }
-            }
-        });
+    //        // Model is initialized so we can color the nodes
+    //        for (const key of Object.keys(node_data)) {
+    //            if (key === 'min' || key === 'max') {
+    //                continue;
+    //            }
 
-        socket.on('error', function(data) {
-            console.error('Error occured', data);
-        });
+    //            color_node(key, {
+    //                value : node_data[key]['value'],
+    //                min : node_data['min'],
+    //                max : node_data['max']
+    //            });
+    //        }
 
-        /**
-         * export the method to initialize the app (called at the bottom of this file)
-         */
-        exports.init = function() {
-            m_app.init({
-                canvas_container_id: 'main_canvas_container',
-                callback: init_cb,
-                show_fps: !env.production,
-                console_verbose: !env.production,
-                assets_gzip_available: env.production,
-                autoresize: true
-            });
-        };
+    //        // Register the data reception via websocket only when everything is loaded
+    //        socket.on('data', function(data) {
+    //            if (!(data['node'] in node_data)) {
+    //                node_data[data['node']] = data;
+    //            }
 
-        /**
-         * callback executed when the app is initialized
-         */
-        function init_cb(canvas_elem, success) {
+    //            node_data[data['node']]['value'] = data['data']['value'];
+    //            node_data[data['node']]['timestamp'] = data['data']['timestamp'];
 
-            if (!success) {
-                console.log('b4w init failure');
-                return;
-            }
+    //            color_node(data['node'], {
+    //                value : data['data']['value'],
+    //                min : data['range']['min'],
+    //                max : data['range']['max']
+    //            });
 
-            const sel = <HTMLSelectElement>document.getElementById('select-metric');
+    //            if (_selected_obj && data['node'] === _selected_obj.name) {
+    //                fillLabel(data['node']);
+    //            }
+    //        });
+    //    }
 
-            sel.value = active_metric;
+    //    /**
+    //     * Color a node based on the payload
+    //     * payload : {
+    //     *      value,
+    //     *      min,
+    //     *      max
+    //     *  }
+    //     */
+    //    function color_node(nodeID, payload) {
+    //        const obj = m_scenes.get_object_by_name(nodeID);
 
-            m_preloader.create_preloader();
+    //        if (obj == null) {
+    //            console.warn('Node nod found');
+    //            return;
+    //        }
 
-            // ignore right-click on the canvas element
-            canvas_elem.oncontextmenu = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            };
+    //        // Check if node is in node_data
+    //        // Create the node if needed
+    //        if (!(nodeID in node_data)) {
+    //            node_data[nodeID] = {};
+    //        }
 
-            m_data.load(APP_ASSETS_PATH + 'Galileo.json', load_cb, (percentage) => {
-                m_preloader.update_preloader(percentage);
-            });
-        }
+    //        node_data[nodeID]['color_rgb'] = HSVtoRGB(
+    //            (100 - calcOffset(payload['value'], payload['min'], payload['max'])) * 2.5,
+    //            1.0,
+    //            1.0);
+    //            m_mat.set_diffuse_color(obj, 'node', [
+    //                node_data[nodeID]['color_rgb']['r'] / 255,
+    //                node_data[nodeID]['color_rgb']['g'] / 255,
+    //                node_data[nodeID]['color_rgb']['b'] / 255,
+    //            ]);
+    //    }
 
-        /**
-         * callback executed when the scene data is loaded
-         */
-        function load_cb(data_id, success) {
-            if (!success) {
-                console.log('b4w load failure');
-                return;
-            }
+    //    function canvas_click(e) {
+    //        if (e.preventDefault) {
+    //            e.preventDefault();
+    //        }
 
-            m_app.enable_camera_controls();
+    //        const offset = getOffset(document.getElementById('main_canvas_container'));
 
-            // place your code here
-            const canvas_elem = m_cont.get_canvas();
-            canvas_elem.addEventListener('mousedown', canvas_click, false);
-            canvas_elem.addEventListener('touchstart', canvas_click, false);
-            document.getElementById('set-metric').addEventListener('click', swichMetric);
+    //        // The shift in coords is needed because the canvas is moved from 0,0 position
+    //        const x = m_mouse.get_coords_x(e) - offset['left'];
+    //        const y = m_mouse.get_coords_y(e) - offset['top'];
 
-            socket.emit('subscribe-metric', {metric : active_metric});
+    //        const obj = m_scenes.pick_object(x, y);
 
-            // Model is initialized so we can color the nodes
-            for (const key of Object.keys(node_data)) {
-                if (key === 'min' || key === 'max') {
-                    continue;
-                }
+    //        highlightNode(obj);
+    //    }
 
-                color_node(key, {
-                    value : node_data[key]['value'],
-                    min : node_data['min'],
-                    max : node_data['max']
-                });
-            }
+    //    function highlightNode(obj) {
+    //        if (obj &&
+    //            m_scenes.check_object_by_name(obj.name) &&
+    //            obj.name.slice(0, 4) === 'node') {
+    //            fillLabel(obj.name);
 
-            // Register the data reception via websocket only when everything is loaded
-            socket.on('data', function(data) {
-                if (!(data['node'] in node_data)) {
-                    node_data[data['node']] = data;
-                }
+    //            if (_selected_obj != obj) {
+    //                if (_selected_obj)
+    //                        m_scenes.clear_outline_anim(_selected_obj);
+    //                if (obj)
+    //                    m_scenes.apply_outline_anim_def(obj);
+    //                _selected_obj = obj;
+    //            }
+    //        } else if (_selected_obj != undefined) {
+    //            m_scenes.clear_outline_anim(_selected_obj);
+    //            hideLabel();
+    //        }
+    //    }
 
-                node_data[data['node']]['value'] = data['data']['value'];
-                node_data[data['node']]['timestamp'] = data['data']['timestamp'];
+    //    function swichMetric(e) {
+    //        if (_selected_obj) {
+    //            m_scenes.clear_outline_anim(_selected_obj);
+    //        }
+    //        _selected_obj = null;
+    //        socket.emit('unsubscribe-metric', {metric : active_metric});
+    //        const sel = <HTMLSelectElement>document.getElementById('select-metric');
 
-                color_node(data['node'], {
-                    value : data['data']['value'],
-                    min : data['range']['min'],
-                    max : data['range']['max']
-                });
+    //        active_metric = sel.value;
+    //        active_metric_name = sel.options[sel.selectedIndex].innerText;
 
-                if (_selected_obj && data['node'] === _selected_obj.name) {
-                    fillLabel(data['node']);
-                }
-            });
-        }
+    //        socket.emit('subscribe-metric', {metric : active_metric});
+    //    }
 
-        /**
-         * Color a node based on the payload
-         * payload : {
-         *      value,
-         *      min,
-         *      max
-         *  }
-         */
-        function color_node(nodeID, payload) {
-            const obj = m_scenes.get_object_by_name(nodeID);
+    //    function fillLabel(node) {
+    //        const label = document.getElementById('label');
 
-            if (obj == null) {
-                console.warn('Node nod found');
-                return;
-            }
+    //        showLabel();
+
+    //        if (node in node_data) {
+    //            const color = node_data[node]['color_rgb'];
+    //            label.innerHTML = '<h4>Node: ' + node + '</h4>' +
+    //                active_metric_name + ': ' + node_data[node]['value'].toFixed(2);
+    //            if (color !== undefined) {
+    //                label.innerHTML += '<span class=\'color-bar\' style=\'background-color: rgb(' +
+    //                    (color['r']) + ',' +
+    //                    (color['g']) + ',' +
+    //                    (color['b']) + ');\'></span>';
+    //            }
+
+    //            if (!env.production) {
+    //                label.innerHTML += '<small>Time of last value: ' + new Date//(+node_data[node]['timestamp'] * 1000) + '</small>';
+    //            }
+
+    //        } else {
+    //            label.innerHTML = '<h4>Node: ' + node + '</h4><p>No data available</p>';
+    //        }
+    //    }
+
+    //    function hideLabel() {
+    //        const label = document.getElementById('label');
+
+    //        label.classList.add('hide');
+    //    }
+    //    function showLabel() {
+    //        const label = document.getElementById('label');
+
+    //        label.classList.remove('hide');
+    //    }
+    //});
+    //}
+
+    private color_node(nodeID, value) {
 
             // Check if node is in node_data
             // Create the node if needed
-            if (!(nodeID in node_data)) {
-                node_data[nodeID] = {};
+            if (!(nodeID in this.data)) {
+                this.data[nodeID] = {};
             }
 
-            node_data[nodeID]['color_rgb'] = HSVtoRGB(
-                (100 - calcOffset(payload['value'], payload['min'], payload['max'])) * 2.5,
+            this.data[nodeID]['color_rgb'] = HSVtoRGB(
+                (100 - calcOffset(value, this.range['min'], this.range['max'])) * 2.5,
                 1.0,
                 1.0);
-                m_mat.set_diffuse_color(obj, 'node', [
-                    node_data[nodeID]['color_rgb']['r'] / 255,
-                    node_data[nodeID]['color_rgb']['g'] / 255,
-                    node_data[nodeID]['color_rgb']['b'] / 255,
-                ]);
         }
 
-        function canvas_click(e) {
-            if (e.preventDefault) {
-                e.preventDefault();
-            }
-
-            const offset = getOffset(document.getElementById('main_canvas_container'));
-
-            // The shift in coords is needed because the canvas is moved from 0,0 position
-            const x = m_mouse.get_coords_x(e) - offset['left'];
-            const y = m_mouse.get_coords_y(e) - offset['top'];
-
-            const obj = m_scenes.pick_object(x, y);
-
-            highlightNode(obj);
-        }
-
-        function highlightNode(obj) {
-            if (obj &&
-                m_scenes.check_object_by_name(obj.name) &&
-                obj.name.slice(0, 4) === 'node') {
-                fillLabel(obj.name);
-
-                if (_selected_obj != obj) {
-                    if (_selected_obj)
-                            m_scenes.clear_outline_anim(_selected_obj);
-                    if (obj)
-                        m_scenes.apply_outline_anim_def(obj);
-                    _selected_obj = obj;
-                }
-            } else if (_selected_obj != undefined) {
-                m_scenes.clear_outline_anim(_selected_obj);
-                hideLabel();
-            }
-        }
-
-        function swichMetric(e) {
-            if (_selected_obj) {
-                m_scenes.clear_outline_anim(_selected_obj);
-            }
-            _selected_obj = null;
-            socket.emit('unsubscribe-metric', {metric : active_metric});
-            const sel = <HTMLSelectElement>document.getElementById('select-metric');
-
-            active_metric = sel.value;
-            active_metric_name = sel.options[sel.selectedIndex].innerText;
-
-            socket.emit('subscribe-metric', {metric : active_metric});
-        }
-
-        function fillLabel(node) {
-            const label = document.getElementById('label');
-
-            showLabel();
-
-            if (node in node_data) {
-                const color = node_data[node]['color_rgb'];
-                label.innerHTML = '<h4>Node: ' + node + '</h4>' +
-                    active_metric_name + ': ' + node_data[node]['value'].toFixed(2);
-                if (color !== undefined) {
-                    label.innerHTML += '<span class=\'color-bar\' style=\'background-color: rgb(' +
-                        (color['r']) + ',' +
-                        (color['g']) + ',' +
-                        (color['b']) + ');\'></span>';
-                }
-
-                if (!env.production) {
-                    label.innerHTML += '<small>Time of last value: ' + new Date(+node_data[node]['timestamp'] * 1000) + '</small>';
-                }
-
-            } else {
-                label.innerHTML = '<h4>Node: ' + node + '</h4><p>No data available</p>';
-            }
-        }
-
-        function hideLabel() {
-            const label = document.getElementById('label');
-
-            label.classList.add('hide');
-        }
-        function showLabel() {
-            const label = document.getElementById('label');
-
-            label.classList.remove('hide');
-        }
-    });
+    private unsubscribe() {
+        console.debug('unsubscribing from WS')
+        this.socket.emit('unsubscribe-metric', {metric : active_metric});
+        this.socket.disconnect();
     }
 
     ngOnDestroy() {
-        socket.emit('unsubscribe-metric', {metric : active_metric});
-        b4w.require('main').reset();
+        this.unsubscribe();
+    }
+
+    @HostListener('window:beforeunload', [ '$event' ])
+    beforeUnloadHandler(event) {
+        this.unsubscribe();
     }
 
 }

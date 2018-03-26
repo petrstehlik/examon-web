@@ -1,17 +1,25 @@
-<div id="main_canvas_container"></div>
-
 <div id="label" class="hide"></div>
 
 <div class="selector form-inline">
-    <select id="select-metric" class="form-control mr-2">
+    <select id="select-metric" #m class="form-control mr-2" (change)="subscribe(m.value)">
         <option *ngFor="let item of metrics" value="{{ item.value }}">
             {{ item.name }}
         </option>
     </select>
-    <button class="btn btn-primary" id="set-metric">
-        Change metric
-    </button>
 </div>
+
+<section class="cluster row">
+    <div class="col rack" *ngFor="let col of cluster">
+        <div *ngFor="let node of col" class="node" [style.background-color]="'rgb(' +
+            data[node]?.color_rgb?.r + ',' +
+            data[node]?.color_rgb?.g + ',' +
+            data[node]?.color_rgb?.b + ')'"
+        >
+            {{ node }}
+            {{ data[node]| json }}
+        </div>
+    </div>
+</section>
 <!--div *ngFor="let color of colors">
     <span style.background-color="rgb({{color?.r}}, {{color?.g}}, {{color?.b}})"
         style="display: block; width: 10px; height: 100px; float:left"

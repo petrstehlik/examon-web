@@ -1,6 +1,6 @@
 export const metrics = [{
-        name : 'Ambient Temperature',
-        value : 'Ambient_Temp'
+        name : 'Level 4 Memory Write/Read Requests',
+        value : 'ame_pub/chnl/data/occ/2/cmp/MEM/id/+/unt/GBs/M4WR_MEM'
     },
     {
         name : 'PIB Ambient Temperature',
