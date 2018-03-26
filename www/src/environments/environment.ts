@@ -23,8 +23,8 @@ export const environment = {
         pmu : 2,
         tmam : 2
     },
-    active_metric : 'Ambient_Temp',
-    active_metric_name : 'Ambient Temperature',
+    active_metric : 'M4WR_MEM',
+    active_metric_name : 'Level 4 Memory Write/Read Requests',
     ws : {
         //host : window.location.hostname,
         host : 'localhost',
@@ -39,4 +39,40 @@ export const environment = {
      * Used only when fetching config.json failed
      */
     apiUrl : 'api',
+    config: {
+        api: {
+            "url" : "/api",
+            "host" : null,
+            "port" : null,
+            "proto" : null
+        },
+        logo : "assets/examon_logo.png",
+        name : "Examon Web",
+        metrics: {
+            "core_load": {
+                "name": "Core's Load",
+                "metric": "load_core",
+                "level": "core",
+                "factor": 1,
+                "unit": "%",
+                "range": [0, 100],
+            },
+            "node_load": {
+                "name": "Node's Load",
+                "metric": "load_node",
+                "level": "node",
+                "factor": 1,
+                "unit": "%",
+                "range": [0, 100],
+            },
+            "cluster_load": {
+                "name": "Cluster's Load",
+                "metric": "load_cluster",
+                "level": "cluster",
+                "factor": 1,
+                "unit": "%",
+                "range": [0, 100],
+            },
+        },
+    },
 };
