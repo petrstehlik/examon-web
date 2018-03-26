@@ -42,6 +42,7 @@ class Aggregate():
     def aggregate(self, query):
         query = self.attach_agg(query)
         query = self.group_tags(query)
+        query['cache_time'] = 86400
 
         for item in query["metrics"]:
             item["aggregators"].append({
