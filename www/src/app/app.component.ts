@@ -35,14 +35,13 @@ export class AppComponent implements OnInit {
                 private msg: MessageService) {}
 
     ngOnInit() {
-        this.getModules();
         this.getIsOpen();
-        this.user = JSON.parse(localStorage.getItem('user'));
         this.session_id = localStorage.getItem('session');
         this.router.events.subscribe(val => {
             // the router will fire multiple events, we need NavigationEnd
             // we only want to react if it's the final active route
             if (val instanceof NavigationEnd) {
+                this.getModules();
                 if (this.router.url === '/setup') {
                     this.isLoginPage = true;
                 } else if (this.router.url === '/login') {
@@ -52,7 +51,7 @@ export class AppComponent implements OnInit {
                     this.auth.checkSession().subscribe(
                         data => {},
                         error => {
-                            console.log(error.status)
+                            console.log(error.status);
                             console.error('The session "' + this.session_id + '" is invalid');
                             this.logout();
                         });
@@ -80,8 +79,8 @@ export class AppComponent implements OnInit {
     }
 
     getModules() {
-        console.log('calling getmodules')
-        console.log(this.router.config)
+        this.user = JSON.parse(localStorage.getItem('user'));
+        this.modules = [];
         for (const route of this.router.config ) {
             if (route.data && route.data['name']) {
                 route.data['path'] = route.path;
@@ -93,7 +92,7 @@ export class AppComponent implements OnInit {
             this.logo = {
                 src : data['logo'],
                 alt : data['name']
-            }
+            };
             this.titleService.setTitle(data['name'])
         })
     }
