@@ -22,7 +22,14 @@ log = logging.getLogger(__name__)
 subscribed_metrics = dict()
 
 metrics = {
-    'M4WR_MEM': 'ame_pub/chnl/data/occ/2/cmp/MEM/id/+/unt/GBs/M4WR_MEM'
+    'M4WR_MEM': 'ame_pub/chnl/data/occ/2/cmp/MEM/id/+/unt/GBs/M4WR_MEM',
+    'UTIL_P0': 'ame_pub/chnl/data/occ/2/cmp/CORE/id/+/unt/Per/UTIL_P0',
+    'TEMP_P0': 'ame_pub/chnl/data/occ/1/cmp/CORE/id/9/unt/C/TEMP_P0',
+    'GPU_Power': 'ipmi_pub/chnl/data/GPU_Power',
+    'Fan_Power': 'ipmi_pub/chnl/data/Fan_Power',
+    'Proc0_Power': 'ipmi_pub/chnl/data/Proc0_Power',
+    'Proc1_Power': 'ipmi_pub/chnl/data/Proc1_Power',
+    'Ambient_Temp': 'ipmi_pub/chnl/data/Ambient_Temp',
 }
 
 
