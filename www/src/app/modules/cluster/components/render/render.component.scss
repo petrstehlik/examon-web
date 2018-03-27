@@ -43,9 +43,19 @@
         padding: 0.5em 1em;
         .node {
             border: 1px solid black;
-            padding: 0.5em 1em;
+            padding: 0.5em 1em 0.5em 25px;
             text-align: center;
             cursor: pointer;
+            position: relative;
+
+            .color-box {
+                width: 25px;
+                height: 100%;
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
 
             &:hover {
                 background: darken(white, 5%);

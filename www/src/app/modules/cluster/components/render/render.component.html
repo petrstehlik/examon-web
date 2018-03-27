@@ -10,13 +10,12 @@
 
 <section class="cluster row">
     <div class="col rack" *ngFor="let col of cluster">
-        <div *ngFor="let node of col" class="node" [style.background-color]="'rgb(' +
+        <div *ngFor="let node of col" class="node">
+            <div class="color-box" [style.background-color]="'rgb(' +
             data[node]?.color_rgb?.r + ',' +
             data[node]?.color_rgb?.g + ',' +
-            data[node]?.color_rgb?.b + ')'"
-        >
-            {{ node }}
-            {{ data[node]| json }}
+            data[node]?.color_rgb?.b + ')'"></div>
+            {{ node }} <small>{{ data[node]?.value | number: '.2' }}</small>
         </div>
     </div>
 </section>

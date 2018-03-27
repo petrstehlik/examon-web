@@ -19,7 +19,7 @@ export class RenderComponent implements OnInit, OnDestroy {
     public metrics = metrics;
     private socket;
     public data = {};
-    public range = {}
+    public range = {};
 
     public cluster = [
         ['davide0', 'davide1', 'davide2', 'davide3', 'davide4', 'davide5', 'davide6', 'davide7', 'davide8', 'davide9','davide10', 'davide11', 'davide12', 'davide13', 'davide14'],
@@ -57,7 +57,10 @@ export class RenderComponent implements OnInit, OnDestroy {
      * @param {string} metric
      */
     public subscribe(metric = active_metric) {
+        this.socket.emit('unsubscribe-metric', {metric: active_metric})
+        active_metric = metric;
         this.socket.emit('subscribe-metric', {metric : metric});
+        this.data = {}
     }
 
     private initialData() {
@@ -80,7 +83,7 @@ export class RenderComponent implements OnInit, OnDestroy {
     private receiveData() {
         this.socket.on('data', (data) => {
             this.data[data['node']] = data['data'];
-            this.range = data['range']
+            this.range = data['range'];
             this.color_node(data['node'], data['data']['value'])
         })
     }
