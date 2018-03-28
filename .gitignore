@@ -82,6 +82,7 @@ celerybeat-schedule
 .venv/
 venv/
 ENV/
+venv*/
 
 # Spyder project settings
 .spyderproject
@@ -101,3 +102,5 @@ dist
 # Ignore local configs
 config.ini
 config.ts
+
+.idea/
