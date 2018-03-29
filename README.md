@@ -15,3 +15,9 @@ To get a better picture on how it works and what is does a popularistic article 
 * Flask
 * pyKairosDB
 * and more...
+
+
+## Galileo
+
+Absolute start of data: 1509580800[000] 11/02/2017 @ 12:00am (UTC)
+Absolute end of data: 1511184044[000] 11/20/2017 @ 1:20pm (UTC)
