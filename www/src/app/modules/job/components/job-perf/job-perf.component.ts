@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { environment as env } from 'environments/environment';
 
-import { JobService } from 'app/services/job.service';
 import { TimeserieService } from 'app/services/timeserie.service';
 import { Job } from 'app/interfaces';
 
@@ -20,19 +19,15 @@ export class JobPerfComponent implements OnInit {
     set setJob(job: Job) {
         if (job != null) {
             this.job = job;
-            this.fetch('utilization', 'core', 'UTIL_P0', 20,1.0);
-            this.fetch('ips', 'node', ['IPS_P0']); // MIPS
-            this.fetch('freq', 'node', ['FREQA_P0'], );
-            //this.fetch('load_core_cluster',  'cluster', 'UTIL_P0', env.window.pmu, 1.0);
-            this.fetch('notfin', 'core', ['NOTFIN_P0', 'NOTBZE_P0']);
-            this.fetch('volt', 'core', ['VOLT_V0', 'VOLT_V1'], null, 0.1);
-            this.fetch('mem_rd', 'core', ['MRD_P0', 'MWR_P0']);
-            this.fetch('l4', 'core', ['M4RD_MEM', 'M4WR_MEM']);
-            /*
+            this.fetch('load_core', 'core', 'load_core');
+            this.fetch('load_core_cluster', 'cluster', 'load_core', env.window.pmu);
             this.fetch('utils', 'node', ['Mem_Utilization', 'CPU_Utilization', 'IO_Utilization', 'Sys_Utilization'], env.window.ipmi + 5);
-            this.fetch('be_bound', 'core', 'back_end_bound');
             this.fetch('fe_bound', 'core', 'front_end_bound');
-            */
+            this.fetch('be_bound', 'core', 'back_end_bound');
+            this.fetch('febe_bound', 'cluster', ['retiring', 'L1L2_bound', 'L3_bound']);
+            this.fetch('ips', 'core', ['ips', 'freq']);
+            this.fetch('cstates', 'node', ['C3res', 'C6res']);
+
         }
     }
 

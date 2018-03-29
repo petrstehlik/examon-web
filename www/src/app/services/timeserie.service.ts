@@ -45,7 +45,7 @@ export class TimeserieService {
         if ('data' in job) {
             //for (let key of job["data"]["asoc_nodes"]) {
             for (const key of job['data']['node_list']) {
-                params = params.append('node', 'davide' + String(key));
+                params = params.append('node', String(key));
             }
         }
 

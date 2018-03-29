@@ -2,16 +2,16 @@
     <div class="col">
         <div class="card text-center">
             <ex-graph
-                [data]="data['job_utilization']"
-                [loading]="data['loading_utilization']"
-                topTitle="Node's Utilization"
+                [data]="data['job_load_core']"
+                [loading]="data['loading_load_core']"
+                topTitle="Core Load"
                 labelY="Load (%)">
             </ex-graph>
         </div>
     </div>
 </div>
 
-<!--div class="row mb-3">
+<div class="row mb-3">
     <div class="col">
         <div class="card text-center">
             <ex-graph
@@ -22,7 +22,7 @@
             </ex-graph>
         </div>
     </div>
-</div-->
+</div>
 
 <div class="row mb-3">
     <div class="col-12">
@@ -42,11 +42,11 @@
     <div class="col-12">
         <div class="card text-center">
            <ex-graph
-                [data]="data['job_freq']"
-                [loading]="data['loading_freq']"
-                topTitle="Frequency"
+                [data]="data['job_fe_bound']"
+                [loading]="data['loading_fe_bound']"
+                topTitle="Front-end Bounds"
                 range="null"
-                labelY="MHz">
+                labelY="Bounds (%)">
             </ex-graph>
         </div>
     </div>
@@ -56,11 +56,26 @@
     <div class="col-12">
         <div class="card text-center">
            <ex-graph
-                [data]="data['job_notfin']"
-                [loading]="data['loading_notfin']"
-                topTitle="Not Finished & Not Busy Cycles"
+                [data]="data['job_be_bound']"
+                [loading]="data['loading_be_bound']"
+                topTitle="Back-end Bounds"
                 range="null"
-                labelY="">
+                labelY="Bounds (%)">
+            </ex-graph>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <ex-graph
+                [data]="data['job_febe_bound']"
+                [loading]="data['loading_febe_bound']"
+                height="150"
+                stacked="true"
+                topTitle="Front/Back-end Bound"
+                labelY="Utilization (%)">
             </ex-graph>
         </div>
     </div>
@@ -70,39 +85,10 @@
     <div class="col-12">
         <div class="card text-center">
            <ex-graph
-                [data]="data['job_mem_rd']"
-                [loading]="data['loading_mem_rd']"
-                topTitle="Memory R/W Requests"
-                range="null"
-                labelY="">
-            </ex-graph>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card text-center">
-           <ex-graph
-                [data]="data['job_l4']"
-                [loading]="data['loading_l4']"
-                topTitle="L4 Cache R/W Requests"
-                range="null"
-                labelY="">
-            </ex-graph>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card text-center">
-           <ex-graph
-                [data]="data['job_volt']"
-                [loading]="data['loading_volt']"
-                topTitle="Voltage Levels"
-                range="null"
-                labelY="">
+                [data]="data['job_cstates']"
+                [loading]="data['loading_cstates']"
+                topTitle="C3 & C6 States"
+                labelY="Share">
             </ex-graph>
         </div>
     </div>
