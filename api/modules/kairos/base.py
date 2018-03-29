@@ -46,6 +46,15 @@ def list_tags():
     return str(res.content)
 
 
+@app.route("/kairos/tagvalues")
+def list_tagvalues():
+    """
+    List all available tag values
+    """
+    res = requests.get(generate_base_url() + "/tagvalues", auth=(conn.user, conn.passw))
+    return res.content
+
+
 @app.route("/kairos/core")
 def core_level():
     """Load data on per-core level in dygraphs-friendly format
@@ -203,19 +212,19 @@ def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags
 
     if not tags:
         tags_parsed = {
-                    "org" : config["kairosdb"].get("org", "e4"),
-                    "cluster" : config["kairosdb"].get("cluster", "davide")
+                    "org" : config["kairosdb"].get("org", "cineca"),
+                    "cluster" : config["kairosdb"].get("cluster", "galileo")
                 }
     else:
         tags_parsed = merge_dicts({
-                "org" : config["kairosdb"].get("org", "e4"),
-                "cluster" : config["kairosdb"].get("cluster", "davide")
+                "org" : config["kairosdb"].get("org", "cineca"),
+                "cluster" : config["kairosdb"].get("cluster", "galileo")
             }, tags)
 
     res = reader.read(conn,
             args["metric"],
-            start_absolute = args["from"] / 1000,
-            end_absolute = args["to"] / 1000,
+            start_absolute = args["from"],
+            end_absolute = args["to"],
             tags = tags_parsed,
             query_modifying_function = mod_func
             )

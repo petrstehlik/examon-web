@@ -71,7 +71,7 @@ def get_job(jobid):
 
 
 @jobs.route('/latest')
-@auth.required()
+#@auth.required()
 def jobs_latest():
     """Fetch all jobs that finished in last 30 minutes, sort them by start_time and return the last one.
 
@@ -84,26 +84,26 @@ def jobs_latest():
             statement = "SELECT * FROM {} WHERE user_id = {} AND start_time >= {} ALLOW FILTERING"\
                 .format(config['tables']['jobs'], user_id, start_time)
         else:
-            statement = "SELECT * FROM {} WHERE start_time >= {} ALLOW FILTERING".format(config['tables']['jobs'], start_time)
+            statement = "SELECT * FROM {} WHERE start_time >= {} AND start_time <= 1511184044000 ALLOW FILTERING".format(config['tables']['jobs'], start_time)
         return session.execute(statement)
 
     # TODO: this will be useful when the LDAP will be connected
-    user_session = auth.lookup(request.headers.get('Authorization', None))
-    user = db.get('users', 'username', user_session['user'].username)
+    #user_session = auth.lookup(request.headers.get('Authorization', None))
+    #user = db.get('users', 'username', user_session['user'].username)
 
-    if user['role'] > Role.admin:
-        user_id = pam.get_uid(user['username'])
+    #if user['role'] > Role.admin:
+    #    user_id = pam.get_uid(user['username'])
 
-    else:
-        user_id = None
+    #else:
+    #    user_id = None
 
     # Get last job ID
-    tstamp = (int(time.time()) - 1800) * 1000
-    qres = query(tstamp, user_id=user_id)
+    tstamp = 1511184044000 - 1800000 #(int(time.time()) - 1800) * 1000
+    qres = query(tstamp)
 
-    while len(qres.current_rows) == 0:
+    while len(qres.current_rows) <= 100:
         tstamp = tstamp - 43200000
-        qres = query(tstamp, user_id=user_id)
+        qres = query(tstamp)
 
     results = [Job.from_dict(item) for item in qres]
 
