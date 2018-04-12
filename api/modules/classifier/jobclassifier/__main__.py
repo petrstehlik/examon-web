@@ -32,23 +32,24 @@ class NetworkList:
     back_end_bound  = 11
 
 metrics = [
-        "job_C6res",
-        "job_C3res",
-        "job_load_core",
-        "job_ips",
-        "job_Sys_Utilization",
-        "job_IO_Utilization",
-        "job_Mem_Utilization",
-        "job_CPU_Utilization",
-        "job_L1L2_Bound",
-        "job_L3_Bound",
-        "job_front_end_bound",
-        "job_back_end_bound",
+        "C6res",
+        "C3res",
+        "load_core",
+        "ips",
+        "Sys_Utilization",
+        "IO_Utilization",
+        "Mem_Utilization",
+        "CPU_Utilization",
+        "L1L2_Bound",
+        "L3_Bound",
+        "front_end_bound",
+        "back_end_bound",
         "jobber"
         ]
 
 
 INPUTS = 80
+
 
 def normalize(job):
     for metric in analyzer.metrics:
@@ -61,48 +62,56 @@ def normalize(job):
         else:
             for point in job[metric]['data']:
                 # normalize to fraction percentage
-                point[1] = point[1]/(100.0)
+                point[1] = point[1]/100.0
     return job
 
+
 def runner(x):
+    """Train a network using given metric.
+
+    :param x: metric name
+    """
     global metrics
     global args
 
     try:
-        networks[x].train(metric_data[metrics[x]], 0.5, epochs = args.epochs, epsilon = 0.1)
+        networks[x].train(metric_data[metrics[x]], 0.5, epochs=args.epochs, epsilon=0.1)
     except Exception as e:
         log.error("Exception: {}, dumping config for {}".format(str(e), metrics[x]))
     with open(os.path.join(args.config_dir, metrics[x] + '_network.json'), 'w+') as fp:
         json.dump(networks[x].export(), fp)
 
-def argparser():
+
+def arg_parser():
     global args
     parser = argparse.ArgumentParser()
     parser.add_argument('--train',
-            action="store_true",
-            help='Train the network using data.json dataset')
+                        action="store_true",
+                        help='Train the network using data.json dataset')
     parser.add_argument('--eval',
-            dest='config_eval',
-            default='configs',
-            help='Evaluate learned network with data.json dataset')
+                        dest='config_eval',
+                        default='configs',
+                        help='Evaluate learned network with data.json dataset')
     parser.add_argument('--dir',
-            dest='config_dir',
-            default='configs',
-            help='Where to store configs')
+                        dest='config_dir',
+                        default='configs',
+                        help='Where to store configs')
     parser.add_argument('--max-epochs',
-            dest="epochs",
-            type=int,
-            help="Maximum number of epochs (default: 10 000)",
-            default=10000)
+                        dest="epochs",
+                        type=int,
+                        help="Maximum number of epochs (default: 10 000)",
+                        default=10000)
 
     args = parser.parse_args()
+
 
 def initializer():
     """Ignore CTRL+C in the worker process."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
+
 if __name__ == "__main__":
-    argparser()
+    arg_parser()
     log.info("Loading data")
     with open('data.json') as fp:
         data = json.load(fp)
@@ -117,8 +126,7 @@ if __name__ == "__main__":
         metric_data[metric] = []
         for job in data:
             # Prepare metric data
-            point_data = analyzer.stretch(job[metric]['data'], size = INPUTS)
-            point_data = point_data.tolist()
+            point_data = analyzer.stretch(job[metric]['data'], size=INPUTS).to_list()
             point_data.append([1 if job[metric]['suspicious'] else 0])
             metric_data[metric].append(point_data)
 
@@ -173,8 +181,7 @@ if __name__ == "__main__":
 
             print("-- {}".format(metric))
             for item in metric_data[metric][-5:]:
-                print("Expected: {0}, Got: {1:.2f}"
-                        .format(item[-1], (network.predict(item[:-1])[0])))
+                print("Expected: {0}, Got: {1:.2f}".format(item[-1], (network.predict(item[:-1])[0])))
 
         print("Complex Job Evaluating")
         networks = [None] * (len(metrics))

@@ -7,32 +7,36 @@ logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 metrics = [
-    "job_load_core",
-    "job_Sys_Utilization",
-    "job_IO_Utilization",
-    "job_Mem_Utilization",
-    "job_CPU_Utilization",
-    "job_L1L2_Bound",
-    "job_L3_Bound",
-    "job_ips",
-    "job_front_end_bound",
-    "job_back_end_bound",
-    "job_C3res",
-    "job_C6res",
-    "job_CPU1_Temp",
-    "job_CPU2_Temp"
+    "load_core",
+    "Sys_Utilization",
+    "IO_Utilization",
+    "Mem_Utilization",
+    "CPU_Utilization",
+    "L1L2_Bound",
+    "L3_Bound",
+    "ips",
+    "front_end_bound",
+    "back_end_bound",
+    "C3res",
+    "C6res",
+    #"job_CPU1_Temp",
+    #"job_CPU2_Temp"
         ]
 
 
-def stretch(data, size=120):
+def stretch(data, size=120, transform=True):
     """
     Take datapoints and stretch them to (60*60*24)/30 = 2880 values using interpolation
     """
-    points = np.array([point[1] for point in data])
+    points = np.array(data)
+
+    if transform:
+        points = np.array([point[1] for point in data])
+
     interp_points = interp.interp1d(np.arange(points.size), points)
     stretched = interp_points(np.linspace(0, points.size - 1, size))
 
-    return stretched
+    return stretched.tolist()
 
 
 def stats(data):
