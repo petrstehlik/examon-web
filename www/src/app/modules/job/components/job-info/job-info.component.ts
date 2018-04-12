@@ -79,7 +79,7 @@ export class JobInfoComponent implements OnInit, OnDestroy {
     }
 
     private processJob() {
-        this.job['from'] = this.job['data']['queue_time'];
+        this.job['from'] = this.job['data']['start_time'];
 
         if (this.job['data']['active']) {
             this.startSocket();

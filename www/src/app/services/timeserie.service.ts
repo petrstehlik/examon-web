@@ -49,8 +49,8 @@ export class TimeserieService {
             }
         }
 
-        params = params.set('from', job['from'])
-                    .set('to', job['to']);
+        params = params.set('from', String(job['from']/1000))
+                    .set('to', String(job['to']/1000));
 
         if (metric.constructor == Array) {
             for (const item of metric) {
