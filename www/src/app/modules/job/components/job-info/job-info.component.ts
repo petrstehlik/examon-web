@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClient } from "@angular/common/http";
 
 import { environment as env } from 'environments/environment';
 
@@ -60,6 +61,8 @@ export class JobInfoComponent implements OnInit, OnDestroy {
 
     public load_core_options = this.default_chart_options;
 
+    public job_classification;
+
     /**
      * Process job data and if event is live start websocket
      */
@@ -72,7 +75,8 @@ export class JobInfoComponent implements OnInit, OnDestroy {
     }
 
     constructor(private modal: NgbModal,
-        private timeserie: TimeserieService) { }
+                private timeserie: TimeserieService,
+                private http : HttpClient) { }
 
     ngOnInit() {
         this.load_core_options['title']['text'] = 'Cores\' Load';
@@ -81,8 +85,10 @@ export class JobInfoComponent implements OnInit, OnDestroy {
     private processJob() {
         this.job['from'] = this.job['data']['start_time'];
 
+        this.fetchClassification();
+
         if (this.job['data']['active']) {
-            this.startSocket();
+            // this.startSocket();
             this.fetchInt = setInterval(() => {
                 this.startFetchRaw('load_core', 'node', 'power', this.aggWindow());
             }, env.interval);
@@ -111,6 +117,14 @@ export class JobInfoComponent implements OnInit, OnDestroy {
                 clearInterval(this.fetchInt);
             }
         });
+    }
+
+    private fetchClassification() {
+        console.log('fetching classification');
+        this.http.get('/classifier/' + this.job.id).subscribe(
+            (res) => {
+                this.job_classification = res
+            });
     }
 
     /**

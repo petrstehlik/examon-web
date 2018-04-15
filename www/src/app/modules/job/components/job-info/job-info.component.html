@@ -222,6 +222,25 @@
 </div>
 
 
+    <section class="classifier row">
+        <div class="col-2">
+            <div class="card">
+                <div class="card-block text-center">
+                    <small class="card-title">Jobber Output</small>
+                    <h5 >
+                        {{ job_classification['jobber'] }}
+                    </h5>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <pre>{{ job_classification | json }}</pre>
+            </div>
+        </div>
+    </section>
+
+
 </section>
 
 <ng-template #nodes let-c="close">

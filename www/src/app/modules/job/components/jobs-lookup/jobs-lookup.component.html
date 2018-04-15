@@ -32,6 +32,12 @@
                 </span>
             </div>
 
+            <form #f="ngForm" (ngSubmit)="query(f.value)">
+                <input type="number" name="duration" id="duration" ngModel>
+                {{ duration.value }}
+                <input type="submit" title="Query">
+            </form>
+
             <table *ngIf="lastjob" class="table table-hover">
                 <tr>
                     <th scope="col">ID</th>

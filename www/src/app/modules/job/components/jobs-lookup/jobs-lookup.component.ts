@@ -43,12 +43,14 @@ export class JobsLookupComponent implements OnInit {
     public active_jobs = {};
     public active_jobs_id = [];
 
+    public duration = 0;
+
     constructor(private router: Router,
         private http: HttpClient,
         private msg: MessageService) { }
 
     ngOnInit() {
-        this.http.get<Job>('/jobs/latest').subscribe(
+        this.http.get<Job>('/jobs/latest?duration=' + this.duration).subscribe(
             data => {
                 this.lastjob = data;
             },
@@ -63,9 +65,20 @@ export class JobsLookupComponent implements OnInit {
 
     }
 
+    public query(f) {
+        this.duration = f.duration;
+        this.http.get<Job>('/jobs/latest?duration=' + this.duration).subscribe(
+            data => {
+                this.lastjob = data;
+            },
+            error => {
+                this.msg.send('Cannot fetch latest job', 'danger');
+            });
+    }
+
     public lookup() {
         // Strip whitespace and go to given route
-        this.router.navigate([this.jobid.trim()]);
+        this.router.navigate(['/jobs/', this.jobid.trim()]);
     }
 
 }
