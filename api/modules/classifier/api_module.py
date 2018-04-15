@@ -10,6 +10,7 @@ from modules.models.Job import Job
 from modules.jobs.cassandra_connector import connect, prepare_statements
 
 import logging
+import numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -33,19 +34,12 @@ def get_job(jobid):
     if len(info.current_rows) == 0:
         return '', 404
 
-    job = Job.from_dict(info[0])
+    return Job.from_dict(info[0])
 
-    # Try to fetch measurements from DB
-    measures = session.execute(prepared["measures"], (jobid,))
-
-    if len(measures.current_rows) > 0:
-        job.add_measures(measures[0])
-
-    return job
 
 def initialize_networks():
     output_networks = {}
-    for x, metric in enumerate(metrics):
+    for x, metric in enumerate(metrics + ['jobber']):
         with open(os.path.join(os.path.dirname(__file__), 'configs/{}_network.json'.format(metric))) as fp:
             output_networks[metric] = Network.load(json.load(fp))
 
@@ -122,7 +116,12 @@ def classify(job_id):
 
     metric_data = {}
 
-    res = {}
+    res = {
+        'jobber_input': [],
+    }
+
+    for m in metrics:
+        res[m] = [0.0]
 
     for m in metrics:
         try:
@@ -132,11 +131,31 @@ def classify(job_id):
 
             for chunk in chunks(data, 120):
                 data = stretch(chunk, transform=False)
-                res[m].append(networks[m].predict(data))
-        except:
-            pass
+                res[m].append(networks[m].predict(data)[0])
+            if len(res[m]) > 0:
+                res['jobber_input'].append(np.max(res[m]))
+        except Exception as e:
+            log.error(e)
+            res['jobber_input'].append(0.0)
 
-    # Normalize the dataset
+    stats_res = {
+        'jobber': {}
+    }
 
     # Classify the job
-    return json.dumps(res)
+
+    for m in metrics:
+        stats_res[m] = {
+            'min': np.min(res[m]),
+            'max': np.max(res[m]),
+            'avg': np.average(res[m]),
+            'mean': np.mean(res[m])
+        }
+
+    for a in ['min', 'max', 'avg', 'mean']:
+        data = []
+        for m in metrics:
+            # for each statistical result classify the job
+            data.append(stats_res[m][a])
+        stats_res['jobber'][a] = networks['jobber'].predict(data)[0]
+    return json.dumps(stats_res)
