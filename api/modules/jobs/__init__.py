@@ -1,29 +1,21 @@
 from muapi import config
 from muapi.error import ApiException
-from modules.utils import transform_live_job, time_serializer, split_list
+from muapi.Module import Module
+from modules.utils import get_duration
 from modules.models.Job import Job
 
 from flask import request
-from muapi.Module import Module
-from muapi import auth
 from muapi import config
-from muapi import db
-from muapi.role import Role
 from .JobManager import JobManager
-from modules.remote_pam.ssh import RemotePAM
 
 from .cassandra_connector import connect, prepare_statements
 import json
 import datetime, time, calendar
-from datetime import timedelta
 import logging
 
 
-jobman = JobManager(config['jobs']['server'], 1883, json.loads(config['jobs']['topics']))
+app = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
 
-from .sockets import *
-
-jobman.on_receive = emit_data
 
 log = logging.getLogger(__name__)
 
@@ -38,17 +30,9 @@ try:
 except Exception as e:
     log.error("Failed to connect to Cassandra: %s" % str(e))
 
-jobs = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
-pam = RemotePAM()
-
-
-@jobs.route('/<string:jobid>', methods=['GET'])
-def get_job(jobid):
+@app.route('/<string:jobid>', methods=['GET'])
+def get_job_data_json(jobid):
     log.info("Query for job ID", jobid)
-
-    if jobid in jobman.db:
-        # The job is currently running, we can fetch the info we need
-        return json.dumps(transform_live_job(jobid, jobman), default=Job.time_serializer)
 
     try:
         jobid = int(jobid)
@@ -70,40 +54,36 @@ def get_job(jobid):
     return job.json()
 
 
-@jobs.route('/latest')
-#@auth.required()
+@app.route('/latest', methods=['GET'])
 def jobs_latest():
     """Fetch all jobs that finished in last 30 minutes, sort them by start_time and return the last one.
 
     If no jobs were found, try looking further in steps of 12 hours until found.
     """
 
-    def query(start_time, user_id=None):
+    def query(start_time, duration=0):
         """Query the jobs in given time span."""
-        if user_id:
-            statement = "SELECT * FROM {} WHERE user_id = {} AND start_time >= {} ALLOW FILTERING"\
-                .format(config['tables']['jobs'], user_id, start_time)
-        else:
-            statement = "SELECT * FROM {} WHERE start_time >= {} AND start_time <= 1511184044000 ALLOW FILTERING".format(config['tables']['jobs'], start_time)
+
+        statement = "SELECT * FROM {} WHERE start_time >= {} AND start_time <= 1511184044000 ALLOW FILTERING".format(config['tables']['jobs'], start_time)
         return session.execute(statement)
 
-    # TODO: this will be useful when the LDAP will be connected
-    #user_session = auth.lookup(request.headers.get('Authorization', None))
-    #user = db.get('users', 'username', user_session['user'].username)
+    def filter_duration(qres, dur=0):
+        dur = int(dur)
+        res = []
+        for item in qres:
+            duration = item['end_time'] - item['start_time']
+            if duration >= datetime.timedelta(milliseconds=dur):
+                res.append(item)
 
-    #if user['role'] > Role.admin:
-    #    user_id = pam.get_uid(user['username'])
-
-    #else:
-    #    user_id = None
+        return res
 
     # Get last job ID
-    tstamp = 1511184044000 - 1800000 #(int(time.time()) - 1800) * 1000
-    qres = query(tstamp)
+    tstamp = 1511184044000 - 1800000
+    qres = filter_duration(query(tstamp), dur=request.args['duration'])
 
-    while len(qres.current_rows) <= 100:
+    while len(qres) <= 100:
         tstamp = tstamp - 43200000
-        qres = query(tstamp)
+        qres = filter_duration(query(tstamp), dur=request.args['duration'])
 
     results = [Job.from_dict(item) for item in qres]
 
@@ -111,7 +91,7 @@ def jobs_latest():
     return json.dumps([job.dict() for job in reversed(ordered[-100:])], default=Job.time_serializer)
 
 
-@jobs.route('/stats/total', methods=['GET'])
+@app.route('/stats/total', methods=['GET'])
 def jobs_total():
     """
         Analyze jobs in given period
@@ -161,14 +141,3 @@ def jobs_total():
 
     return(json.dumps(results))
 
-@jobs.route('/active', methods=['GET'])
-def get_active_jobs():
-    return(json.dumps(jobman.db))
-
-@jobs.route('/failed', methods=['GET'])
-def get_failed_jobs():
-    return(json.dumps(jobman.db_fail))
-
-@jobs.route('/finished', methods=['GET'])
-def get_finished_jobs():
-    return(json.dumps(jobman.finished))
