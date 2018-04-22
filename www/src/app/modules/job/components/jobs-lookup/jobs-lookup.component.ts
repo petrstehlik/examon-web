@@ -67,7 +67,7 @@ export class JobsLookupComponent implements OnInit {
 
     public query(f) {
         this.duration = f.duration;
-        this.http.get<Job>('/jobs/latest?duration=' + this.duration).subscribe(
+        this.http.get<Job>('/jobs/latest?duration=' + String(this.duration * 1000)).subscribe(
             data => {
                 this.lastjob = data;
             },

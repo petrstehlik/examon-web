@@ -1,63 +1,56 @@
-<div class="container-fluid" style="height: 100vh">
-    <div class="row">
-        <div class="wrapper container">
-            <form novalidate style="width: 350px;">
-                <div class="input-group">
-                    <input type="text"
-                        [(ngModel)]="jobid"
-                        name="jobid"
-                        class="form-control"
-                        placeholder="Enter a job ID obtained by PBS">
-                    <span class="input-group-btn">
-                        <button type="button"
-                            class="btn btn-primary"
-                            (click)="lookup()">
-                            Search
-                        </button>
-                    </span>
-                </div>
-            </form>
-
-            <br />
-
-            <div style="max-width: 600px">
-                <h4>Active jobs</h4>
-                <span *ngFor="let job of active_jobs_id "
-                    class="btn btn-secondary btn-sm mr-2 mb-2">
-                    <a [routerLink]="[job]" >{{ job }}</a>
-                </span>
-
-                <span *ngIf="active_jobs_id.length == 0">
-                    <small>No active jobs :(</small>
+<div class="container">
+    <div class="row my-5">
+        <form novalidate style="min-width: 350px; margin: 0 auto;">
+            <h2 class="text-center">Job Lookup</h2>
+            <div class="input-group">
+                <input type="text"
+                    [(ngModel)]="jobid"
+                    name="jobid"
+                    class="form-control"
+                    placeholder="Enter the job ID">
+                <span class="input-group-btn">
+                    <button type="button"
+                        class="btn btn-primary"
+                        (click)="lookup()">
+                        Search
+                    </button>
                 </span>
             </div>
+        </form>
+    </div>
 
-            <form #f="ngForm" (ngSubmit)="query(f.value)">
-                <input type="number" name="duration" id="duration" ngModel>
+    <div class="row">
+        <h2 class="text-center mx-auto my-3">Latest jobs</h2>
+
+        <form #f="ngForm" (ngSubmit)="query(f.value)" class="col-offset-3 col-6">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">Minimum Job Duration (s)</span>
+                </div>
+                <input type="number" name="duration" id="duration" ngModel class="form-control" aria-describedby="basic-addon3">
                 {{ duration.value }}
-                <input type="submit" title="Query">
-            </form>
+                <input type="submit" title="Query" class="btn btn-secondary">
+            </div>
+        </form>
 
-            <table *ngIf="lastjob" class="table table-hover">
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Account</th>
-                    <th scope="col">Start time</th>
-                    <th scope="col">End time</th>
-                </tr>
-                <tr *ngFor="let job of lastjob" [routerLink]="[job?.job_id]" style="cursor: pointer">
-                    <td>
-                        {{  job?.job_id }}
-                    </td>
-                    <td>{{ job.job_name}}</td>
-                    <td>{{ job.account_name}}</td>
-                    <td>{{ job.start_time | date:'HH:mm:ss dd/MM/yy' }}</td>
-                    <td>{{ job.end_time | date:'HH:mm:ss dd/MM/yy' }}</td>
-                </tr>
-            </table>
-
-        </div>
+        <table *ngIf="lastjob" class="table table-hover">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Account</th>
+                <th scope="col">Duration (s)</th>
+                <th scope="col">Start time</th>
+                <th scope="col">End time</th>
+            </tr>
+            <tr *ngFor="let job of lastjob" [routerLink]="[job?.job_id]" style="cursor: pointer">
+                <td>{{  job?.job_id }}</td>
+                <td>{{ job.job_name}}</td>
+                <td>{{ job.account_name}}</td>
+                <td>{{ (job.end_time - job.start_time)/1000 | number }}</td>
+                <td>{{ job.start_time | date:'HH:mm:ss dd/MM/yy' }}</td>
+                <td>{{ job.end_time | date:'HH:mm:ss dd/MM/yy' }}</td>
+            </tr>
+        </table>
     </div>
 </div>
 
