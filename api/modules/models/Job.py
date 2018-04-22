@@ -225,6 +225,7 @@ class Job:
             'cpu_util': self.cpu_util,
             'gpu_power': self.gpu_power,
             'project': self.project,
+            'memory': self.memory,
         }
 
     def json(self):
