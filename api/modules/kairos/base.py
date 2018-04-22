@@ -89,6 +89,7 @@ def core_level():
 
     return json.dumps(join_data(res))
 
+
 @app.route("/kairos/cpu")
 def cpu_level():
     """
@@ -118,11 +119,11 @@ def cpu_level():
 
     for item in metrics:
         args["metric"] = [item]
-        res.append(query(args, 25, ['node', 'cpu'], tags = {
-                "node" : args["node"]
+        res.append(query(args, 25, ['node', 'cpu'], tags={
+                "node": args["node"]
             }))
 
-    return(json.dumps(join_data(res)))
+    return json.dumps(join_data(res))
 
 
 @app.route("/kairos/node")
@@ -147,8 +148,8 @@ def load_base():
     if len(args["node"]) > 0:
         for item in metrics:
             args["metric"] = [item]
-            res_list.append(query(args, 5, ['node'], tags = {
-                "node" : args["node"]
+            res_list.append(query(args, 5, ['node'], tags={
+                "node": args["node"]
             }))
 
         return json.dumps(join_data(res_list))
@@ -179,19 +180,19 @@ def cluster_level():
     if len(args["node"]) > 0:
         for item in metrics:
             args["metric"] = [item]
-            res_list.append(query(args, 5, ['cluster'], tags = {
-                "node" : args["node"]
+            res_list.append(query(args, 5, ['cluster'], tags={
+                "node": args["node"]
             }))
 
-        return(json.dumps(join_data(res_list)))
+        return json.dumps(join_data(res_list))
     else:
         args["metric"] = [args["metric"]]
         res_list.append(query(args, 5, ['cluster']))
 
-    return(json.dumps(join_data(res_list)))
+    return json.dumps(join_data(res_list))
 
 
-def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags = None):
+def query(args, aggregate_window, group_tags, modifying_func="aggregate", tags=None):
     check_times(args)
 
     agg = Aggregate(aggregate_window)
@@ -212,21 +213,21 @@ def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags
 
     if not tags:
         tags_parsed = {
-                    "org" : config["kairosdb"].get("org", "cineca"),
-                    "cluster" : config["kairosdb"].get("cluster", "galileo")
+                    "org": config["kairosdb"].get("org", "cineca"),
+                    "cluster": config["kairosdb"].get("cluster", "galileo")
                 }
     else:
         tags_parsed = merge_dicts({
-                "org" : config["kairosdb"].get("org", "cineca"),
-                "cluster" : config["kairosdb"].get("cluster", "galileo")
+                "org": config["kairosdb"].get("org", "cineca"),
+                "cluster": config["kairosdb"].get("cluster", "galileo")
             }, tags)
 
     res = reader.read(conn,
             args["metric"],
-            start_absolute = args["from"],
-            end_absolute = args["to"],
-            tags = tags_parsed,
-            query_modifying_function = mod_func
+            start_absolute=args["from"],
+            end_absolute=args["to"],
+            tags=tags_parsed,
+            query_modifying_function=mod_func
             )
 
     if "raw" in args:
@@ -241,8 +242,8 @@ def query(args, aggregate_window, group_tags, modifying_func = "aggregate", tags
     extract_data(res, data, labels, group_tags)
 
     return({
-        "points" : data,
-        "labels" : labels,
-        "metric" : res["queries"][0]["results"][0]["name"]
+        "points": data,
+        "labels": labels,
+        "metric": res["queries"][0]["results"][0]["name"]
     })
 

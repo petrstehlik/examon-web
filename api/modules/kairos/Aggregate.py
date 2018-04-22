@@ -1,4 +1,4 @@
-import json
+from muapi.configurator import Config
 
 class Aggregate():
     window = None
@@ -8,6 +8,7 @@ class Aggregate():
         self.default_window = default_window
         self.window = default_window
         self.tags = None
+        self.config = Config()
 
     def set_window(self, window):
         if window != self.default_window:
@@ -42,7 +43,7 @@ class Aggregate():
     def aggregate(self, query):
         query = self.attach_agg(query)
         query = self.group_tags(query)
-        query['cache_time'] = 86400
+        query['cache_time'] = self.config['kairosdb'].get('cache_time', 864000)
 
         for item in query["metrics"]:
             item["aggregators"].append({
@@ -54,7 +55,6 @@ class Aggregate():
                             "unit" : "seconds"
                         }
                 })
-        print(json.dumps(query))
         return query
 
     def gaps(self, query):
