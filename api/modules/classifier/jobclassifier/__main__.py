@@ -6,6 +6,7 @@ from multiprocessing import Pool
 import argparse
 import os
 import signal
+import sqlite3
 
 from network import Network
 from neuron import Neuron
@@ -17,19 +18,21 @@ metric_data = dict()
 networks = list()
 args = dict()
 
-class NetworkList:
-    C6              = 0
-    C3              = 1
-    load_core       = 2
-    ips             = 3
-    sys_util        = 4
-    io_util         = 5
-    mem_util        = 6
-    cpu_util        = 7
-    l1l2_bound      = 8
-    l3_bound        = 9
+
+class NetworkList(object):
+    C6 = 0
+    C3 = 1
+    load_core = 2
+    ips = 3
+    sys_util = 4
+    io_util = 5
+    mem_util = 6
+    cpu_util = 7
+    l1l2_bound = 8
+    l3_bound = 9
     front_end_bound = 10
-    back_end_bound  = 11
+    back_end_bound = 11
+
 
 metrics = [
         "C6res",
@@ -49,20 +52,47 @@ metrics = [
 
 
 INPUTS = 80
+DATA = []
+
+
+def load_data():
+    global metrics
+    # jobs = os.listdir('../../../../../examon-data/data_cluster')
+    conn = sqlite3.connect('../../../database-galileo.sq3')
+    conn.row_factory = sqlite3.Row
+
+    jobs = conn.cursor().execute('SELECT job_id FROM classifier').fetchall()
+
+    for job in jobs:
+        job_data = {
+            'jobber': {
+                'data': []
+            }
+        }
+        job_id = job[0]
+
+        susp = conn.cursor().execute('SELECT * FROM classifier WHERE job_id="{}"'.format(job_id)).fetchone()
+        for m in metrics[:-1]:
+            with open(os.path.join('../../../../../examon-data/data_cluster', job_id, m + '_raw.json')) as f:
+                m_data = json.load(f)
+                job_data[m] = {
+                    'data': analyzer.stretch(m_data['queries'][0]['results'][0]['values'], size=INPUTS),
+                    'suspicious': [susp[m]]
+                }
+            job_data['jobber']['data'].append(susp[m])
+        job_data['jobber']['suspicious'] = [susp['jobber']]
+
+        DATA.append(normalize(job_data))
 
 
 def normalize(job):
-    for metric in analyzer.metrics:
-        if metric == "job_ips":
-            for point in job[metric]['data']:
-                point[1] = point[1]/(8000000000.0)
-        if metric == "job_CPU1_Temp" or metric == "job_CPU2_Temp":
-            # Skip temperatures
-            continue
+    global metrics
+    for metric in metrics[:-1]:
+        if metric == "ips":
+            job[metric]['data'] = map(lambda x: x / 8000000000.0, job[metric]['data'])
         else:
-            for point in job[metric]['data']:
-                # normalize to fraction percentage
-                point[1] = point[1]/100.0
+            # normalize to fraction percentage
+            job[metric]['data'] = map(lambda x: x / 100.0, job[metric]['data'])
     return job
 
 
@@ -75,7 +105,7 @@ def runner(x):
     global args
 
     try:
-        networks[x].train(metric_data[metrics[x]], 0.5, epochs=args.epochs, epsilon=0.1)
+        networks[x].train(metric_data[metrics[x]][:250], 0.5, epochs=args.epochs, epsilon=0.1)
     except Exception as e:
         log.error("Exception: {}, dumping config for {}".format(str(e), metrics[x]))
     with open(os.path.join(args.config_dir, metrics[x] + '_network.json'), 'w+') as fp:
@@ -107,43 +137,32 @@ def arg_parser():
 
 def initializer():
     """Ignore CTRL+C in the worker process."""
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pass
+    # signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 
 if __name__ == "__main__":
     arg_parser()
     log.info("Loading data")
-    with open('data.json') as fp:
-        data = json.load(fp)
+    load_data()
 
-    log.info("Normalizing dataset")
-    for job in data:
-        job = normalize(job)
-
-    # Reorganize and interpolate data so that metrics from jobs are together
-    metric_data["jobber"] = []
-    for metric in metrics[:-1]:
+    # Reorganize data so that metrics from jobs are together
+    for metric in metrics:
+        # Prepare metric data
         metric_data[metric] = []
-        for job in data:
-            # Prepare metric data
-            point_data = analyzer.stretch(job[metric]['data'], size=INPUTS).to_list()
-            point_data.append([1 if job[metric]['suspicious'] else 0])
-            metric_data[metric].append(point_data)
+        for job in DATA:
+            md = job[metric]['data']
+            md.append(job[metric]['suspicious'])
+            metric_data[metric].append(md)
 
-    for job in data:
-        # Prepare jobber data
-        record = [1 if job[m]['suspicious'] else 0 for m in metrics[:-1]]
-        record.append([1 if job['suspicious'] else 0])
-
-        metric_data["jobber"].append(record)
-
+    log.info('Data ready')
 
     if args.train:
         # Create folder for networks configurations
         try:
             os.makedirs(args.config_dir)
         except Exception as e:
-            log.info("Folder exists, overwriting existings configurations")
+            log.info("Folder exists, overwriting existing configurations")
         networks = [
                 Network([INPUTS, INPUTS/20, 3, 1], "C6res"),
                 Network([INPUTS, INPUTS/20, 3, 1], "C3res"),
@@ -163,7 +182,7 @@ if __name__ == "__main__":
         log.info("Starting training")
 
         try:
-            p = Pool(processes = 13, initializer=initializer)
+            p = Pool(processes=13, initializer=initializer)
 
             p.map(runner, range(13))
             p.close()
