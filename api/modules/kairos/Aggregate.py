@@ -55,6 +55,8 @@ class Aggregate():
                             "unit" : "seconds"
                         }
                 })
+        import json
+        print(json.dumps(query))
         return query
 
     def gaps(self, query):

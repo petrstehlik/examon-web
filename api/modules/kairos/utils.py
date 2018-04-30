@@ -1,5 +1,6 @@
 from .error import JobsError
 import time
+from collections import OrderedDict
 
 from .base import conn
 
@@ -45,14 +46,14 @@ def extract_data(raw_data, data, labels, grouper):
             round_time = int(round(item[0], 1))
 
             if str(round_time) not in data:
-                data[str(round_time)] = [item[1]]
+                data[round_time] = [item[1]]
             else:
-                data[str(round_time)].append(item[1])
+                data[round_time].append(item[1])
 
 def join_data(data):
     labels = list()
     metrics = list()
-    points = dict()
+    points = OrderedDict()
 
     for dataset in data:
         for item in dataset["labels"]:
@@ -67,7 +68,7 @@ def join_data(data):
         metrics.append(dataset["metric"])
 
     return({
-            "points" : points,
-            "labels" : labels,
-            "metric" : metrics
+            "points": points,
+            "labels": labels,
+            "metric": metrics
         })

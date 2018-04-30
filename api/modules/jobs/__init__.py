@@ -1,4 +1,4 @@
-from muapi import config
+from muapi import config, dbConnector
 from muapi.error import ApiException
 from muapi.Module import Module
 from modules.utils import get_duration
@@ -12,6 +12,7 @@ from .cassandra_connector import connect, prepare_statements
 import json
 import datetime, time, calendar
 import logging
+import os
 
 
 app = Module('jobs', __name__, url_prefix = '/jobs', no_version=True)
@@ -30,9 +31,31 @@ try:
 except Exception as e:
     log.error("Failed to connect to Cassandra: %s" % str(e))
 
+config['data']['abs_path'] = os.path.join(os.getcwd(), config['data']['path'])
+jobs_data = {}
+jobs_list = []
+jobs_ids = os.listdir(config['data']['abs_path'])
+
+with open(config['data']['jobs'], 'r') as f:
+    jobs_raw = json.load(f)
+    for job in jobs_raw:
+        jobs_data[job['job_id']] = job
+
+for job in jobs_ids:
+    if job[0] == '.':
+        # Skip dotfiles
+        continue
+    data = jobs_data[job]
+    data['metrics'] = len(os.listdir(os.path.join(config['data']['abs_path'], job)))
+    jobs_list.append(data)
+
+jobs_list_json = json.dumps(jobs_list)
+job_db = dbConnector()
+
+
 @app.route('/<string:jobid>', methods=['GET'])
 def get_job_data_json(jobid):
-    log.info("Query for job ID", jobid)
+    log.info("Query for job ID {}".format(jobid))
 
     try:
         jobid = int(jobid)
@@ -60,6 +83,13 @@ def jobs_latest():
 
     If no jobs were found, try looking further in steps of 12 hours until found.
     """
+
+    global jobs_list
+
+    if config['api']['local']:
+        cur = job_db.connection.cursor()
+        res = cur.execute('SELECT job_id FROM classifier').fetchall()
+        return json.dumps({'data': jobs_list_json, 'classified': [job[0] for job in res]})
 
     def query(start_time, duration=0):
         """Query the jobs in given time span."""

@@ -6,12 +6,16 @@ import logging
 from muapi.configurator import Config
 
 
+cluster = None
+
+
 def connect():
     """
     Connect to a Cassandra cluster specified in config
 
     @return session instance
     """
+    global cluster
     conf = Config()
 
     # Set logging level only to ERROR
@@ -22,15 +26,16 @@ def connect():
     logger = logging.getLogger(__name__)
     logger.info("Connecting to Cassandra cluster")
 
-    auth = PlainTextAuthProvider(
-            username=conf["cassandradb"].get("user"),
-            password=conf["cassandradb"].get("password"))
-    cluster = Cluster(
-            contact_points=[conf["cassandradb"].get("server")],
-            port=conf['cassandradb'].getint("port", 9042),
-            auth_provider=auth,
-            connect_timeout=10.0,
-            control_connection_timeout=10.0)
+    if cluster is None:
+        auth = PlainTextAuthProvider(
+                username=conf["cassandradb"].get("user"),
+                password=conf["cassandradb"].get("password"))
+        cluster = Cluster(
+                contact_points=[conf["cassandradb"].get("server")],
+                port=conf['cassandradb'].getint("port", 9042),
+                auth_provider=auth,
+                connect_timeout=10.0,
+                control_connection_timeout=10.0)
     session = cluster.connect(conf["cassandradb"].get("cluster"))
 
     logger.info("Successfully connected to Cassanda cluster")

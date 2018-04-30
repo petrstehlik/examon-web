@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from muapi import config, app
 from .error import JobsError
 from .Aggregate import Aggregate
@@ -6,6 +8,7 @@ from flask import request
 from pyKairosDB import connect, reader
 import json
 import requests
+import os
 
 
 conn = connect(server=config["kairosdb"].get("server", "localhost"),
@@ -15,6 +18,22 @@ conn = connect(server=config["kairosdb"].get("server", "localhost"),
                )
 
 from .utils import check_times, generate_health_url, generate_base_url, extract_data, merge_dicts, join_data
+
+
+def load_data(job_id, metric, grouper='node'):
+    with open(os.path.join(config['data']['path'], job_id, metric + '_raw.json')) as f:
+        res = json.load(f)
+        labels = list()
+        data = OrderedDict()
+
+        extract_data(res, data, labels, [grouper])
+
+        return ({
+            "points": data,
+            "labels": labels,
+            "metric": metric
+        })
+
 
 @app.route("/kairos/health")
 def health():
@@ -82,10 +101,7 @@ def core_level():
     args["core"] = request.args.getlist("core")
 
     for item in metrics:
-        args["metric"] = [item]
-        res.append(query(args, 2, ['node', 'core'], tags={
-            "node": args["node"]
-            }))
+        res.append(load_data(args['job_id'], item))
 
     return json.dumps(join_data(res))
 
@@ -118,10 +134,7 @@ def cpu_level():
     args["cpu"] = request.args.getlist("cpu")
 
     for item in metrics:
-        args["metric"] = [item]
-        res.append(query(args, 25, ['node', 'cpu'], tags={
-                "node": args["node"]
-            }))
+        res.append(load_data(args['job_id'], item))
 
     return json.dumps(join_data(res))
 
@@ -143,21 +156,12 @@ def load_base():
     args["node"] = request.args.getlist("node")
     metrics = request.args.getlist("metric")
 
-    res_list = list()
+    res = list()
 
-    if len(args["node"]) > 0:
-        for item in metrics:
-            args["metric"] = [item]
-            res_list.append(query(args, 5, ['node'], tags={
-                "node": args["node"]
-            }))
+    for item in metrics:
+        res.append(load_data(args['job_id'], item))
 
-        return json.dumps(join_data(res_list))
-    else:
-        args["metric"] = [args["metric"]]
-        res_list.append(query(args, 5, ['node']))
-
-    return json.dumps(join_data(res_list))
+    return json.dumps(join_data(res))
 
 
 @app.route("/kairos/cluster")
@@ -175,21 +179,12 @@ def cluster_level():
     args = request.args.to_dict()
     args["node"] = request.args.getlist("node")
     metrics = request.args.getlist("metric")
-    res_list = list()
+    res = list()
 
-    if len(args["node"]) > 0:
-        for item in metrics:
-            args["metric"] = [item]
-            res_list.append(query(args, 5, ['cluster'], tags={
-                "node": args["node"]
-            }))
+    for item in metrics:
+        res.append(load_data(args['job_id'], item, grouper='cluster'))
 
-        return json.dumps(join_data(res_list))
-    else:
-        args["metric"] = [args["metric"]]
-        res_list.append(query(args, 5, ['cluster']))
-
-    return json.dumps(join_data(res_list))
+    return json.dumps(join_data(res))
 
 
 def query(args, aggregate_window, group_tags, modifying_func="aggregate", tags=None):

@@ -105,7 +105,7 @@ class Job:
             nodes = data['nnodes_req']
             gpus = data['ngpus_req']
             time = data.get('req_time')
-            memory = data.get('req_mem')
+            memory = data.get('mem_req')
             project = data.get('project_name')
             data['core_list'] = data['used_cores']
             data['node_list'] = data['used_nodes']
