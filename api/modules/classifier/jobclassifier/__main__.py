@@ -43,8 +43,8 @@ metrics = [
         "IO_Utilization",
         "Mem_Utilization",
         "CPU_Utilization",
-        "L1L2_Bound",
-        "L3_Bound",
+        "L1L2_bound",
+        "L3_bound",
         "front_end_bound",
         "back_end_bound",
         "jobber"
@@ -90,6 +90,11 @@ def normalize(job):
     for metric in metrics[:-1]:
         if metric == "ips":
             job[metric]['data'] = map(lambda x: x / 8000000000.0, job[metric]['data'])
+        elif metric == 'back_end_bound':
+            if job[metric]['data'][0] > 110:
+                job[metric]['data'] = map(lambda x: x / 10000000.0, job[metric]['data'])
+            else:
+                job[metric]['data'] = map(lambda x: x / 100.0, job[metric]['data'])
         else:
             # normalize to fraction percentage
             job[metric]['data'] = map(lambda x: x / 100.0, job[metric]['data'])
