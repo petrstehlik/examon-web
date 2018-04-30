@@ -18,7 +18,7 @@ export class AppConfigService {
     public obs;
 
     constructor() {
-        this.config = environment.config;
+        this.config = environment['config'];
         this.obs = this.fetch().subscribe((data: string) => {
             try {
                 this.config = data;

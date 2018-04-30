@@ -57,7 +57,7 @@
                 <div class="card">
                     <div class="card-block text-center">
                         <small class="card-title">Memory</small>
-                        <h5>{{ job?.data?.mem_req | number }} MB</h5>
+                        <h5>{{ job?.data?.memory | number }} MB</h5>
                     </div>
                 </div>
             </div>
@@ -204,7 +204,7 @@
     </div>
 </div>
 
-<div class="row mb-3">
+<!--div class="row mb-3">
     <div class="col" *ngIf="!data?.loading_load_core">
         <div class="card" style="height: 400px">
             <canvas baseChart
@@ -219,10 +219,10 @@
             </canvas>
         </div>
     </div>
-</div>
+</div-->
 
 
-    <section class="classifier row">
+    <section class="classifier row" *ngIf="job_classification">
         <div class="col-2">
             <div class="card">
                 <div class="card-block text-center">
@@ -238,6 +238,10 @@
                 <pre>{{ job_classification | json }}</pre>
             </div>
         </div>
+    </section>
+
+    <section class="perf row">
+        <ex-job-perf [job]="job" class="col"></ex-job-perf>
     </section>
 
 

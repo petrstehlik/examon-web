@@ -49,8 +49,10 @@ export class TimeserieService {
             }
         }
 
-        params = params.set('from', String(job['from']/1000))
-                    .set('to', String(job['to']/1000));
+        params = params
+            .set('from', String(job['from']/1000))
+            .set('to', String(job['to']/1000))
+            .set('job_id', job['data']['job_id']);
 
         if (metric.constructor == Array) {
             for (const item of metric) {
@@ -72,7 +74,7 @@ export class TimeserieService {
 
         for (const key of Object.keys(data['points'])) {
             tmp_data.push([
-                new Date(+key * 1000),
+                new Date(+key),
                 ...data['points'][key].map(x => {return x * factor})
             ]);
         }

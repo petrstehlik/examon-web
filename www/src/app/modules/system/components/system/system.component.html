@@ -58,8 +58,8 @@
     <div class="col-10">
         <div class="card text-center">
             <ex-graph
-                [data]="data?.load"
-                [loading]="data?.loading_load"
+                [data]="data['load']"
+                [loading]="data['loading_load']"
                 topTitle="Cluster Load" labelY="Load (%)"></ex-graph>
         </div>
     </div>
@@ -69,10 +69,10 @@
             <div class="card-block text-center">
                 <small class="card-title">Average Load</small>
                 <h4>
-                    <span *ngIf="!data?.loading_load_total">
-                        {{ data?.load_total?.data[0][1] | number:'1.0-2' }}
+                    <span *ngIf="!data['loading_load_total']">
+                        {{ data['load_total']?.data[0][1] | number:'1.0-2' }}
                     </span>
-                    <span *ngIf="data?.loading_load_total">--</span>
+                    <span *ngIf="data['loading_load_total']">--</span>
                     %
                 </h4>
             </div>
@@ -82,10 +82,10 @@
             <div class="card-block text-center">
                 <small class="card-title">Current Load</small>
                 <h4>
-                    <span *ngIf="!data?.loading_load">
-                        {{ data?.load?.data[data['load']['data'].length - 1][1] | number:'1.0-2' }}
+                    <span *ngIf="!data['loading_load']">
+                        {{ data['load']?.data[data['load']['data'].length - 1][1] | number:'1.0-2' }}
                     </span>
-                    <span *ngIf="data?.loading_load">--</span>
+                    <span *ngIf="data['loading_load']">--</span>
                     %
                 </h4>
             </div>
@@ -98,8 +98,8 @@
     <div class="col-10">
         <div class="card text-center">
             <ex-graph
-                [data]="data?.temp"
-                [loading]="data?.loading_temp"
+                [data]="data['temp']"
+                [loading]="data['loading_temp']"
                 [range]="null"
                 topTitle="Cluster Temperature"
                 labelY="Temperature (°C)">
@@ -112,8 +112,8 @@
             <div class="card-block text-center">
                 <small class="card-title">Average Temperature</small>
                 <h4>
-                    <span *ngIf="!data?.loading_temp_total">
-                        {{ data?.temp_total?.data[0][1] | number:'1.0-2' }}
+                    <span *ngIf="!data['loading_temp_total']">
+                        {{ data['temp_total']?.data[0][1] | number:'1.0-2' }}
                     </span>
                     <span *ngIf="data?.loading_temp_total">--</span>
                     °C
@@ -246,7 +246,7 @@
                     <span *ngIf="!data?.loading_fan_total">
                         {{ data?.fan_total?.data[0][1] | number:'1.0-2' }}
                     </span>
-                    <span *ngIf="data?.loading_fan_total">--</span>
+                    <span *ngIf="data['loading_fan_total']">--</span>
                     W
                 </h4>
             </div>
@@ -256,7 +256,7 @@
             <div class="card-block text-center">
                 <small class="card-title">Current power consumption</small>
                 <h4>
-                    <span *ngIf="!data?.loading_fan">
+                    <span *ngIf="!data['loading_fan']">
                         {{ data?.fan?.data[data['fan']['data'].length - 1][1] | number:'1.0-2' }}
                     </span>
                     <span *ngIf="data?.loading_fan">--</span>

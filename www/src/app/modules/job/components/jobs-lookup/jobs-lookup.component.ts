@@ -39,7 +39,8 @@ interface Job {
 export class JobsLookupComponent implements OnInit {
 
     public jobid = '';
-    public lastjob: Job;
+    public jobs = [];
+    public classified_jobs = []
     public active_jobs = {};
     public active_jobs_id = [];
 
@@ -50,9 +51,10 @@ export class JobsLookupComponent implements OnInit {
         private msg: MessageService) { }
 
     ngOnInit() {
-        this.http.get<Job>('/jobs/latest?duration=' + this.duration).subscribe(
+        this.http.get<any>('/jobs/latest?duration=' + this.duration).subscribe(
             data => {
-                this.lastjob = data;
+                this.jobs = JSON.parse(data['data']).slice(499, 600);
+                this.classified_jobs = data['classified']
             },
             error => {
                 this.msg.send('Cannot fetch latest job', 'danger');
@@ -67,9 +69,9 @@ export class JobsLookupComponent implements OnInit {
 
     public query(f) {
         this.duration = f.duration;
-        this.http.get<Job>('/jobs/latest?duration=' + String(this.duration * 1000)).subscribe(
+        this.http.get<any>('/jobs/latest?duration=' + String(this.duration * 1000)).subscribe(
             data => {
-                this.lastjob = data;
+                this.jobs = data;
             },
             error => {
                 this.msg.send('Cannot fetch latest job', 'danger');

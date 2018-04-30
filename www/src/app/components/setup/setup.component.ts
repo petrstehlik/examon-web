@@ -10,10 +10,11 @@ import { AuthService } from 'app/services';
 })
 export class SetupComponent implements OnInit {
 
-    admin: Object = {
+    admin = {
         username : '',
         password : '',
-        password2 : ''
+        password2 : '',
+
     };
 
     error = '';

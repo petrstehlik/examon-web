@@ -20,7 +20,7 @@
     </div>
 
     <div class="row">
-        <h2 class="text-center mx-auto my-3">Latest jobs</h2>
+        <h2 class="text-center mx-auto my-3">Jobs available <small>({{ jobs?.length }})</small></h2>
 
         <form #f="ngForm" (ngSubmit)="query(f.value)" class="col-offset-3 col-6">
             <div class="input-group">
@@ -28,27 +28,27 @@
                     <span class="input-group-text" id="basic-addon3">Minimum Job Duration (s)</span>
                 </div>
                 <input type="number" name="duration" id="duration" ngModel class="form-control" aria-describedby="basic-addon3">
-                {{ duration.value }}
+                {{ duration }}
                 <input type="submit" title="Query" class="btn btn-secondary">
             </div>
         </form>
 
-        <table *ngIf="lastjob" class="table table-hover">
+        <table *ngIf="jobs" class="table table-hover">
             <tr>
                 <th scope="col">ID</th>
                 <th scope="col">Name</th>
-                <th scope="col">Account</th>
                 <th scope="col">Duration (s)</th>
                 <th scope="col">Start time</th>
                 <th scope="col">End time</th>
+                <th scope="col">Classified</th>
             </tr>
-            <tr *ngFor="let job of lastjob" [routerLink]="[job?.job_id]" style="cursor: pointer">
-                <td>{{  job?.job_id }}</td>
-                <td>{{ job.job_name}}</td>
-                <td>{{ job.account_name}}</td>
-                <td>{{ (job.end_time - job.start_time)/1000 | number }}</td>
-                <td>{{ job.start_time | date:'HH:mm:ss dd/MM/yy' }}</td>
-                <td>{{ job.end_time | date:'HH:mm:ss dd/MM/yy' }}</td>
+            <tr *ngFor="let job of jobs" [routerLink]="[job?.job_id]" style="cursor: pointer">
+                <td>{{ job?.job_id }}</td>
+                <td>{{ job.metrics}}</td>
+                <td>{{ (job.to - job.from) | number }}</td>
+                <td>{{ job.from * 1000 | date:'HH:mm:ss dd/MM/yy' }}</td>
+                <td>{{ job.to * 1000 | date:'HH:mm:ss dd/MM/yy' }}</td>
+                <td>{{ classified_jobs.includes(job.job_id) }}</td>
             </tr>
         </table>
     </div>

@@ -13,15 +13,15 @@ export class UsersEditComponent implements OnInit {
     userId: String;
     error: String;
     passwordValidation = '';
-    user: Object = {
+    user = <any>{
         first_name : '',
         last_name : '',
         username : '',
         email : '',
         password : '',
         role : -1
-    }
-    user_original: Object;
+    };
+    user_original;
 
     roles = [
         {value: 0, viewValue: 'Administrator'},
@@ -38,7 +38,7 @@ export class UsersEditComponent implements OnInit {
             this.userId = params['id'];
 
             this.usersService.get(this.userId).subscribe(
-                (data: Object) => {
+                (data) => {
                     console.log(data);
                     this.user = data;
                     this.user_original = JSON.parse(JSON.stringify(data));

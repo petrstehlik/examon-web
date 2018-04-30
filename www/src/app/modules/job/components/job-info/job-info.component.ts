@@ -8,8 +8,6 @@ import { Job } from 'app/interfaces';
 
 import { TimeserieService } from 'app/services/timeserie.service';
 
-declare const io;
-
 @Component({
     selector: 'ex-job-info',
     templateUrl: './job-info.component.html',
@@ -90,41 +88,19 @@ export class JobInfoComponent implements OnInit, OnDestroy {
         if (this.job['data']['active']) {
             // this.startSocket();
             this.fetchInt = setInterval(() => {
-                this.startFetchRaw('load_core', 'node', 'power', this.aggWindow());
+                this.startFetchRaw('load_core', 'node', 'load_core', this.aggWindow());
             }, env.interval);
         }
-        this.fetchRaw('load_core', 'node', 'power', this.aggWindow());
-    }
-
-    /**
-     * We are ready for live stream of data, prepare websocket and add handlers
-     */
-    private startSocket() {
-        this.socket = io(env.ws.host + ':' + env.ws.port + '/jobs');
-
-        // Subscribe to a room with jobid
-        this.socket.on('connect', () => {
-            this.socket.emit('subscribe', {jobid : this.job['data']['job_id']});
-        });
-
-        // Handle new data
-        this.socket.on('data', (data) => {
-            this.job['data'] = Object.assign(this.job['data'], JSON.parse(data));
-
-            // Job finished executing, we don't need any new data and we can stop refreshing the chart
-            if ('exc_end' in this.job['data'] && this.job['data']['exc_end']) {
-                this.socket.emit('unsubscribe', {jobid : this.job['data']['job_id']});
-                clearInterval(this.fetchInt);
-            }
-        });
+        //this.fetchRaw('load_core', 'node', 'load_core', this.aggWindow());
     }
 
     private fetchClassification() {
         console.log('fetching classification');
-        this.http.get('/classifier/' + this.job.id).subscribe(
+        /*this.http.get('/classifier/' + this.job.id).subscribe(
             (res) => {
                 this.job_classification = res
             });
+            */
     }
 
     /**

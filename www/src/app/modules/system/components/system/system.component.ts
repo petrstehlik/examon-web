@@ -24,7 +24,7 @@ interface Total {
 export class SystemComponent implements OnInit {
 
     private time: Object;
-    public data = {
+    public data = <any>{
         total : <Total>{},
         active_jobs : 0,
 
@@ -50,7 +50,10 @@ export class SystemComponent implements OnInit {
         loading_gpu_total : true,
 
         fan_total : {},
-        loading_fan_total : true
+        loading_fan_total : true,
+
+        fan: {},
+        loading_fan : true
     };
 
     public chart_data = {

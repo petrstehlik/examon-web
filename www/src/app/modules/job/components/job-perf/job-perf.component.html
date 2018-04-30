@@ -1,95 +1,59 @@
-<div class="row mb-3">
-    <div class="col">
+<div class="row mb-3" *ngFor="let metric of metrics_ranged">
+    <div class="col-11">
         <div class="card text-center">
             <ex-graph
-                [data]="data['job_load_core']"
-                [loading]="data['loading_load_core']"
-                topTitle="Core Load"
-                labelY="Load (%)">
+                [data]="data['job_' + metric]"
+                [loading]="data['loading_' + metric]"
+                topTitle="{{ metric }}"
+                labelY=""
+                >
             </ex-graph>
+        </div>
+    </div>
+    <div class="col-1">
+        <div class="card text-center h-100">
+            <label>Suspicious?</label>
+            <input type="checkbox" name=metric [ngModel]="classifier[metric]" (ngModelChange)="checkChange($event, metric)" style="width: 100%; height: 100%;">
         </div>
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col">
+<div class="row mb-3" *ngFor="let metric of metrics_null">
+    <div class="col-11">
         <div class="card text-center">
             <ex-graph
-                [data]="data['job_utils']"
-                [loading]="data['loading_utils']"
-                topTitle="Utilization"
-                labelY="Utilization (%)">
-            </ex-graph>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card text-center">
-           <ex-graph
-                [data]="data['job_ips']"
-                [loading]="data['loading_ips']"
-                topTitle="MIPS"
+                [data]="data['job_' + metric]"
+                [loading]="data['loading_' + metric]"
+                topTitle="{{ metric }}"
+                labelY=""
                 range="null"
-                labelY="MIPS">
+                >
             </ex-graph>
+        </div>
+    </div>
+    <div class="col-1">
+        <div class="card text-center h-100">
+            <label>Suspicious?</label>
+            <input type="checkbox" name=metric [ngModel]="classifier[metric]" (ngModelChange)="checkChange($event, metric)" style="width: 100%; height: 100%;">
         </div>
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card text-center">
-           <ex-graph
-                [data]="data['job_fe_bound']"
-                [loading]="data['loading_fe_bound']"
-                topTitle="Front-end Bounds"
-                range="null"
-                labelY="Bounds (%)">
-            </ex-graph>
-        </div>
-    </div>
-</div>
+<div class="row">
+    <pre class="col">
+        {{ classifier | json }}
+    </pre>
 
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card text-center">
-           <ex-graph
-                [data]="data['job_be_bound']"
-                [loading]="data['loading_be_bound']"
-                topTitle="Back-end Bounds"
-                range="null"
-                labelY="Bounds (%)">
-            </ex-graph>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-3">
     <div class="col">
-        <div class="card text-center">
-            <ex-graph
-                [data]="data['job_febe_bound']"
-                [loading]="data['loading_febe_bound']"
-                height="150"
-                stacked="true"
-                topTitle="Front/Back-end Bound"
-                labelY="Utilization (%)">
-            </ex-graph>
+         <div class="card text-center h-50">
+            <label>Whole job suspicious?</label>
+            <input type="checkbox" name=metric [ngModel]="classifier['jobber']" (ngModelChange)="checkChange($event, 'jobber')" style="width: 25%; height: 25%;">
+        </div>
+        <button type="submit" (click)="saveClassifier()" class="btn btn-primary btn-large">SAVE</button>
+
+        <div>
+            {{ resp | json }}
         </div>
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card text-center">
-           <ex-graph
-                [data]="data['job_cstates']"
-                [loading]="data['loading_cstates']"
-                topTitle="C3 & C6 States"
-                labelY="Share">
-            </ex-graph>
-        </div>
-    </div>
-</div>

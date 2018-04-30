@@ -19,9 +19,11 @@ import { ApiInterceptor } from './utils/http.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SafePipe, SafePipeModule } from './utils/safe.pipe';
 
-import { AppConfigService } from 'app/services/app-config.service';
+import { AppConfigService } from './services/app-config.service';
 
 import { modules } from './modules';
+import { JobsLookupComponent, JobDashboardComponent } from './modules/job/components'
+import { JobModule } from './modules/job/job.module';
 
 /**
   * Basic routes of the application
@@ -42,8 +44,19 @@ const appRoutes: Routes = [
     },
     {
         path: '',
-        component: HomeComponent,
-        canActivate : [AuthGuard]
+        children: [
+            {
+                path: '',
+                component: JobsLookupComponent,
+                data: {
+                    role: 255
+                }
+            },
+            {
+                path: ':jobid',
+                component: JobDashboardComponent,
+            }
+        ]
     },
     {
         path: '**',

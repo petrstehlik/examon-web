@@ -19,10 +19,10 @@ import { environment } from 'environments/environment';
 export class ApiInterceptor implements HttpInterceptor {
     private currentUser: Object;
     private prefixUrl: string;
-    private api: Object = {};
+    private api = {};
 
     constructor(private router : Router) {
-        this.api = environment.config.api;
+        this.api = environment['config']['api'];
     }
 
     /**
