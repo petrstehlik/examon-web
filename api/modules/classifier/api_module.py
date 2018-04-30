@@ -1,8 +1,12 @@
 import json
 import os
+from sqlite3 import IntegrityError
+
 import requests
+from flask import request
 
 from muapi import app
+from muapi import dbConnector
 from jobclassifier.analyzer import metrics, stretch
 from jobclassifier.network import Network
 
@@ -20,6 +24,28 @@ try:
     prepared = prepare_statements(session)
 except Exception as e:
     log.error("Failed to connect to Cassandra: %s" % str(e))
+
+
+job_db = dbConnector()
+
+job_db.db.execute(
+    "CREATE TABLE IF NOT EXISTS classifier ("
+    "job_id VARCHAR PRIMARY KEY,"
+    "jobber INTEGER,"
+    "load_core INTEGER,"
+    "Sys_Utilization INTEGER,"
+    "IO_Utilization INTEGER,"
+    "Mem_Utilization INTEGER,"
+    "CPU_Utilization INTEGER,"
+    "L1L2_Bound INTEGER,"
+    "L3_Bound INTEGER,"
+    "ips INTEGER,"
+    "front_end_bound INTEGER,"
+    "back_end_bound INTEGER,"
+    "C3res INTEGER,"
+    "C6res INTEGER"
+    ")"
+)
 
 
 def get_job(jobid):
@@ -103,7 +129,7 @@ def normalize(job):
 networks = initialize_networks()
 
 
-@app.route('/classifier/<string:job_id>')
+@app.route('/classifier/<string:job_id>', methods=['GET'])
 def classify(job_id):
     """Classify a job by its job ID"""
     global networks
@@ -159,3 +185,43 @@ def classify(job_id):
             data.append(stats_res[m][a])
         stats_res['jobber'][a] = networks['jobber'].predict(data)[0]
     return json.dumps(stats_res)
+
+
+@app.route('/classifier/<string:job_id>', methods=['POST'])
+def store_classification(job_id):
+    """Store classification of all metrics into DB.
+
+    The format expected is as follows:
+    {
+        "metric_name": <value>,
+    }
+    """
+
+    cols = []
+    vals = []
+    classification = request.json
+    classification['job_id'] = job_id
+
+    for m in classification:
+        cols.append(m)
+        if m == 'job_id':
+            # job id must be inserted with quotes
+            classification[m] = '"{}"'.format(classification[m])
+        vals.append(str(classification[m]))
+
+    print(cols, vals)
+
+    st = "INSERT INTO classifier ({}) VALUES ({})".format(','.join(cols), ','.join(vals))
+
+    cur = job_db.connection.cursor()
+
+    try:
+        res = cur.execute(st)
+    except IntegrityError as e:
+        cur.close()
+        return json.dumps({'status': 'error', 'msg': str(e)}), 501
+
+    job_db.connection.commit()
+    cur.close()
+
+    return json.dumps({'status': 'OK'})
