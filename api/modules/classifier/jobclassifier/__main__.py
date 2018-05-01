@@ -89,15 +89,15 @@ def normalize(job):
     global metrics
     for metric in metrics[:-1]:
         if metric == "ips":
-            job[metric]['data'] = map(lambda x: x / 8000000000.0, job[metric]['data'])
+            job[metric]['data'] = map(lambda x: round(x / 8000000000.0, 5), job[metric]['data'])
         elif metric == 'back_end_bound':
             if job[metric]['data'][0] > 110:
-                job[metric]['data'] = map(lambda x: x / 10000000.0, job[metric]['data'])
+                job[metric]['data'] = map(lambda x: round(x / 10000000.0, 5), job[metric]['data'])
             else:
-                job[metric]['data'] = map(lambda x: x / 100.0, job[metric]['data'])
+                job[metric]['data'] = map(lambda x: round(x / 100.0, 5), job[metric]['data'])
         else:
             # normalize to fraction percentage
-            job[metric]['data'] = map(lambda x: x / 100.0, job[metric]['data'])
+            job[metric]['data'] = map(lambda x: round(x / 100.0, 5), job[metric]['data'])
     return job
 
 
@@ -113,8 +113,9 @@ def runner(x):
         networks[x].train(metric_data[metrics[x]][:250], 0.5, epochs=args.epochs, epsilon=0.1)
     except Exception as e:
         log.error("Exception: {}, dumping config for {}".format(str(e), metrics[x]))
-    with open(os.path.join(args.config_dir, metrics[x] + '_network.json'), 'w+') as fp:
-        json.dump(networks[x].export(), fp)
+    finally:
+        with open(os.path.join(args.config_dir, metrics[x] + '_network.json'), 'w+') as fp:
+            json.dump(networks[x].export(), fp)
 
 
 def arg_parser():

@@ -21,6 +21,7 @@ class Neuron:
 
         # Add bias as the last weight
         self._weights = [random() for _ in range(inputs+1)]
+        self._velocity = [0 * inputs]
 
         self.log.debug("CREATE: Weights {0}".format(self._weights))
 
@@ -59,7 +60,8 @@ class Neuron:
 
     def update_weights(self, lrate, inputs):
         for j in range(len(inputs)):
-            self._weights[j] += lrate * self._delta * inputs[j]
+            self._velocity[j] = 0.9 * self._velocity[j] + lrate * self._delta * inputs[j]
+            self._weights[j] += self._velocity[j]
 
         self._weights[-1] += lrate * self._delta
 
