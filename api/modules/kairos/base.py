@@ -11,11 +11,12 @@ import requests
 import os
 
 
-conn = connect(server=config["kairosdb"].get("server", "localhost"),
+conn = None
+"""connect(server=config["kairosdb"].get("server", "localhost"),
                port=config["kairosdb"].get("port", 8000),
                user=config["kairosdb"].get("user", ""),
                passw=config["kairosdb"].get("password", "")
-               )
+               )"""
 
 from .utils import check_times, generate_health_url, generate_base_url, extract_data, merge_dicts, join_data
 

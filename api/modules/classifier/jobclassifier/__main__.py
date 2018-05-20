@@ -204,9 +204,20 @@ if __name__ == "__main__":
             with open(os.path.join(args.config_eval, metric + '_network.json'),) as fp:
                 network = Network.load(json.load(fp))
 
-            print("-- {}".format(metric))
-            for item in metric_data[metric][-5:]:
-                print("Expected: {0}, Got: {1:.2f}".format(item[-1], (network.predict(item[:-1])[0])))
+            #print("-- {}".format(metric))
+            good = 0
+            bad = 0
+            for item in metric_data[metric][350:]:
+                result = network.predict(item[:-1])[0]
+                expected = item[-1][0]
+
+                if abs(result - expected) > 0.25:
+                    # print("Expected: {0}, Got: {1:.2f}".format(expected, result))
+                    bad += 1
+                else:
+                    good += 1
+
+            print("{:>20}:\tgood {:<4}\tbad {:<3}\tratio: {:.2f}".format(metric, good, bad, bad/1.500))
 
         print("Complex Job Evaluating")
         networks = [None] * (len(metrics))
@@ -214,12 +225,25 @@ if __name__ == "__main__":
             with open(os.path.join(args.config_eval, metric + '_network.json'),) as fp:
                 networks[x] = Network.load(json.load(fp))
 
-        for i in range(5):
+        good = 0
+        bad = 0
+        for i in range(350, 500):
             job = []
-            j = len(metric_data[metrics[x]]) - 5 + i
-            for x, network in enumerate(networks[:-1]):
-                job.append(network.predict(metric_data[metrics[x]][j][:-1])[0])
 
-            res = networks[-1].predict(job)
-            print("Expected: {1}, Got: {0:.2f}".format(res[0], metric_data['jobber'][j][-1][0]))
+            #j = len(metric_data[metrics[x]]) - 5 + i
+            for x, network in enumerate(networks[:-1]):
+                job.append(network.predict(metric_data[metrics[x]][i][:-1])[0])
+
+            res = networks[-1].predict(job)[0]
+            expected = metric_data['jobber'][i][-1][0]
+
+            if abs(res - expected) > 0.25:
+                bad += 1
+                print("Expected: {1}, Got: {0:.2f}".format(res, expected))
+            else:
+                good += 1
+
+        print("good {:<4}\tbad {:<3}\tratio: {:.2f}".format( good, bad, bad/1.500))
+
+
 
