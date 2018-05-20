@@ -17,6 +17,11 @@ To get a better picture on how it works and what is does a popularistic article 
 * and more...
 
 
+## Version
+
+This version is based on Galileo version but tailored for job dataset classification with offline files.
+
+
 ## Galileo
 
 Absolute start of data: 1509580800[000] 11/02/2017 @ 12:00am (UTC)
