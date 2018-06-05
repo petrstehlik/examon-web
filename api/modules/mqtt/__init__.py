@@ -49,8 +49,8 @@ def emit_data(node, metric, data):
 
 
 # Initialize Holder with config topics
-holder = Holder(config['mqtt']['server'])
-holder.on_store = emit_data
+holder = None #Holder(config['mqtt']['server'])
+#holder.on_store = emit_data
 
 
 @mqtt.route('/metric/<string:metric>')

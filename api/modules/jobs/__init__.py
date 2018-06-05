@@ -74,7 +74,18 @@ def get_job_data_json(jobid):
     if len(measures.current_rows) > 0:
         job.add_measures(measures[0])
 
-    return job.json()
+    cur = job_db.connection.cursor()
+
+    classifier = cur.execute('SELECT * FROM classifier WHERE job_id = ?', (str(jobid),))
+
+    job_j = job.dict()
+
+    try:
+        job_j['classifier'] = dict(classifier.fetchone())
+    except:
+        pass
+
+    return json.dumps(job_j, default=Job.time_serializer)
 
 
 @app.route('/latest', methods=['GET'])

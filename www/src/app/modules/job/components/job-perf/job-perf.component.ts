@@ -58,6 +58,11 @@ export class JobPerfComponent implements OnInit {
             for (let metric of [...this.metrics_ranged, ...this.metrics_null]) {
                 this.fetch(metric, 'cluster', metric);
             }
+
+            console.log(this.job.data['classifier'])
+            if ('classifier' in this.job.data) {
+                this.classifier = this.job.data['classifier'];
+            }
         //     this.fetch('load_core', 'node', 'load_core');
         //     this.fetch('load_core_cluster', 'node', 'load_core', env.window.pmu);
         //     this.fetch('utils', 'node', ['Mem_Utilization', 'CPU_Utilization', 'IO_Utilization', 'Sys_Utilization'], env.window.ipmi + 5);
