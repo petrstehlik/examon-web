@@ -1,0 +1,30 @@
+CREATE KEYSPACE cineca WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+
+CREATE TABLE cineca.galileo_jobs_complexkey (
+    user_id text,
+    start_time timestamp,
+    job_id text,
+    account_name text,
+    backup_qtime timestamp,
+    ctime timestamp,
+    end_time timestamp,
+    job_name text,
+    mean_power decimal,
+    mem_req bigint,
+    mpiprocs int,
+    ncpus_req int,
+    ngpus_req int,
+    nmics_req int,
+    nnodes_req int,
+    node_list text,
+    project text,
+    qlist text,
+    qtime timestamp,
+    queue text,
+    req_time int,
+    used_cores text,
+    used_nodes text,
+    var_list text,
+    vnode_list text,
+    PRIMARY KEY (user_id, start_time, job_id)
+) WITH CLUSTERING ORDER BY (start_time ASC, job_id ASC);
